@@ -1,0 +1,10 @@
+line-length = 100
+target-version = "py313"
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[lint.isort]
+# backend/alembic/ (migrations) would otherwise make "alembic" look first-party.
+known-first-party = ["app", "tests"]
+known-third-party = ["alembic"]

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "legal-intake-backend"
+version = "0.1.0"
+description = "Legal Intake & Case Handoff Agent - backend"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "sqlalchemy>=2.0.36,<2.1",
+    "alembic>=1.14,<2",
+    "psycopg[binary]>=3.2,<4",
+    "pydantic>=2.9,<3",
+    "pydantic-settings>=2.6,<3",
+    "tzdata>=2024.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<9",
+    "ruff>=0.8,<1",
+    "mypy>=1.13,<2",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires the PostgreSQL test database"]
+
+# Ruff is configured in the repository-root ruff.toml (covers backend/ and scripts/).
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+plugins = ["pydantic.mypy"]

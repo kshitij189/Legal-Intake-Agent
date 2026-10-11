@@ -1,0 +1,291 @@
+# Implementation Progress
+
+Status values: `NOT_STARTED` · `IN_PROGRESS` · `BLOCKED` · `COMPLETED`.
+A phase is `COMPLETED` only when every acceptance criterion has recorded evidence.
+
+**Repository state at documentation setup (2026-10-11):** empty directory, no source code, no git
+repository. No prior implementation work existed, so every phase started `NOT_STARTED`.
+
+**Last updated:** 2026-10-11 — Phase 1 completed.
+
+**Next phase to implement:** Phase 2 — Text-based intake agent (awaiting authorization).
+
+## Summary
+
+| # | Phase | Status | Depends on |
+|---|---|---|---|
+| 1 | Domain and database foundation | COMPLETED (2026-10-11) | — |
+| 2 | Text-based intake agent | NOT_STARTED | 1 |
+| 3 | Conversational state and safety | NOT_STARTED | 2 |
+| 4 | Voice loop | NOT_STARTED | 3 |
+| 5 | Durable workflows | NOT_STARTED | 1, 2 (3 recommended) |
+| 6 | Evaluation harness | NOT_STARTED | 3 (audio mode: 4; recovery/fault cases: 5) |
+| 7 | Human-review dashboard | NOT_STARTED | 1, 5 |
+| 8 | Hardening and demonstration | NOT_STARTED | 1–7 |
+
+---
+
+## Phase 1 — Domain and database foundation
+
+**Status:** COMPLETED (2026-10-11)
+
+**Objective:** Implement the fictional firm, intake questionnaire, staff, availability, appointment,
+escalation and audit data models with deterministic business rules and seed data — before any LLM.
+
+**Dependencies:** none.
+
+**Tasks / deliverables**
+- [x] Docker Compose PostgreSQL 17 service (host port 5433) with `legal_intake` and
+      `legal_intake_test` databases (`docker-compose.yml`, `infra/postgres/init/`).
+- [x] `backend/` Python package (`pyproject.toml`, `app/config.py`, `app/db/session.py`),
+      `.env.example`, `.gitignore`, root `ruff.toml`.
+- [x] SQLAlchemy models (`app/models/`) + Alembic initial migration `cad5c81e1178`: `firms`,
+      `staff_members`, `availability_slots`, `intake_records`, `appointments`, `escalations`,
+      `audit_events`; composite `(firm_id, id)` FKs, partial unique indexes (one `BOOKED`
+      appointment per slot and per intake; one unresolved escalation per intake+rule), idempotency
+      unique keys, CHECK-constrained enums, `intake_reference_seq` (INT-1001…).
+- [x] Pydantic firm configuration schema (`app/schemas/firm_config.py`) with cross-reference
+      validation; field provenance model (`app/schemas/intake.py`).
+- [x] Pure policy engine (`app/domain/policy_engine.py`): answer normalization/validation,
+      provenance rules, escalation rule evaluation, completeness.
+- [x] Domain services: `firm_config_service`, `intake_service`, `appointment_service`,
+      `escalation_service`, plus `actors` (authorization), `audit`, `transitions`, `errors`.
+- [x] `scripts/seed_demo_data.py` (logic in `app/db/seed.py`) — idempotent: Northstar Legal,
+      3 lawyers, 1 intake coordinator, 1 administrator, 120 slots over the next 10 business days.
+- [x] `scripts/phase1_demo.py` — manual exit-criterion walkthrough against the real database.
+
+**Acceptance criteria → evidence**
+- [x] Draft intake created and fields saved with provenance statuses —
+      `test_intake_service.py`, `test_phase1_exit_criterion.py`, demo output (INT-1001, deadline
+      stored as `REPORTED_BY_CALLER`, phone `DECLINED_BY_CALLER` with null value).
+- [x] Booking; same-key replay returns the same appointment; booked slot rejected; concurrent
+      bookings yield exactly one appointment — `test_appointment_service.py` (incl. two threaded
+      race tests); demo printed `booking replayed on retry: True | same appointment: True`; SQL
+      check showed 1 appointment, slot `BOOKED`. Mutation check: removing the intake row lock makes
+      the same-key race test fail, so the test detects real races.
+- [x] Escalation only when the configured rule matches persisted state (`RuleNotMatched`
+      otherwise); coordinator can accept/resolve; agent, system, administrator, inactive staff and
+      other-firm staff cannot — `test_escalation_service.py`; demo shows `ACCEPTED`, `URGENT`.
+- [x] Tenant isolation (cross-firm reads, writes, bookings, escalations all rejected) — tenant tests
+      in all three service test modules; DB-level composite FKs.
+- [x] Audit events for each successful state change (IDs/statuses only, no contact values) —
+      verified in tests and demo output (`audit_actions` timeline).
+- [x] Migrations downgrade/upgrade cleanly with no model drift — `test_migrations_and_seed.py`
+      and `alembic check` → "No new upgrade operations detected."
+
+**Validation results (2026-10-11)**
+- `pytest` (from `backend/`): **111 passed** (73 unit, 38 integration against PostgreSQL 17).
+- `ruff check backend scripts`: all checks passed. `ruff format --check`: 45 files already formatted.
+- `mypy backend/app` (strict): no issues in 28 source files.
+- `alembic upgrade head` on `legal_intake`: OK. Seed run twice: 120 slots, then 0 (idempotent).
+
+**Known limitations (accepted for Phase 1)**
+- No REST API yet (see Outstanding decision 1). Domain services are called in-process.
+- Rejected/failed attempts are not audited yet; that belongs to the Phase 2 tool-executor boundary.
+- No appointment cancellation or rescheduling (not required by the MVP so far).
+- Seed slots are relative to the current date; re-run the seed to extend the calendar.
+- An idempotency key reused at the same moment for two *different* intakes is caught only by the
+  database unique constraint (raises `IntegrityError` instead of `IdempotencyConflict`).
+
+**Blockers:** none.
+
+---
+
+## Phase 2 — Text-based intake agent
+
+**Status:** NOT_STARTED
+
+**Objective:** Connect Claude to the backend through typed tool definitions; run a scripted text
+conversation that captures facts through real application services.
+
+**Dependencies:** Phase 1.
+
+**Tasks / deliverables**
+- [ ] Anthropic SDK client adapter with configurable model ID, timeouts and bounded retries.
+- [ ] The nine blueprint tools with strict Pydantic schemas and structured results; tool registry.
+- [ ] Tool executor: validation, session-derived `firm_id`/intake/actor, domain-service calls,
+      unit of work, failure auditing, mapping `DomainError` codes to structured tool results, and
+      re-reading committed state (`get_appointment`, `get_escalation`) before reporting success.
+- [ ] `call_sessions` table + migration (session lifecycle for text and later voice).
+- [ ] System prompt: role disclosure, no legal advice, only speak verified tool outcomes.
+- [ ] Text conversation loop (CLI) for scripted conversations.
+
+**Acceptance criteria**
+- The agent captures the labelled fields correctly for scripted conversations.
+- The agent cannot bypass business validation (invalid fields, unavailable slots, non-matching
+  escalation rules, setting `VERIFIED_BY_SYSTEM`, cross-firm IDs are all rejected by code).
+- No tool allows arbitrary SQL, shell or URL access.
+
+**Required tests / evidence:** tool unit tests with a fake model client; integration tests of the
+tool executor against PostgreSQL; at least a small set of live Claude scripted runs (requires
+`ANTHROPIC_API_KEY` — otherwise `BLOCKED` for the live part).
+
+**Blockers / decisions:** Anthropic API key; model choice. **Next step:** after Phase 1.
+
+---
+
+## Phase 3 — Conversational state and safety
+
+**Status:** NOT_STARTED
+
+**Objective:** Missing-field tracking, reported-versus-verified values, interruption behavior,
+escalation rules and safe handling of uncertain answers.
+
+**Dependencies:** Phase 2.
+
+**Tasks / deliverables**
+- [ ] Structured conversation state (intake state + next action) derived from persisted data.
+- [ ] Clarification flow for ambiguous answers (e.g., relative/ambiguous dates) → `PENDING_HUMAN_REVIEW`.
+- [ ] Refusal handling → `DECLINED_BY_CALLER`; missing-info list in finalize.
+- [ ] Legal-advice boundary handling with administrative handoff offer.
+- [ ] Unsupported matter category → clarify or route for review.
+- [ ] Interruption/correction handling without corrupting stored state.
+- [ ] `finalize_intake_summary` validated against the intake record.
+
+**Acceptance criteria:** the agent manages incomplete, ambiguous and refused answers without
+fabricating data; every configured critical escalation in the scripted set is triggered.
+
+**Required tests / evidence:** transcript-mode scenario tests for the blueprint §13 cases that do not
+need audio or workflows; DB assertions on resulting state.
+
+**Blockers / decisions:** none known. **Next step:** after Phase 2.
+
+---
+
+## Phase 4 — Voice loop
+
+**Status:** NOT_STARTED
+
+**Objective:** LiveKit Agents + local STT (faster-whisper), Silero VAD, local TTS (Piper; evaluate
+Kokoro), browser microphone interface.
+
+**Dependencies:** Phase 3.
+
+**Tasks / deliverables**
+- [ ] Self-hosted LiveKit server in Docker Compose; agent worker.
+- [ ] STT/TTS/VAD adapters; voice session manager; interruption handling.
+- [ ] `transcript_turns` table + migration; consent/disclosure metadata on call sessions.
+- [ ] Minimal browser page to join a room with the microphone.
+- [ ] Disconnect handling → intake `INCOMPLETE`, partial state preserved.
+- [ ] Latency instrumentation (structured logs / OpenTelemetry).
+
+**Acceptance criteria:** you can speak to the agent, hear responses, inspect the transcript and see
+the corresponding intake state change.
+
+**Required tests / evidence:** adapter unit tests; a recorded manual voice session with transcript
+and DB state; measured latency numbers. Hardware/model download constraints documented.
+
+**Blockers / decisions:** TTS voice licence; CPU/GPU capacity for faster-whisper model size;
+language support (English first). **Next step:** after Phase 3.
+
+---
+
+## Phase 5 — Durable workflows
+
+**Status:** NOT_STARTED
+
+**Objective:** Temporal for finalization, booking, escalation and recovery.
+
+**Dependencies:** Phases 1–2 (Phase 3 recommended).
+
+**Tasks / deliverables**
+- [ ] Self-hosted Temporal in Docker Compose; Temporal worker process.
+- [ ] Workflows/activities for intake finalization, booking (timeout → state check before retry),
+      escalation/handoff (`FAILED` + configured fallback when the queue is unavailable).
+- [ ] `workflow_executions` table + migration; bounded retry policies.
+
+**Acceptance criteria:** a worker restart does not corrupt intake records or create duplicate side
+effects.
+
+**Required tests / evidence:** Temporal test-environment workflow tests; a kill-and-restart worker
+test with DB assertions (no duplicates, correct final state).
+
+**Blockers / decisions:** none known. **Next step:** after Phase 3/4.
+
+---
+
+## Phase 6 — Evaluation harness
+
+**Status:** NOT_STARTED
+
+**Objective:** Labelled scenario dataset, transcript runner, DB assertions, audio fixtures, fault
+injection and regression reports.
+
+**Dependencies:** Phase 3 (audio mode needs Phase 4; recovery and fault scenarios need Phase 5).
+
+**Tasks / deliverables**
+- [ ] 30–50 labelled scenarios in `fixtures/scenarios/` covering blueprint §13.
+- [ ] Transcript-mode runner (Mode A) and audio-mode runner (Mode B) with a simulated caller.
+- [ ] Fault injection: calendar timeout, review-queue outage, disconnects, Claude/DB failures.
+- [ ] Metrics report (all blueprint §13 metrics) via `scripts/run_evaluations.py`.
+
+**Acceptance criteria:** a single command runs the suite and reports the exact passing and failing
+scenarios.
+
+**Required tests / evidence:** the generated report with actual numbers (targets: zero false booking
+confirmations, zero duplicate appointments, all critical escalations handled).
+
+**Blockers / decisions:** live Claude runs consume API credits. **Next step:** after Phases 3–5.
+
+---
+
+## Phase 7 — Human-review dashboard
+
+**Status:** NOT_STARTED
+
+**Objective:** Intake list, intake details, booking list, escalation queue, workflow state and audit
+timeline for a simulated coordinator.
+
+**Dependencies:** Phases 1 and 5.
+
+**Tasks / deliverables**
+- [ ] FastAPI surface (blueprint §12) over the domain services, with staff authentication/authorization.
+- [ ] Next.js + TypeScript dashboard pages.
+- [ ] Coordinator actions: accept/resolve escalations, review intakes.
+
+**Acceptance criteria:** a simulated coordinator can review the results and complete the next action;
+the dashboard shows the real handoff state.
+
+**Required tests / evidence:** API integration tests; Playwright UI tests.
+
+**Blockers / decisions:** authentication approach for the local demo. **Next step:** after Phase 5.
+
+---
+
+## Phase 8 — Hardening and demonstration
+
+**Status:** NOT_STARTED
+
+**Objective:** Access controls, tenant isolation, secret management, bounded retries, idempotency,
+structured logging, failure recovery; repeatable demo.
+
+**Dependencies:** Phases 1–7.
+
+**Tasks / deliverables**
+- [ ] Security and tenant-isolation review; retention/deletion policy.
+- [ ] Optional Langfuse tracing.
+- [ ] README: architecture diagram, setup, schema, sample conversations, scenario dataset, evaluation
+      results, known limitations, walkthrough.
+- [ ] Recorded demo: normal intake, urgent escalation, calendar failure, successful recovery.
+
+**Acceptance criteria:** the system demonstrates both the happy path and predictable behavior when a
+dependency fails; blueprint §18 "definition of done" items 1–11 all verified.
+
+**Required tests / evidence:** full test + evaluation run; demo recording.
+
+**Blockers / decisions:** none known. **Next step:** after Phase 7.
+
+---
+
+## Outstanding decisions
+
+1. **REST API timing.** The blueprint lists the FastAPI surface (§12) but assigns it to no phase.
+   Proposed: Phases 1–6 call domain services in-process; the HTTP API is built in Phase 7 together
+   with staff authentication (so no unauthenticated write endpoints exist). Override if you want the
+   API earlier.
+2. **Claude model ID** for the realtime loop (latency vs. quality) — decide in Phase 2.
+3. **TTS engine** (Piper vs. Kokoro) and voice licence — decide in Phase 4.
+4. **Supported languages** — English only until Hindi/Hinglish are tested explicitly.
+5. **Firm timezone** for the fictional firm — proposed `Asia/Kolkata`.
+6. **Blueprint file.** The blueprint currently exists only in the chat. Saving it in the repo (e.g.
+   `docs/BLUEPRINT.md`) would let future sessions read it.
