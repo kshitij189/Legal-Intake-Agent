@@ -4,7 +4,13 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
-from app.domain import appointment_service, escalation_service, intake_service, policy_engine
+from app.domain import (
+    appointment_service,
+    conversation_state,
+    escalation_service,
+    intake_service,
+    policy_engine,
+)
 from app.domain.call_session_service import attach_intake
 from app.domain.firm_config_service import firm_today, get_active_firm, load_config
 from app.models.enums import EscalationReason, FieldStatus
@@ -130,6 +136,7 @@ def get_intake_status(session: Session, ctx: ToolContext, _: NoArguments) -> dic
             if appointment
             else None
         ),
+        "next_action": conversation_state.next_action(config, intake.status, completeness.missing),
     }
 
 

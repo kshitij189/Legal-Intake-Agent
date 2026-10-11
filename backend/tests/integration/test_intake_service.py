@@ -61,6 +61,7 @@ def test_save_answer_persists_normalized_value_with_provenance(
         "field_key": "phone",
         "previous_status": "MISSING",
         "status": "CONFIRMED_BY_CALLER",
+        "corrected": False,
     }
     assert "98765" not in str(event.details)  # contact details stay out of the audit log
 

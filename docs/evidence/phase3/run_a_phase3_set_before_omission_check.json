@@ -1,0 +1,471 @@
+{
+  "providers": "gemini:gemini-3.8-flash,gemini:gemini-3.5-flash-lite,groq:openai/gpt-oss-120b,groq:openai/gpt-oss-20b",
+  "gemini_model": "gemini-3.8-flash",
+  "groq_model": "openai/gpt-oss-120b",
+  "results": [
+    {
+      "id": "correction_mid_call",
+      "passed": true,
+      "problems": [],
+      "session_status": "COMPLETED",
+      "end_status": "COMPLETED",
+      "intake_reference": "INT-1033",
+      "fields": {
+        "email": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "phone": {
+          "value": "9845012346",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 1
+        },
+        "caller_name": {
+          "value": "Meena Joshi",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "jurisdiction": {
+          "value": "Mumbai",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "matter_summary": {
+          "value": "Landlord kept the full security deposit after moving out last month",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "matter_category": {
+          "value": "PROPERTY",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "caller_questions": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "reported_deadline": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "preferred_contact_method": {
+          "value": "PHONE",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        }
+      },
+      "outstanding": {
+        "missing": [],
+        "declined": [],
+        "needs_review": []
+      },
+      "replies_blocked_by_guard": [],
+      "escalations": [],
+      "appointment": null,
+      "llm_providers_used": [
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite"
+      ],
+      "tool_calls": [
+        "create_draft_intake",
+        "save_intake_answer",
+        "save_intake_answer",
+        "get_intake_status",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "check_appointment_availability",
+        "save_intake_answer",
+        "finalize_intake_summary"
+      ],
+      "tool_errors": [],
+      "transcript": [
+        {
+          "agent": "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. May I ask you a few questions?"
+        },
+        {
+          "caller": "Hi, I'm Meena Joshi. My landlord kept my whole security deposit after I moved out last month."
+        },
+        {
+          "agent": "Could you please share the phone number we can reach you at?"
+        },
+        {
+          "caller": "My number is 98450 12345, phone is best. I'm in Mumbai."
+        },
+        {
+          "agent": "Thank you, Ms. Joshi. I have that down. Would you like to schedule a consultation with one of our lawyers? We have an opening with Daniel Brooks tomorrow, Tuesday the 13th of October, at 10:00 AM, 11:00 AM, or 2:00 PM."
+        },
+        {
+          "caller": "Sorry, I misspoke - my number ends in 46, not 45."
+        },
+        {
+          "agent": "Got it, I've updated your phone number to end in 46. Would you like to schedule one of those consultation times with Daniel Brooks?"
+        },
+        {
+          "caller": "No, that's everything, thanks."
+        },
+        {
+          "agent": "Thank you for contacting Northstar Legal, Ms. Joshi. We have all your details, and a member of our team will review your inquiry and follow up with you. Have a good day!"
+        }
+      ]
+    },
+    {
+      "id": "legal_advice_request",
+      "passed": true,
+      "problems": [],
+      "session_status": "COMPLETED",
+      "end_status": "COMPLETED",
+      "intake_reference": "INT-1034",
+      "fields": {
+        "email": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "phone": {
+          "value": "9000011122",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "caller_name": {
+          "value": "Farhan Ali",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "jurisdiction": {
+          "value": "Delhi",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "matter_summary": {
+          "value": "Purchased a laptop that stopped working after a week, and the shop refuses to provide a refund.",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "matter_category": {
+          "value": "CONSUMER",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "caller_questions": {
+          "value": "Can I sue them? What are my chances of winning?",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "reported_deadline": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "preferred_contact_method": {
+          "value": "PHONE",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        }
+      },
+      "outstanding": {
+        "missing": [],
+        "declined": [],
+        "needs_review": []
+      },
+      "replies_blocked_by_guard": [],
+      "escalations": [],
+      "appointment": null,
+      "llm_providers_used": [
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "groq:openai/gpt-oss-20b",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite"
+      ],
+      "tool_calls": [
+        "create_draft_intake",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "finalize_intake_summary"
+      ],
+      "tool_errors": [
+        "VALIDATION_FAILED"
+      ],
+      "transcript": [
+        {
+          "agent": "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. May I ask you a few questions?"
+        },
+        {
+          "caller": "Hello, I'm Farhan Ali. I bought a laptop that stopped working after a week and the shop refuses to refund me."
+        },
+        {
+          "agent": "What phone number can the firm reach you on?"
+        },
+        {
+          "caller": "Can I sue them? What are my chances of winning?"
+        },
+        {
+          "agent": "I can't provide legal advice or assess your chances of winning, but I have noted down your question for the firm's lawyers to review. \n\nTo help us get in touch, what phone number can the firm reach you on?"
+        },
+        {
+          "caller": "My number is 90000 11122, call me please. I'm in Delhi. That's all for now."
+        },
+        {
+          "agent": "Thank you, Farhan. I have recorded your details and your enquiry, and submitted everything to the team at Northstar Legal for review. Someone will be in touch with you by phone soon. Thank you for contacting us, and have a good day."
+        }
+      ]
+    },
+    {
+      "id": "vague_date_then_clarified",
+      "passed": true,
+      "problems": [],
+      "session_status": "COMPLETED",
+      "end_status": "COMPLETED",
+      "intake_reference": "INT-1035",
+      "fields": {
+        "email": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "phone": {
+          "value": "+919811122233",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "caller_name": {
+          "value": "Rohan Das",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "jurisdiction": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "matter_summary": {
+          "value": "Bank sent a court summons about an unpaid personal loan.",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "matter_category": {
+          "value": "CONSUMER",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "caller_questions": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "reported_deadline": {
+          "value": "2026-11-20",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 1
+        },
+        "preferred_contact_method": {
+          "value": "PHONE",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        }
+      },
+      "outstanding": {
+        "missing": [],
+        "declined": [],
+        "needs_review": []
+      },
+      "replies_blocked_by_guard": [],
+      "escalations": [],
+      "appointment": null,
+      "llm_providers_used": [
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite"
+      ],
+      "tool_calls": [
+        "create_draft_intake",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "finalize_intake_summary"
+      ],
+      "tool_errors": [],
+      "transcript": [
+        {
+          "agent": "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. May I ask you a few questions?"
+        },
+        {
+          "caller": "I'm Rohan Das. My bank has sent me a court summons about an unpaid personal loan."
+        },
+        {
+          "agent": "What phone number can the firm reach you on?"
+        },
+        {
+          "caller": "The hearing is sometime in November, I don't remember exactly."
+        },
+        {
+          "agent": "I understand. What phone number can the firm reach you on?"
+        },
+        {
+          "caller": "Let me check the paper... it says the 20th of November 2026."
+        },
+        {
+          "agent": "What phone number can the firm reach you on?"
+        },
+        {
+          "caller": "You can reach me on +91 98111 22233, by phone. That's all."
+        },
+        {
+          "agent": "Thank you, Rohan. We have all the details we need, and your information has been submitted for our team to review. We will be in touch with you soon. Have a good day."
+        }
+      ]
+    },
+    {
+      "id": "refuses_everything",
+      "passed": false,
+      "problems": [
+        "phone: expected status in ['DECLINED_BY_CALLER'], got MISSING"
+      ],
+      "session_status": "COMPLETED",
+      "end_status": "COMPLETED",
+      "intake_reference": "INT-1036",
+      "fields": {
+        "email": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "phone": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "caller_name": {
+          "value": null,
+          "status": "DECLINED_BY_CALLER",
+          "corrections": 0
+        },
+        "jurisdiction": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "matter_summary": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "matter_category": {
+          "value": "PROPERTY",
+          "status": "REPORTED_BY_CALLER",
+          "corrections": 0
+        },
+        "caller_questions": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "reported_deadline": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        },
+        "preferred_contact_method": {
+          "value": null,
+          "status": "MISSING",
+          "corrections": 0
+        }
+      },
+      "outstanding": {
+        "missing": [
+          "phone",
+          "preferred_contact_method",
+          "matter_summary"
+        ],
+        "declined": [
+          "caller_name"
+        ],
+        "needs_review": []
+      },
+      "replies_blocked_by_guard": [],
+      "escalations": [],
+      "appointment": null,
+      "llm_providers_used": [
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b"
+      ],
+      "tool_calls": [
+        "create_draft_intake",
+        "save_intake_answer",
+        "save_intake_answer",
+        "finalize_intake_summary"
+      ],
+      "tool_errors": [],
+      "transcript": [
+        {
+          "agent": "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. May I ask you a few questions?"
+        },
+        {
+          "caller": "I'd rather not give my name. I just want to know whether you handle tenant disputes with landlords."
+        },
+        {
+          "agent": "Could you please share a phone number where we can reach you?"
+        },
+        {
+          "caller": "No, I don't want to share my number or email either."
+        },
+        {
+          "agent": "I'm sorry, I didn't manage to complete that. Could you say that again?"
+        },
+        {
+          "caller": "That's all, bye."
+        },
+        {
+          "agent": "Thank you for reaching out. We\u2019ve noted your inquiry and will review it shortly. Have a good day."
+        }
+      ]
+    }
+  ]
+}

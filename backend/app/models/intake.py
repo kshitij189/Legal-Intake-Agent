@@ -24,6 +24,8 @@ class IntakeRecord(Base):
     # {field_key: FieldEntry} - see app.schemas.intake.FieldEntry. Keys come from the firm config.
     fields: Mapped[dict[str, Any]] = mapped_column(JSONB)
     summary: Mapped[str | None] = mapped_column(Text)
+    # Unanswered questions at finalization: {"missing", "declined", "needs_review": [keys]}
+    outstanding: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

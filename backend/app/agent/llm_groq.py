@@ -65,8 +65,8 @@ class GroqLLMClient:
                 return self._client.chat.completions.create(
                     model=self.model,
                     messages=cast(Any, messages),
-                    tools=cast(Any, list(tools)),
-                    tool_choice="auto",
+                    tools=cast(Any, list(tools)) if tools else groq.omit,
+                    tool_choice="auto" if tools else groq.omit,
                     temperature=self._temperature,
                 )
             except groq.BadRequestError as exc:

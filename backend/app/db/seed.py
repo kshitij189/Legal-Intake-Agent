@@ -65,6 +65,13 @@ DEMO_FIRM_CONFIG: dict[str, Any] = {
             "type": "DATE",
             "required": False,
         },
+        {
+            # Legal questions are recorded for the lawyers, never answered by the agent.
+            "key": "caller_questions",
+            "prompt": "Is there a specific question you would like the firm's lawyer to address?",
+            "type": "TEXT",
+            "required": False,
+        },
     ],
     "escalation_rules": [
         {

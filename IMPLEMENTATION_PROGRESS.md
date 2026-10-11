@@ -6,9 +6,9 @@ A phase is `COMPLETED` only when every acceptance criterion has recorded evidenc
 **Repository state at documentation setup (2026-10-11):** empty directory, no source code, no git
 repository. No prior implementation work existed, so every phase started `NOT_STARTED`.
 
-**Last updated:** 2026-10-11 — Phases 1 and 2 completed.
+**Last updated:** 2026-10-11 — Phases 1, 2 and 3 completed.
 
-**Next phase to implement:** Phase 3 — Conversational state and safety (awaiting authorization).
+**Next phase to implement:** Phase 4 — Voice loop (awaiting authorization).
 
 ## Summary
 
@@ -16,7 +16,7 @@ repository. No prior implementation work existed, so every phase started `NOT_ST
 |---|---|---|---|
 | 1 | Domain and database foundation | COMPLETED (2026-10-11) | — |
 | 2 | Text-based intake agent | COMPLETED (2026-10-11) | 1 |
-| 3 | Conversational state and safety | NOT_STARTED | 2 |
+| 3 | Conversational state and safety | COMPLETED (2026-10-11) | 2 |
 | 4 | Voice loop | NOT_STARTED | 3 |
 | 5 | Durable workflows | NOT_STARTED | 1, 2 (3 recommended) |
 | 6 | Evaluation harness | NOT_STARTED | 3 (audio mode: 4; recovery/fault cases: 5) |
@@ -156,7 +156,8 @@ calls); `ruff check` clean; `ruff format --check` clean; `mypy` strict: no issue
 **Blockers:** none.
 ## Phase 3 — Conversational state and safety
 
-**Status:** NOT_STARTED
+**Status:** COMPLETED (2026-10-11) — live-model re-validation of the final code was cut short by
+free-tier quota exhaustion (see evidence below).
 
 **Objective:** Missing-field tracking, reported-versus-verified values, interruption behavior,
 escalation rules and safe handling of uncertain answers.
@@ -164,24 +165,65 @@ escalation rules and safe handling of uncertain answers.
 **Dependencies:** Phase 2.
 
 **Tasks / deliverables**
-- [ ] Structured conversation state (intake state + next action) derived from persisted data.
-- [ ] Clarification flow for ambiguous answers (e.g., relative/ambiguous dates) → `PENDING_HUMAN_REVIEW`.
-- [ ] Refusal handling → `DECLINED_BY_CALLER`; missing-info list in finalize.
-- [ ] Legal-advice boundary handling with administrative handoff offer.
-- [ ] Unsupported matter category → clarify or route for review.
-- [ ] Interruption/correction handling without corrupting stored state.
-- [ ] `finalize_intake_summary` validated against the intake record.
+- [x] Structured conversation state from persisted data (`domain/conversation_state.py`): saved
+      fields and statuses, missing/declined/needs-review, escalations, booking, `next_action`.
+      Injected into every model request and returned by `get_intake_status`.
+- [x] Clarification flow: vague answers are saved immediately as `PENDING_HUMAN_REVIEW` with the
+      caller's words, then clarified once; a clarified value is re-saved and the original kept.
+- [x] Refusal handling → `DECLINED_BY_CALLER`; outstanding items persisted on finalization
+      (`intake_records.outstanding`, migration `1d3c29187505`).
+- [x] Legal-advice boundary: the question is recorded in the configured `caller_questions` field,
+      never answered; the reply guard blocks "I noted your question" when it was not saved.
+- [x] Unsupported matter category → `OTHER` → `outside_intake_workflow` escalation; no slots offered.
+- [x] Interruption/correction handling: re-saves keep up to 5 earlier values in field history
+      (audit `corrected` flag); the agent can never overwrite a staff-verified value.
+- [x] `finalize_intake_summary` validated against the record: nothing-captured is rejected; exact
+      dates, emails and phone numbers in the summary must match stored values.
+- [x] Deterministic safety nets beyond the plan, added after live failures:
+      `agent/omission_check.py` (one nudge when a deadline, phone, email, refusal, legal question or
+      "I'm done" from the caller was not acted on) and `agent/reply_guard.py` (blocks unsupported
+      booking, acceptance and noted-question claims; one regeneration, then a safe reply).
 
-**Acceptance criteria:** the agent manages incomplete, ambiguous and refused answers without
-fabricating data; every configured critical escalation in the scripted set is triggered.
+**Acceptance criteria → evidence**
+- [x] *Manages incomplete, ambiguous and refused answers without fabricating data* —
+      `tests/integration/test_phase3_scenarios.py` (17 transcript-mode scenarios with DB
+      assertions: normal enquiry, urgent deadline, ambiguous date, missing phone, refusal, legal
+      question, unsupported category, interruption/correction, verified-value protection, finalize
+      validation, false booking/acceptance claims, guard fallback, omission nudges), plus unit tests
+      for the state, guard, omission check, corrections and summary validation.
+      **Live: zero fabricated values across every Phase 3 live run.**
+- [x] *Every configured critical escalation in the scripted set is triggered* — deterministic:
+      rules fire on save (tests for `imminent_deadline` and `outside_intake_workflow`). Live: before
+      the omission check, one run missed the urgent deadline (the model never saved it). Since the
+      check, the urgent deadline escalated in every run where a model was available (2/2).
 
-**Required tests / evidence:** transcript-mode scenario tests for the blueprint §13 cases that do not
-need audio or workflows; DB assertions on resulting state.
+**Live runs (Gemini → Groq chain; reports in `docs/evidence/phase3/`)**
 
-**Blockers / decisions:** none known. **Next step:** after Phase 2.
+| Run | Code | Phase 2 set | Phase 3 set | Notes |
+|---|---|---|---|---|
+| first | Phase 3 prompt | 3/4 | 4/4 | eviction deadline not saved, yet "recorded" claimed → prompt fix |
+| A | prompt fix | 3/4 | 3/4 | **urgent deadline missed** → omission check; phone refusal missed |
+| B | omission check v2 | **4/4** | 3/4 | legal question "noted" but not saved → nudge + guard rule |
+| C | final code | not measured (all 4 sessions FAILED on quota) | 2/4 (both scenarios a model answered passed) | quota exhausted mid-run |
+
+One further run between B and C was rate-limited on every model and is not counted (no report kept).
+
+**Validation (2026-10-11):** `pytest` 248 passed; `ruff check` clean; `ruff format --check` clean;
+`mypy` strict: no issues in 47 files; `alembic check`: no drift.
+
+**Known limitations**
+- Free-tier quotas: all four models were exhausted on 2026-10-11. Re-run both live sets (paced with
+  `--pause 60`) when quotas reset, to re-validate the final code end to end.
+- The omission check and reply guard are pattern-based, English-only safety nets: they reduce but
+  cannot eliminate missed extractions or false claims. Each new failure should become a pattern
+  plus a regression test.
+- Conversation quality issues remain (repetitive questions, unprompted slot offers, simple
+  "do you handle X?" questions not answered). Measured properly in Phase 6.
+- Every omission nudge costs an extra model request (latency and quota).
+
+**Blockers:** none for the phase; live re-validation waits on quota.
 
 ---
-
 ## Phase 4 — Voice loop
 
 **Status:** NOT_STARTED

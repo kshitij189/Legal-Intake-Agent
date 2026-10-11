@@ -308,6 +308,30 @@ Notes:
 - Idempotency keys are derived in code (`book:<session>:<slot>`, `rule:<intake>:<rule>`,
   `unable:<session>`), never supplied by the model.
 - Only slots returned by `check_appointment_availability` in the same conversation can be booked.
+### Conversation safety layer (Phase 3)
+- `domain/conversation_state.py` derives the conversation state from the database (saved fields
+  with statuses, missing/declined/needs-review, escalations, booking, `next_action`). It is
+  appended to the system message on **every** model request and returned by `get_intake_status`.
+  Never keep authoritative state only in the model's context.
+- `agent/omission_check.py`: after the model drafts a final reply, the caller's last message is
+  scanned for deadline cues, phone numbers, emails, refusals, legal questions and "I'm done"
+  phrases. If the matching field or step is still unsaved, the draft is discarded and the model
+  gets **one** `[Automated check]` nudge per turn (audited as `agent.omission_nudged`).
+  Critical-escalation recall must not depend on the model remembering to save a deadline.
+- `agent/reply_guard.py`: before a reply reaches the caller, three claims are checked against the
+  database: booking confirmed without a `BOOKED` appointment, lawyer/firm acceptance without an
+  `ACCEPTED` escalation, "I noted your question" while `caller_questions` is unsaved. A violating
+  draft is regenerated once without tools; otherwise a safe fixed reply is sent (audited as
+  `agent.reply_blocked`). Negation is scoped to the claim's own clause. Both checks are
+  pattern-based safety nets: extend them with tests whenever a new false claim is observed.
+- Corrections keep up to 5 earlier values in `FieldEntry.history`. A `VERIFIED_BY_SYSTEM` value can
+  only be changed by a staff reviewer.
+- `finalize_intake` refuses an intake with nothing captured, and rejects summaries containing exact
+  dates, emails or phone numbers that are not stored values. It persists `intake_records.outstanding`
+  (missing/declined/needs-review keys).
+- Legal questions are saved in the configured optional field `caller_questions`, never answered.
+- Vague answers are saved at once as `PENDING_HUMAN_REVIEW` (with the caller's words), *then*
+  clarified once. Deferring the save led the model to claim it had recorded things it had not.
 - The blueprint's `agent/claude_client.py` is `agent/llm_client.py` (neutral types + fallback)
   with `agent/llm_gemini.py` and `agent/llm_groq.py` adapters.
 

@@ -13,7 +13,7 @@ from app.domain import policy_engine
 from app.domain.actors import Action, Actor, authorize
 from app.domain.audit import record_audit
 from app.domain.clock import resolve_now
-from app.domain.errors import InvalidTransition, NotFound, ValidationFailed
+from app.domain.errors import InvalidTransition, NotFound, PermissionDenied, ValidationFailed
 from app.domain.firm_config_service import get_active_firm, load_config
 from app.domain.transitions import ensure_intake_transition
 from app.models import IntakeRecord, intake_reference_seq
@@ -100,12 +100,21 @@ def save_intake_answer(
             f"intake in status {intake.status} cannot be edited", current=str(intake.status)
         )
 
+    fields = intake_fields(intake)
+    previous = fields.get(field_key, FieldEntry())
+    if previous.status is FieldStatus.VERIFIED_BY_SYSTEM:
+        try:
+            authorize(session, firm_id, actor, Action.INTAKE_VERIFY_FIELD)
+        except PermissionDenied as exc:
+            raise PermissionDenied(
+                "a verified value can only be changed by a staff reviewer", field_key=field_key
+            ) from exc
+
     entry = policy_engine.build_field_entry(
         question, status=status, value=value, note=note, source=actor.type, now=now
     )
-    fields = intake_fields(intake)
-    previous_status = fields.get(field_key, FieldEntry()).status
-    fields[field_key] = entry
+    previous_status = previous.status
+    fields[field_key] = policy_engine.merge_with_previous(previous, entry)
     intake.fields = policy_engine.dump_fields(fields)  # reassign so the JSONB change is tracked
     session.flush()
     record_audit(
@@ -120,6 +129,7 @@ def save_intake_answer(
             "field_key": field_key,
             "previous_status": str(previous_status),
             "status": str(status),
+            "corrected": len(fields[field_key].history) > len(previous.history),
         },
     )
     return intake
@@ -166,8 +176,10 @@ def finalize_intake(
 ) -> tuple[IntakeRecord, policy_engine.Completeness]:
     """Store the summary and hand the draft to human review (status PENDING_REVIEW).
 
-    Missing, declined and pending-review fields do not block finalization; they are returned so the
-    reviewer (and the caller) know what is outstanding."""
+    The summary is validated against the record: something must have been captured, and exact
+    dates, emails and phone numbers in it must match stored values. Missing, declined and
+    pending-review fields do not block finalization; they are persisted as `outstanding` so the
+    reviewer knows what is still open."""
     authorize(session, firm_id, actor, Action.INTAKE_TRANSITION)
     clean = summary.strip()
     if not clean or len(clean) > MAX_SUMMARY_LENGTH:
@@ -177,10 +189,26 @@ def finalize_intake(
     intake = get_intake(session, firm_id=firm_id, intake_id=intake_id, for_update=True)
     previous = intake.status
     ensure_intake_transition(previous, IntakeStatus.PENDING_REVIEW)
+    fields = intake_fields(intake)
+    if all(e.status is FieldStatus.MISSING for e in fields.values()):
+        raise ValidationFailed("nothing has been captured yet; save the caller's answers first")
+    unsupported = policy_engine.unsupported_summary_facts(clean, fields)
+    if unsupported:
+        raise ValidationFailed(
+            "the summary contains facts that are not in the intake record; save them as answers"
+            " first or remove them from the summary",
+            unsupported=unsupported,
+        )
+
+    result = policy_engine.completeness(config, fields)
     intake.summary = clean
     intake.status = IntakeStatus.PENDING_REVIEW
+    intake.outstanding = {
+        "missing": list(result.missing),
+        "declined": list(result.declined),
+        "needs_review": list(result.needs_review),
+    }
     session.flush()
-    result = policy_engine.completeness(config, intake_fields(intake))
     record_audit(
         session,
         firm_id=firm_id,

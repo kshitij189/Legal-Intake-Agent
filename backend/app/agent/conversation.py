@@ -13,18 +13,26 @@ from typing import Any
 
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.agent import prompts
+from app.agent import omission_check, prompts, reply_guard
 from app.agent.llm_client import PROVIDER_STATE_KEY, LLMClient, LLMResponse, LLMUnavailable
 from app.agent.tool_registry import REGISTRY, tool_definitions
 from app.domain import escalation_service, intake_service
 from app.domain.actors import Actor
+from app.domain.audit import record_audit
 from app.domain.call_session_service import (
     end_call_session,
     get_call_session,
     start_call_session,
 )
+from app.domain.conversation_state import ConversationState, build_conversation_state
 from app.domain.firm_config_service import firm_today, get_active_firm, load_config
-from app.models.enums import CallSessionStatus, EscalationReason, IntakeStatus, SessionChannel
+from app.models.enums import (
+    AuditOutcome,
+    CallSessionStatus,
+    EscalationReason,
+    IntakeStatus,
+    SessionChannel,
+)
 from app.tools.context import ToolContext
 from app.tools.escalation_tools import unable_escalation_key
 from app.tools.executor import ToolExecutor
@@ -112,16 +120,32 @@ class IntakeConversation:
             raise ConversationEnded("the conversation is not active")
         self._messages.append({"role": "user", "content": caller_text})
 
+        nudged = False
         for _ in range(self.max_tool_rounds):
             try:
-                response = self.llm.complete(self._messages, self._tools)
+                response = self.llm.complete(self._request(), self._tools)
             except LLMUnavailable as exc:
                 logger.error("llm_unavailable", extra={"reason": exc.reason})
                 return self._fail(exc.reason)
 
             self.providers_used.append(response.provider or "unknown")
             if not response.tool_calls:
+                if not nudged:
+                    omissions = omission_check.find_omissions(caller_text, self.state())
+                    if omissions:
+                        # The draft is discarded; the model gets one chance to save what it missed.
+                        nudged = True
+                        self._audit(
+                            "agent.omission_nudged",
+                            AuditOutcome.SUCCESS,
+                            {"omissions": [o.code for o in omissions]},
+                        )
+                        self._messages.append(
+                            {"role": "user", "content": omission_check.nudge(omissions)}
+                        )
+                        continue
                 reply = (response.content or "").strip() or RETRY_PROMPT
+                reply, response = self._guard(reply, response)
                 self._messages.append(
                     _with_provider_state({"role": "assistant", "content": reply}, response)
                 )
@@ -155,6 +179,61 @@ class IntakeConversation:
         )
         self._messages.append({"role": "assistant", "content": RETRY_PROMPT})
         return RETRY_PROMPT
+
+    def state(self) -> ConversationState:
+        """Authoritative conversation state, recomputed from the database."""
+        assert self.call_session_id is not None
+        with self.sessions() as session:
+            call = get_call_session(
+                session, firm_id=self.firm_id, call_session_id=self.call_session_id
+            )
+            return build_conversation_state(session, firm_id=self.firm_id, intake_id=call.intake_id)
+
+    def _request(self) -> list[dict[str, Any]]:
+        """Messages for the next model call: the system prompt plus the current stored state."""
+        base = self._messages[0]
+        system = {**base, "content": f"{base['content']}\n\n{self.state().to_prompt()}"}
+        return [system, *self._messages[1:]]
+
+    def _guard(self, reply: str, response: LLMResponse) -> tuple[str, LLMResponse]:
+        """Block replies whose claims the database does not support; regenerate once."""
+        state = self.state()
+        violations = reply_guard.check_reply(reply, state)
+        if not violations:
+            return reply, response
+        logger.warning("reply_blocked", extra={"violations": violations})
+        self._audit("agent.reply_blocked", AuditOutcome.REJECTED, {"violations": violations})
+        correction = {"role": "user", "content": reply_guard.correction_instruction(violations)}
+        try:
+            retry = self.llm.complete([*self._request(), correction], [])
+        except LLMUnavailable:
+            retry = None
+        if retry is not None:
+            self.providers_used.append(retry.provider or "unknown")
+            text = (retry.content or "").strip()
+            if text and not retry.tool_calls and not reply_guard.check_reply(text, state):
+                # Provider state is dropped: it belongs to a request containing the correction.
+                return text, LLMResponse(content=text, provider=retry.provider)
+        fallback = reply_guard.safe_reply(violations)
+        return fallback, LLMResponse(content=fallback, provider="reply_guard")
+
+    def _audit(self, action: str, outcome: AuditOutcome, details: dict[str, Any]) -> None:
+        """Record an agent-level safety event against the call session (own transaction)."""
+        assert self.call_session_id is not None
+        try:
+            with self.sessions() as session, session.begin():
+                record_audit(
+                    session,
+                    firm_id=self.firm_id,
+                    actor=self.actor,
+                    action=action,
+                    entity_type="call_session",
+                    entity_id=self.call_session_id,
+                    outcome=outcome,
+                    details=details,
+                )
+        except Exception:
+            logger.exception("agent_audit_failed", extra={"action": action})
 
     def end(self, *, disconnected: bool = False) -> CallSessionStatus:
         """Close the session. An unfinished intake is kept and marked INCOMPLETE."""

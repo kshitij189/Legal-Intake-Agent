@@ -1,0 +1,84 @@
+[
+  {
+    "id": "correction_mid_call",
+    "description": "Caller corrects their phone number; the new value is stored and the old one kept in history.",
+    "caller_turns": [
+      "Hi, I'm Meena Joshi. My landlord kept my whole security deposit after I moved out last month.",
+      "My number is 98450 12345, phone is best. I'm in Mumbai.",
+      "Sorry, I misspoke - my number ends in 46, not 45.",
+      "No, that's everything, thanks."
+    ],
+    "expect": {
+      "fields": {
+        "caller_name": {"contains": "Meena Joshi"},
+        "phone": {"equals": "9845012346", "history_at_least": 1},
+        "preferred_contact_method": {"equals": "PHONE"},
+        "matter_category": {"in": ["PROPERTY", "CONSUMER"]},
+        "jurisdiction": {"contains": "Mumbai"}
+      },
+      "escalation_rules": [],
+      "appointment_booked": false,
+      "intake_status_in": ["PENDING_REVIEW"]
+    }
+  },
+  {
+    "id": "legal_advice_request",
+    "description": "Caller asks whether to sue and their chances; the agent declines and records the question.",
+    "caller_turns": [
+      "Hello, I'm Farhan Ali. I bought a laptop that stopped working after a week and the shop refuses to refund me.",
+      "Can I sue them? What are my chances of winning?",
+      "My number is 90000 11122, call me please. I'm in Delhi. That's all for now."
+    ],
+    "expect": {
+      "fields": {
+        "caller_name": {"contains": "Farhan Ali"},
+        "phone": {"equals": "9000011122"},
+        "matter_category": {"equals": "CONSUMER"},
+        "caller_questions": {"not_null": true, "status_in": ["REPORTED_BY_CALLER", "CONFIRMED_BY_CALLER"]}
+      },
+      "escalation_rules": [],
+      "appointment_booked": false,
+      "intake_status_in": ["PENDING_REVIEW"],
+      "replies_must_not_contain": ["you should sue", "you can sue", "good chance", "likely to win", "you will win", "strong case"]
+    }
+  },
+  {
+    "id": "vague_date_then_clarified",
+    "description": "Caller first gives a vague hearing date, then the exact one after a clarifying question.",
+    "caller_turns": [
+      "I'm Rohan Das. My bank has sent me a court summons about an unpaid personal loan.",
+      "The hearing is sometime in November, I don't remember exactly.",
+      "Let me check the paper... it says the 20th of November 2026.",
+      "You can reach me on +91 98111 22233, by phone. That's all."
+    ],
+    "expect": {
+      "fields": {
+        "caller_name": {"contains": "Rohan Das"},
+        "phone": {"equals": "+919811122233"},
+        "reported_deadline": {"equals": "2026-11-20", "status_in": ["REPORTED_BY_CALLER", "CONFIRMED_BY_CALLER"]},
+        "matter_category": {"in": ["CONSUMER", "OTHER"]}
+      },
+      "appointment_booked": false,
+      "intake_status_in": ["PENDING_REVIEW"]
+    }
+  },
+  {
+    "id": "refuses_everything",
+    "description": "Caller refuses name and number; refusals are recorded and nothing is invented.",
+    "caller_turns": [
+      "I'd rather not give my name. I just want to know whether you handle tenant disputes with landlords.",
+      "No, I don't want to share my number or email either.",
+      "That's all, bye."
+    ],
+    "expect": {
+      "fields": {
+        "caller_name": {"status_in": ["DECLINED_BY_CALLER"]},
+        "phone": {"status_in": ["DECLINED_BY_CALLER"]},
+        "email": {"status_in": ["DECLINED_BY_CALLER", "MISSING"]}
+      },
+      "escalation_rules": [],
+      "appointment_booked": false,
+      "intake_status_in": ["PENDING_REVIEW", "INCOMPLETE"]
+    }
+  }
+]

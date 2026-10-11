@@ -267,3 +267,61 @@ per model). Google does not publish free-tier numbers; they are only visible in 
 free-tier quotas, voice-unfriendly latency, proactive slot offers, heuristic live checks).
 
 **Next:** Phase 3 — Conversational state and safety (awaiting authorization).
+
+---
+
+## 2026-10-11 — Phase 3: conversational state and safety
+
+**Added**
+- `domain/conversation_state.py`: state derived from the DB (fields/statuses, missing, declined,
+  needs-review, escalations, booking, `next_action`). Appended to the system message on every model
+  request; `get_intake_status` returns `next_action`.
+- `FieldEntry.history` (≤5 earlier values) via `policy_engine.merge_with_previous`; audit `corrected`
+  flag; staff-verified values protected from agent/system overwrites.
+- `finalize_intake` validation (nothing captured → rejected; summary dates, emails and phones must
+  match stored values via `policy_engine.unsupported_summary_facts`); `intake_records.outstanding`
+  column (migration `1d3c29187505`).
+- Demo firm config: optional `caller_questions` field for legal questions (appended, so existing
+  question indices are unchanged); main DB reseeded.
+- `agent/reply_guard.py`: blocks unsupported booking, acceptance and "question noted" claims;
+  regenerates once with no tools, then falls back to a safe fixed reply; audited
+  `agent.reply_blocked`.
+- `agent/omission_check.py`: one `[Automated check]` nudge per turn when the caller's message has a
+  deadline cue, phone, email, refusal (naming the refused fields), legal question or "I'm done"
+  that the stored state does not reflect; audited `agent.omission_nudged`.
+- Prompt rules: save vague answers immediately as `PENDING_HUMAN_REVIEW`, then clarify once; never
+  claim something was recorded unless the save succeeded; corrections; interruptions; offer slots
+  only when asked or after the required fields; trust the injected state.
+- Runner: `--scenarios`, `in`/`not_null`/`history_at_least` checks, `replies_must_not_contain`,
+  guard-based claim check, reports of outstanding items, corrections and guard blocks. New fixture
+  `fixtures/transcripts/phase3_scripted.json` (correction, legal advice, vague→clarified date,
+  refuses everything).
+- Tests: `test_phase3_scenarios.py` (17 transcript-mode scenarios with DB assertions), unit tests for
+  reply guard, omission check, conversation state, corrections and summary validation.
+
+**Bugs found by tests and live runs, then fixed**
+- Guard false positive: the guard's own fallback ("nobody has accepted it yet") matched the
+  acceptance pattern → "nobody/no one/none" added as negations.
+- Guard false negative: "Don't worry, the lawyer has accepted your case" passed, because "n't" in
+  "Don't" negated the whole sentence → negation now scoped to the claim's own clause.
+- Omission check: ISO dates were also detected as phone numbers → dates stripped before the phone
+  scan.
+- Prompt regression: "clarify before saving" made the model claim it had recorded a vague eviction
+  date that was never saved → save-first-then-clarify rule.
+- Live: the urgent deadline went unsaved in one run (no escalation) → omission check. The legal
+  question was "noted" but not saved → legal-question cue plus a guard rule.
+
+**Live results (actual):** see the Phase 3 table in `IMPLEMENTATION_PROGRESS.md` and the reports in
+`docs/evidence/phase3/`. Best full run on the omission-check code: Phase 2 set 4/4, Phase 3 set 3/4.
+On the final code, only 2 scenarios could be measured before all four free-tier models were exhausted
+(`gemini-3.5-flash-lite` reached its daily quota); both passed. No fabricated value in any run.
+
+**Tests executed (actual):** `pytest` 248 passed; `ruff check` clean; `ruff format --check` clean;
+`mypy` strict: no issues in 47 files; `alembic upgrade head` + `alembic check` on the main DB: no
+drift.
+
+**Known limitations:** pattern-based, English-only safety nets; nudges cost extra requests; free-tier
+quotas block repeated live evaluation; conversation-quality issues are left for Phase 6 measurement.
+
+**Next:** Phase 4 — Voice loop (awaiting authorization). Before it, re-run both live sets once quotas
+reset, and re-check latency.

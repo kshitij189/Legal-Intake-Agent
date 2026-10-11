@@ -7,7 +7,6 @@ Exit code 0 only if every scenario passes. Results depend on a live model and ca
 
 import argparse
 import json
-import re
 import sys
 import time
 from datetime import UTC, datetime, timedelta
@@ -16,18 +15,18 @@ from typing import Any
 
 from sqlalchemy import select
 
+from app.agent import reply_guard
 from app.agent.conversation import IntakeConversation
 from app.agent.llm_client import build_llm_client
 from app.config import REPO_ROOT, get_settings
 from app.db.session import make_engine, make_session_factory
 from app.domain import appointment_service, escalation_service, intake_service
+from app.domain.conversation_state import build_conversation_state
 from app.domain.firm_config_service import firm_today
-from app.models import CallSession, Firm, IntakeRecord
+from app.models import AuditEvent, CallSession, Firm, IntakeRecord
 from app.models.enums import EscalationReason, FieldStatus
 
-SCENARIOS = REPO_ROOT / "fixtures" / "transcripts" / "phase2_scripted.json"
-# Heuristic: a reply that sounds like a booking confirmation when nothing is booked.
-BOOKING_CLAIM = re.compile(r"\b(is|are|been|have)\s+(now\s+)?(booked|scheduled|confirmed)\b", re.I)
+DEFAULT_SCENARIOS = REPO_ROOT / "fixtures" / "transcripts" / "phase2_scripted.json"
 
 
 def check_field(name: str, rule: dict[str, Any], entry: Any, today: Any) -> list[str]:
@@ -41,6 +40,12 @@ def check_field(name: str, rule: dict[str, Any], entry: Any, today: Any) -> list
         expected = (today + timedelta(days=rule["equals_days_from_today"])).isoformat()
         if value != expected:
             problems.append(f"{name}: expected {expected}, got {value!r}")
+    if "in" in rule and value not in rule["in"]:
+        problems.append(f"{name}: expected one of {rule['in']}, got {value!r}")
+    if rule.get("not_null") and value is None:
+        problems.append(f"{name}: expected a value, got None")
+    if len(entry.history) < rule.get("history_at_least", 0):
+        problems.append(f"{name}: expected a correction history, got {len(entry.history)}")
     if "status_in" in rule and status not in rule["status_in"]:
         problems.append(f"{name}: expected status in {rule['status_in']}, got {status}")
     return problems
@@ -87,13 +92,24 @@ def run_scenario(scenario: dict[str, Any], sessions: Any, firm: Firm, llm: Any) 
             for e in escalations
             if e.reason_code is EscalationReason.CONFIGURED_RULE
         )
-        if rules != sorted(expect["escalation_rules"]):
+        if "escalation_rules" in expect and rules != sorted(expect["escalation_rules"]):
             problems.append(f"escalation rules {rules} != expected {expect['escalation_rules']}")
         if (appointment is not None) != expect["appointment_booked"]:
             problems.append(f"appointment booked = {appointment is not None}")
-        replies = " ".join(t["agent"] for t in transcript if "agent" in t)
-        if appointment is None and BOOKING_CLAIM.search(replies):
-            problems.append("possible false booking confirmation in agent replies")
+        replies = [t["agent"] for t in transcript if "agent" in t]
+        final_state = build_conversation_state(s, firm_id=firm.id, intake_id=call.intake_id)
+        claims = sorted({v for r in replies for v in reply_guard.check_reply(r, final_state)})
+        if claims:
+            problems.append(f"unsupported claims reached the caller: {claims}")
+        lowered = " ".join(replies).lower()
+        for phrase in expect.get("replies_must_not_contain", []):
+            if phrase.lower() in lowered:
+                problems.append(f"agent reply contains forbidden phrase {phrase!r}")
+        blocked = s.scalars(
+            select(AuditEvent.details).where(
+                AuditEvent.entity_id == call.id, AuditEvent.action == "agent.reply_blocked"
+            )
+        ).all()
 
         return {
             "id": scenario["id"],
@@ -102,7 +118,12 @@ def run_scenario(scenario: dict[str, Any], sessions: Any, firm: Firm, llm: Any) 
             "session_status": str(call.status),
             "end_status": end_status,
             "intake_reference": intake.reference if intake else None,
-            "fields": {k: {"value": v.value, "status": str(v.status)} for k, v in fields.items()},
+            "fields": {
+                k: {"value": v.value, "status": str(v.status), "corrections": len(v.history)}
+                for k, v in fields.items()
+            },
+            "outstanding": intake.outstanding if intake else None,
+            "replies_blocked_by_guard": [b["violations"] for b in blocked],
             "escalations": [
                 {"reason": str(e.reason_code), "rule_id": e.rule_id, "status": str(e.status)}
                 for e in escalations
@@ -121,6 +142,7 @@ def run_scenario(scenario: dict[str, Any], sessions: Any, firm: Firm, llm: Any) 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--scenarios", type=Path, default=DEFAULT_SCENARIOS)
     parser.add_argument("--only")
     parser.add_argument("--report", type=Path)
     parser.add_argument("--pause", type=float, default=5.0, help="seconds between scenarios")
@@ -132,7 +154,7 @@ def main() -> int:
     with sessions() as s:
         firm = s.scalars(select(Firm).where(Firm.slug == settings.demo_firm_slug)).one()
 
-    scenarios = json.loads(SCENARIOS.read_text(encoding="utf-8"))
+    scenarios = json.loads(args.scenarios.read_text(encoding="utf-8"))
     if args.only:
         scenarios = [sc for sc in scenarios if sc["id"] == args.only]
     results = []

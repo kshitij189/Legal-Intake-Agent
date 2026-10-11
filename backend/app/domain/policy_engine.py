@@ -19,7 +19,7 @@ from app.schemas.firm_config import (
     IntakeQuestion,
     QuestionType,
 )
-from app.schemas.intake import FieldEntry
+from app.schemas.intake import MAX_FIELD_HISTORY, FieldEntry, PriorValue
 
 MAX_TEXT_LENGTH = 2000
 MAX_NOTE_LENGTH = 1000
@@ -110,6 +110,15 @@ def build_field_entry(
     )
 
 
+def merge_with_previous(previous: FieldEntry, new: FieldEntry) -> FieldEntry:
+    """Carry correction history forward: a changed answer keeps what it replaced (bounded)."""
+    changed = (previous.value, previous.status) != (new.value, new.status)
+    if previous.status is FieldStatus.MISSING or not changed:
+        return new.model_copy(update={"history": previous.history})
+    prior = PriorValue(value=previous.value, status=previous.status, updated_at=previous.updated_at)
+    return new.model_copy(update={"history": (prior, *previous.history)[:MAX_FIELD_HISTORY]})
+
+
 def initial_fields(config: FirmConfig) -> dict[str, FieldEntry]:
     return {q.key: FieldEntry() for q in config.intake_questions}
 
@@ -165,6 +174,39 @@ def evaluate_rules(
 ) -> list[RuleMatch]:
     matches = (evaluate_rule(rule, fields, today) for rule in config.escalation_rules)
     return [m for m in matches if m is not None]
+
+
+_SUMMARY_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+_SUMMARY_EMAIL = re.compile(r"[^@\s(),;:]+@[^@\s(),;:]+\.[A-Za-z]{2,}")
+_SUMMARY_PHONE = re.compile(r"\+?\d[\d\s\-().]{5,}\d")
+
+
+def _digits(text: str) -> str:
+    return ("+" if text.strip().startswith("+") else "") + re.sub(r"\D", "", text)
+
+
+def unsupported_summary_facts(summary: str, fields: Mapping[str, FieldEntry]) -> list[str]:
+    """Exact dates, emails and phone numbers in a summary must match stored field values, so a
+    summary cannot introduce contact details or deadlines the intake record does not contain."""
+    stored = [e.value for e in fields.values() if e.value]
+    stored_lower = {v.lower() for v in stored}
+    stored_digits = {_digits(v) for v in stored} | {_digits(v).lstrip("+") for v in stored}
+    problems: list[str] = []
+
+    remaining = summary
+    for match in _SUMMARY_DATE.findall(summary):
+        if match not in stored:
+            problems.append(f"date {match}")
+        remaining = remaining.replace(match, " ")
+    for match in _SUMMARY_EMAIL.findall(remaining):
+        if match.lower().rstrip(".") not in stored_lower:
+            problems.append(f"email {match}")
+        remaining = remaining.replace(match, " ")
+    for match in _SUMMARY_PHONE.findall(remaining):
+        digits = _digits(match)
+        if len(digits.lstrip("+")) >= 7 and digits not in stored_digits:
+            problems.append(f"phone {match.strip()}")
+    return problems
 
 
 @dataclass(frozen=True)

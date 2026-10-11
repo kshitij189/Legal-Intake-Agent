@@ -181,7 +181,15 @@ def test_finalized_conversation_completes(committed_demo: Demo) -> None:
     convo, _ = conversation(
         committed_demo,
         [
-            tools(call("create_draft_intake")),
+            tools(
+                call("create_draft_intake"),
+                call(
+                    "save_intake_answer",
+                    field_key="matter_summary",
+                    status="REPORTED_BY_CALLER",
+                    value="Tenancy issue.",
+                ),
+            ),
             tools(call("finalize_intake_summary", summary="Caller asked about a tenancy issue.")),
             say("Thank you, the team will review your enquiry."),
         ],
