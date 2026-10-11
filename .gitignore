@@ -8,3 +8,7 @@ __pycache__/
 .ruff_cache/
 node_modules/
 .next/
+models/
+voice_smoke_worker.log
+voice_web.log
+voice_browser_caller.wav

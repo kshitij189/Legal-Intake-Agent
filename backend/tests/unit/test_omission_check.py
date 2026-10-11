@@ -121,3 +121,7 @@ def test_legal_questions_must_be_recorded(text: str) -> None:
     assert "possible_legal_question" not in codes(
         text, state(caller_questions=FieldStatus.REPORTED_BY_CALLER)
     )
+
+
+def test_speech_to_text_number_format_is_detected() -> None:
+    assert codes("My number is 98,765 43,210.") == ["possible_phone"]

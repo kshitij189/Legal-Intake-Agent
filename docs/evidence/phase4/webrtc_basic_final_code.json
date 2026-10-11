@@ -1,0 +1,82 @@
+{
+  "mode": "basic",
+  "checks": {
+    "greeting_heard": true,
+    "reply_heard": true,
+    "caller_transcribed": true,
+    "voice_session": true,
+    "deadline_saved_and_escalated": true,
+    "hangup_kept_partial_state": true
+  },
+  "worker_registration_s": 42.4,
+  "greeting_after_join_s": 1.47,
+  "response_latency_s": 3.04,
+  "heard_greeting": "Hello, thank you for contacting North Star Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your inquiry. May I ask you a few questions?",
+  "heard_reply": "Thank you. I have flagged the deadline for the team's prompt review. A member of the firm's team will look at your inquiry as soon as possible. And I can also note any other details you would like them to know before they contact you.",
+  "db": {
+    "channel": "VOICE",
+    "session_status": "DISCONNECTED",
+    "intake_status": "INCOMPLETE",
+    "reported_deadline": "2026-10-12",
+    "escalations": [
+      "imminent_deadline"
+    ],
+    "transcript": [
+      [
+        "AGENT",
+        "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+        null
+      ],
+      [
+        "CALLER",
+        "Hello, my name is Test Caller, and I must respond to a notice by tomorrow.",
+        null
+      ],
+      [
+        "AGENT",
+        "Thank you. I have flagged the deadline for the team's prompt review. A member of the firm's team will look at your enquiry as soon as possible, and I can also note any other details you would like them to know before they contact you.",
+        195
+      ]
+    ],
+    "interrupted_flags": [
+      [
+        "AGENT",
+        false
+      ],
+      [
+        "CALLER",
+        false
+      ],
+      [
+        "AGENT",
+        false
+      ]
+    ]
+  },
+  "stage_timings_ms": {
+    "stt_ms": [
+      1761,
+      1761
+    ],
+    "tts_ms": [
+      561,
+      561,
+      305,
+      305,
+      597,
+      597,
+      364,
+      364,
+      169,
+      169,
+      290,
+      290,
+      515,
+      515
+    ],
+    "processing_ms": [
+      195,
+      195
+    ]
+  }
+}

@@ -281,11 +281,19 @@ copy .env.example .env   # then edit values
 .\.venv\Scripts\python -u scripts/run_scripted_conversations.py --report <file.json>
 #   labelled scripts: fixtures/transcripts/phase2_scripted.json; live results vary per run
 
+# voice (Phase 4) - needs `docker compose up -d postgres livekit`
+.\.venv\Scripts\python scripts/download_voice_models.py        # Piper voice + Whisper model -> models/
+.\.venv\Scripts\python scripts/voice_worker.py start           # real worker (Gemini/Groq chain)
+.\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 8000   # http://127.0.0.1:8000/voice
+.\.venv\Scripts\python scripts/voice_worker.py console         # talk via this PC's mic, no browser
+.\.venv\Scripts\python -u scripts/voice_e2e_smoke.py [--barge-in] --report <f>  # automated WebRTC test
+.\.venv\Scripts\python -u scripts/voice_browser_smoke.py --report <f>           # real Chromium + fake mic
+
 # checks (run pytest from backend/ so its pyproject settings apply)
 cd backend; ..\.venv\Scripts\python -m pytest; cd ..
 .\.venv\Scripts\ruff check backend scripts
 .\.venv\Scripts\ruff format --check backend scripts
-.\.venv\Scripts\mypy backend/app
+.\.venv\Scripts\mypy --config-file backend/pyproject.toml backend/app   # config must be explicit from the repo root
 ```
 
 Notes:
@@ -332,6 +340,28 @@ Notes:
 - Legal questions are saved in the configured optional field `caller_questions`, never answered.
 - Vague answers are saved at once as `PENDING_HUMAN_REVIEW` (with the caller's words), *then*
   clarified once. Deferring the save led the model to claim it had recorded things it had not.
+### Voice layer (Phase 4)
+- LiveKit Agents 1.8 owns audio, VAD (Silero), turn-taking and barge-in. `IntakeVoiceAgent`
+  (`agent/voice_agent.py`) overrides `llm_node` and calls `IntakeConversation.respond()`, so voice
+  uses exactly the tested text code path. A marker `ConversationOwnedLLM` must be set on the
+  session: LiveKit skips replies when no LLM is configured. Its `chat()` must never be reached.
+- STT: `voice/stt.py` = faster-whisper `base.en` int8 on CPU, non-streaming per VAD segment.
+  Segments with `no_speech_prob >= 0.6` are dropped (Whisper hallucinates "Thank you." on silence).
+  An empty transcript gets "Sorry, I didn't catch that". STT writes numbers like "98,765 43,210",
+  so phone parsing accepts commas.
+- TTS: `voice/tts.py` = Piper `en_US-ljspeech-medium` (public-domain dataset), 22.05 kHz.
+  LiveKit splits replies into sentences and synthesizes each one.
+- The greeting is **not interruptible** (it carries the transcript disclosure); replies are. An
+  interrupted reply is flagged on its `transcript_turns` row and in the model's history.
+- Consent: `call_sessions.consent` records what was disclosed. Turns are stored only if the firm's
+  `privacy.retain_transcripts` is true. Audio is never recorded. Transcript text is never logged.
+- A caller hang-up closes the session: unfinished intake → `INCOMPLETE`, session `DISCONNECTED`.
+- Heavy models load once per worker process (`prewarm`). Blocking work (Whisper, Piper, the
+  conversation) runs in threads, never on the event loop.
+- `scripts/voice_smoke_worker.py` uses a deterministic scripted model for automated audio tests
+  only; the real worker is `scripts/voice_worker.py`.
+- The web app (`app/main.py`) is local-demo only: an unauthenticated token endpoint bound to
+  127.0.0.1. Staff authentication and the full API arrive in Phase 7.
 - The blueprint's `agent/claude_client.py` is `agent/llm_client.py` (neutral types + fallback)
   with `agent/llm_gemini.py` and `agent/llm_groq.py` adapters.
 

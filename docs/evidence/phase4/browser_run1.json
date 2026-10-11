@@ -1,0 +1,35 @@
+{
+  "checks": {
+    "page_received_agent_audio": true,
+    "fresh_voice_session": true,
+    "browser_mic_transcribed": true,
+    "agent_replied": true,
+    "end_call_kept_partial_state": true
+  },
+  "page_status_after_connect": "Connected - waiting for the assistant",
+  "page_log": [
+    "23:35:51 Disconnected",
+    "23:35:10 Assistant audio connected",
+    "23:35:10 Joined room intake-99b9b47b03bc"
+  ],
+  "db": {
+    "session_started_after_test_start": true,
+    "channel": "VOICE",
+    "session_status": "DISCONNECTED",
+    "intake_status": "INCOMPLETE",
+    "transcript": [
+      [
+        "AGENT",
+        "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?"
+      ],
+      [
+        "CALLER",
+        "Hello, my name is Test Caller and I must respond to a notice by tomorrow."
+      ],
+      [
+        "AGENT",
+        "Thank you. I have flagged the deadline for the team's prompt review."
+      ]
+    ]
+  }
+}

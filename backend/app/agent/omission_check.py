@@ -27,7 +27,7 @@ _DEADLINE_CUE = re.compile(
     re.I,
 )
 _NO_DEADLINE = re.compile(r"\bno (?:deadlines?|notice|due date|hearing)\b", re.I)
-_PHONE = re.compile(r"\+?\d[\d\s\-().]{5,}\d")
+_PHONE = re.compile(r"\+?\d[\d\s\-().,]{5,}\d")  # commas: STT number formatting
 _EMAIL = re.compile(r"[^@\s(),;:]+@[^@\s(),;:]+\.[A-Za-z]{2,}")
 _REFUSAL = re.compile(
     r"\b(?:rather not|prefer not to|don't want to (?:share|give)|do not want to (?:share|give)|"

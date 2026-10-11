@@ -69,6 +69,11 @@ class CallSessionStatus(StrEnum):
     FAILED = "FAILED"
 
 
+class Speaker(StrEnum):
+    CALLER = "CALLER"
+    AGENT = "AGENT"
+
+
 class AuditOutcome(StrEnum):
     SUCCESS = "SUCCESS"
     FAILURE = "FAILURE"

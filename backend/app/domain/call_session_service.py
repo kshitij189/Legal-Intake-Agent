@@ -2,6 +2,7 @@
 
 import uuid
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -20,11 +21,18 @@ _ENDED_EARLY = {CallSessionStatus.DISCONNECTED, CallSessionStatus.FAILED}
 
 
 def start_call_session(
-    session: Session, *, firm_id: uuid.UUID, actor: Actor, channel: SessionChannel
+    session: Session,
+    *,
+    firm_id: uuid.UUID,
+    actor: Actor,
+    channel: SessionChannel,
+    consent: dict[str, Any] | None = None,
 ) -> CallSession:
     authorize(session, firm_id, actor, Action.SESSION_MANAGE)
     get_active_firm(session, firm_id)
-    call = CallSession(firm_id=firm_id, channel=channel, status=CallSessionStatus.ACTIVE)
+    call = CallSession(
+        firm_id=firm_id, channel=channel, status=CallSessionStatus.ACTIVE, consent=consent or {}
+    )
     session.add(call)
     session.flush()
     record_audit(

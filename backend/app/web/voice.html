@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Northstar Legal - Voice Intake (demo)</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #f6f7f9; --fg: #1d2330; --muted: #5d6676; --card: #fff;
+            --accent: #2d5bd7; --danger: #b3261e; --border: #d9dde4; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #14171c; --fg: #e8eaee; --muted: #a2a9b6; --card: #1d2128; --accent: #7c9cf5;
+              --danger: #f2b8b5; --border: #313744; }
+    }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+    main { max-width: 560px; margin: 0 auto; padding: 32px 16px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    h1 { font-size: 1.3rem; margin: 0 0 4px; }
+    p { color: var(--muted); line-height: 1.5; }
+    button { font-size: 1rem; padding: 10px 18px; border-radius: 8px; border: 0; cursor: pointer;
+             background: var(--accent); color: #fff; }
+    button.end { background: var(--danger); }
+    button:disabled { opacity: .5; cursor: default; }
+    #status { margin-top: 14px; font-weight: 600; }
+    #log { margin-top: 14px; font-size: .85rem; color: var(--muted); max-height: 200px; overflow: auto; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <h1>Northstar Legal - virtual intake assistant</h1>
+    <p>Fictional demo firm. The assistant collects initial information and can arrange a
+       consultation. It cannot give legal advice. This conversation is transcribed for the firm's
+       review; audio is not recorded. Use fictional details only.</p>
+    <button id="start">Start call</button>
+    <button id="end" class="end" disabled>End call</button>
+    <div id="status">Not connected</div>
+    <div id="log"></div>
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@2.22.3/dist/livekit-client.umd.min.js"></script>
+<script>
+  const { Room, RoomEvent, Track } = LivekitClient;
+  const startBtn = document.getElementById("start");
+  const endBtn = document.getElementById("end");
+  const statusEl = document.getElementById("status");
+  const logEl = document.getElementById("log");
+  let room = null;
+
+  function log(text) {
+    const line = document.createElement("div");
+    line.textContent = new Date().toLocaleTimeString() + "  " + text;
+    logEl.prepend(line);
+  }
+
+  async function startCall() {
+    startBtn.disabled = true;
+    statusEl.textContent = "Connecting...";
+    try {
+      const res = await fetch("/api/v1/voice/token", { method: "POST" });
+      if (!res.ok) throw new Error("token request failed: " + res.status);
+      const { url, token, room: roomName } = await res.json();
+      room = new Room({ adaptiveStream: true, dynacast: true });
+      room.on(RoomEvent.TrackSubscribed, (track) => {
+        if (track.kind === Track.Kind.Audio) {
+          const el = track.attach();
+          document.body.appendChild(el);
+          log("Assistant audio connected");
+        }
+      });
+      room.on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
+        const agent = speakers.find((p) => p.identity !== room.localParticipant.identity);
+        statusEl.textContent = agent ? "Assistant speaking..." : "Listening...";
+      });
+      room.on(RoomEvent.Disconnected, () => {
+        statusEl.textContent = "Call ended";
+        startBtn.disabled = false;
+        endBtn.disabled = true;
+        log("Disconnected");
+      });
+      await room.connect(url, token);
+      await room.localParticipant.setMicrophoneEnabled(true);
+      statusEl.textContent = "Connected - waiting for the assistant";
+      endBtn.disabled = false;
+      log("Joined room " + roomName);
+    } catch (err) {
+      statusEl.textContent = "Could not connect: " + err.message;
+      startBtn.disabled = false;
+    }
+  }
+
+  startBtn.addEventListener("click", startCall);
+  endBtn.addEventListener("click", () => room && room.disconnect());
+</script>
+</body>
+</html>

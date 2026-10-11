@@ -24,7 +24,8 @@ from app.schemas.intake import MAX_FIELD_HISTORY, FieldEntry, PriorValue
 MAX_TEXT_LENGTH = 2000
 MAX_NOTE_LENGTH = 1000
 
-_PHONE_SEPARATORS = re.compile(r"[\s\-().]")
+# Commas included: speech-to-text writes spoken numbers as "98,765 43,210".
+_PHONE_SEPARATORS = re.compile(r"[\s\-().,]")
 _PHONE = re.compile(r"^\+?\d{7,15}$")
 _EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -178,7 +179,7 @@ def evaluate_rules(
 
 _SUMMARY_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 _SUMMARY_EMAIL = re.compile(r"[^@\s(),;:]+@[^@\s(),;:]+\.[A-Za-z]{2,}")
-_SUMMARY_PHONE = re.compile(r"\+?\d[\d\s\-().]{5,}\d")
+_SUMMARY_PHONE = re.compile(r"\+?\d[\d\s\-().,]{5,}\d")
 
 
 def _digits(text: str) -> str:

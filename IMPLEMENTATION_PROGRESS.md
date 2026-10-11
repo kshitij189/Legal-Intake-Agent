@@ -6,9 +6,13 @@ A phase is `COMPLETED` only when every acceptance criterion has recorded evidenc
 **Repository state at documentation setup (2026-10-11):** empty directory, no source code, no git
 repository. No prior implementation work existed, so every phase started `NOT_STARTED`.
 
-**Last updated:** 2026-10-11 — Phases 1, 2 and 3 completed.
+**Last updated:** 2026-10-11 — Phases 1–4 completed.
 
-**Next phase to implement:** Phase 4 — Voice loop (awaiting authorization).
+> Correction (Phase 4): the "mypy strict" results recorded for Phases 1–3 were produced without the
+> strict config loaded (see CHANGE_LOG, Phase 4). Strict mode now runs via
+> `mypy --config-file backend/pyproject.toml backend/app` and is clean.
+
+**Next phase to implement:** Phase 5 — Durable workflows (awaiting authorization).
 
 ## Summary
 
@@ -17,7 +21,7 @@ repository. No prior implementation work existed, so every phase started `NOT_ST
 | 1 | Domain and database foundation | COMPLETED (2026-10-11) | — |
 | 2 | Text-based intake agent | COMPLETED (2026-10-11) | 1 |
 | 3 | Conversational state and safety | COMPLETED (2026-10-11) | 2 |
-| 4 | Voice loop | NOT_STARTED | 3 |
+| 4 | Voice loop | COMPLETED (2026-10-11) | 3 |
 | 5 | Durable workflows | NOT_STARTED | 1, 2 (3 recommended) |
 | 6 | Evaluation harness | NOT_STARTED | 3 (audio mode: 4; recovery/fault cases: 5) |
 | 7 | Human-review dashboard | NOT_STARTED | 1, 5 |
@@ -226,7 +230,8 @@ One further run between B and C was rate-limited on every model and is not count
 ---
 ## Phase 4 — Voice loop
 
-**Status:** NOT_STARTED
+**Status:** COMPLETED (2026-10-11), on automated real-audio evidence. Two items are not done yet:
+a session with a human speaking, and a voice session with the live LLM (quota exhausted today).
 
 **Objective:** LiveKit Agents + local STT (faster-whisper), Silero VAD, local TTS (Piper; evaluate
 Kokoro), browser microphone interface.
@@ -234,24 +239,68 @@ Kokoro), browser microphone interface.
 **Dependencies:** Phase 3.
 
 **Tasks / deliverables**
-- [ ] Self-hosted LiveKit server in Docker Compose; agent worker.
-- [ ] STT/TTS/VAD adapters; voice session manager; interruption handling.
-- [ ] `transcript_turns` table + migration; consent/disclosure metadata on call sessions.
-- [ ] Minimal browser page to join a room with the microphone.
-- [ ] Disconnect handling → intake `INCOMPLETE`, partial state preserved.
-- [ ] Latency instrumentation (structured logs / OpenTelemetry).
+- [x] Self-hosted LiveKit server `v1.13.9` in Docker Compose (dev mode, ports 7880/7881/7882-udp,
+      bound to 127.0.0.1); agent worker `scripts/voice_worker.py` (`dev`/`start`/`console`).
+- [x] Adapters: `voice/stt.py` (faster-whisper), `voice/tts.py` (Piper), Silero VAD;
+      `voice/session_manager.py` (per-process model prewarm, session wiring, events);
+      `agent/voice_agent.py` (`llm_node` → `IntakeConversation`, readiness gate, interruption hook).
+- [x] `transcript_turns` table + `call_sessions.consent` (migration `1602d7e7af4d`); firm
+      `privacy` policy (retain transcripts + disclosure text); disclosure spoken in the greeting.
+- [x] Browser page `GET /voice` + `POST /api/v1/voice/token` (`app/main.py`, local demo only).
+- [x] Disconnect handling → session `DISCONNECTED`, intake `INCOMPLETE`, partial state preserved.
+- [x] Latency instrumentation: per-turn `processing_ms` stored on agent turns; `stt_ms`, `tts_ms`,
+      `processing_ms` logs; LiveKit `metrics_collected` logged.
+- [x] `scripts/download_voice_models.py`; automated tests `scripts/voice_e2e_smoke.py`
+      (`--barge-in`) and `scripts/voice_browser_smoke.py` (Playwright Chromium, fake mic).
 
-**Acceptance criteria:** you can speak to the agent, hear responses, inspect the transcript and see
-the corresponding intake state change.
+**Acceptance criteria → evidence** (reports in `docs/evidence/phase4/`)
+- [x] *Speak to the agent and hear responses* — automated caller over real WebRTC: 4/4 runs PASS
+      (basic ×3, barge-in ×1). Real browser page with a WAV as the microphone: 2/2 runs PASS. The
+      greeting and replies were heard and transcribed back by Whisper. The audio was synthesized,
+      not a human voice.
+- [x] *Inspect the transcript* — `transcript_turns` rows (agent greeting with disclosure, caller
+      turn transcribed exactly, agent reply with `processing_ms`); `interrupted` flag set on a
+      barged-in reply, and never on the greeting.
+- [x] *See the intake state change* — the spoken "respond to a notice by tomorrow" produced the
+      saved `reported_deadline` and the `imminent_deadline` escalation. A hang-up left the session
+      `DISCONNECTED` and the intake `INCOMPLETE`.
 
-**Required tests / evidence:** adapter unit tests; a recorded manual voice session with transcript
-and DB state; measured latency numbers. Hardware/model download constraints documented.
+**Measured latency** (scripted model, so no LLM time included):
 
-**Blockers / decisions:** TTS voice licence; CPU/GPU capacity for faster-whisper model size;
-language support (English first). **Next step:** after Phase 3.
+| Measure | Values |
+|---|---|
+| End of caller speech → start of agent reply | 2.61–3.07 s (5 runs) |
+| Agent reply after a barge-in | 2.47 s |
+| Whisper `base.en` per caller utterance (~4 s of audio) | 1.18–1.44 s |
+| Conversation turn (tools + DB, scripted model) | ~0.2 s |
+| Piper TTS per sentence | 0.2–0.85 s |
+| Greeting after joining | 1.2–3.0 s |
+| Worker registration (model load) | 42–48 s |
+
+A real LLM adds its own time to every turn: Gemini/Groq calls took 2–35 s in Phases 2–3, often
+several calls per turn. **Not yet measured in voice.**
+
+**Hardware / model constraints:** Ryzen 7 4800H (8 cores), 16 GB RAM, RTX 3050 Ti 4 GB, ~9.6 GB
+free disk. STT runs on CPU (`base.en` int8). `small.en` measured 2.6× slower with no accuracy gain on
+the test sentence, and GPU/CUDA libraries (~2 GB) were skipped for disk space. Models ~210 MB in
+`models/` (git-ignored).
+
+**Decisions:** Piper (LJSpeech voice, public-domain dataset) chosen. **Kokoro was not evaluated**:
+Piper already meets latency, and disk is tight; revisit in Phase 8 if voice quality matters.
+English only: Hindi/Hinglish untested, so not supported.
+
+**Known limitations / pending**
+- Voice with the real LLM chain: blocked today by free-tier quota exhaustion. Run
+  `scripts/voice_worker.py start` + the web page once quotas reset, and measure turn latency.
+- A human-microphone session is still to be done by you (instructions in CLAUDE.md §12).
+- With live free-tier LLMs, expect multi-second to tens-of-seconds pauses per turn; a paid tier
+  is likely needed for a fluid demo.
+- Speech said during the greeting is discarded (the greeting is uninterruptible by design).
+- The token endpoint is unauthenticated (local only, 127.0.0.1); real auth comes in Phase 7.
+
+**Blockers:** none for the phase.
 
 ---
-
 ## Phase 5 — Durable workflows
 
 **Status:** NOT_STARTED

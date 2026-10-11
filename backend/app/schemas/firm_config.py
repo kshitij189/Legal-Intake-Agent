@@ -90,10 +90,22 @@ class SchedulingPolicy(StrictModel):
     max_days_ahead: int = Field(ge=1, le=90)
 
 
+class PrivacyPolicy(StrictModel):
+    """What the firm retains from conversations, and what callers are told about it."""
+
+    retain_transcripts: bool = True
+    transcript_disclosure: str = Field(
+        default="This conversation is transcribed so the firm's team can review your enquiry.",
+        min_length=1,
+        max_length=300,
+    )
+
+
 class FirmConfig(StrictModel):
     intake_questions: tuple[IntakeQuestion, ...] = Field(min_length=1)
     escalation_rules: tuple[EscalationRule, ...] = ()
     scheduling: SchedulingPolicy
+    privacy: PrivacyPolicy = PrivacyPolicy()
 
     @model_validator(mode="after")
     def _check_references(self) -> Self:

@@ -17,5 +17,15 @@ services:
       timeout: 3s
       retries: 30
 
+  # Self-hosted LiveKit (WebRTC) for the voice loop. Dev mode = placeholder keys devkey/secret:
+  # local development only, never exposed beyond this machine.
+  livekit:
+    image: livekit/livekit-server:v1.13.9
+    command: ["--dev", "--bind", "0.0.0.0", "--node-ip", "127.0.0.1"]
+    ports:
+      - "127.0.0.1:7880:7880"   # signalling (ws)
+      - "127.0.0.1:7881:7881"   # WebRTC over TCP
+      - "127.0.0.1:7882:7882/udp"  # WebRTC over UDP (single muxed port)
+
 volumes:
   postgres_data:

@@ -5,6 +5,7 @@ The voice runtime (Phase 4) will drive the same loop with transcribed speech.
 
 import json
 import logging
+import time
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -16,7 +17,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.agent import omission_check, prompts, reply_guard
 from app.agent.llm_client import PROVIDER_STATE_KEY, LLMClient, LLMResponse, LLMUnavailable
 from app.agent.tool_registry import REGISTRY, tool_definitions
-from app.domain import escalation_service, intake_service
+from app.domain import escalation_service, intake_service, transcript_service
 from app.domain.actors import Actor
 from app.domain.audit import record_audit
 from app.domain.call_session_service import (
@@ -32,6 +33,7 @@ from app.models.enums import (
     EscalationReason,
     IntakeStatus,
     SessionChannel,
+    Speaker,
 )
 from app.tools.context import ToolContext
 from app.tools.escalation_tools import unable_escalation_key
@@ -40,6 +42,7 @@ from app.tools.executor import ToolExecutor
 logger = logging.getLogger(__name__)
 
 MAX_TOOL_ROUNDS = 8
+INTERRUPTED_NOTE = "[interrupted: the caller may not have heard the end of this reply]"
 RETRY_PROMPT = "I'm sorry, I didn't manage to complete that. Could you say that again?"
 FAILURE_FLAGGED = (
     "I'm sorry, I'm having a technical problem and can't continue right now. I've saved what "
@@ -88,6 +91,7 @@ class IntakeConversation:
     ended: bool = field(default=False, init=False)
     trace: list[TraceEntry] = field(default_factory=list, init=False)
     providers_used: list[str] = field(default_factory=list, init=False)  # one per model response
+    last_processing_ms: int | None = field(default=None, init=False)
     _messages: list[dict[str, Any]] = field(default_factory=list, init=False)
     _tools: list[dict[str, Any]] = field(default_factory=list, init=False)
     _executor: ToolExecutor | None = field(default=None, init=False)
@@ -96,14 +100,26 @@ class IntakeConversation:
         with self.sessions() as session, session.begin():
             firm = get_active_firm(session, self.firm_id)
             config = load_config(firm)
+            privacy = config.privacy
+            disclosure = privacy.transcript_disclosure if privacy.retain_transcripts else None
             call = start_call_session(
-                session, firm_id=self.firm_id, actor=self.actor, channel=self.channel
+                session,
+                firm_id=self.firm_id,
+                actor=self.actor,
+                channel=self.channel,
+                # Audio is never stored; transcripts only if the firm retains them and the
+                # caller is told so in the greeting.
+                consent={
+                    "transcript_retained": privacy.retain_transcripts,
+                    "disclosure": disclosure,
+                    "audio_recorded": False,
+                },
             )
             self.call_session_id = call.id
             system = prompts.system_prompt(
                 firm.name, firm_today(firm, self.clock()), firm.timezone, config
             )
-            opening = prompts.greeting(firm.name)
+            opening = prompts.greeting(firm.name, disclosure)
         ctx = ToolContext(
             firm_id=self.firm_id, call_session_id=call.id, actor=self.actor, clock=self.clock
         )
@@ -113,11 +129,54 @@ class IntakeConversation:
             {"role": "system", "content": system},
             {"role": "assistant", "content": opening},
         ]
+        self._record(Speaker.AGENT, opening)
         return opening
 
     def respond(self, caller_text: str) -> str:
+        """Process one caller turn and return the reply. Both turns are recorded (if the firm
+        retains transcripts) with the reply's processing time."""
         if self.ended or self._executor is None:
             raise ConversationEnded("the conversation is not active")
+        self._record(Speaker.CALLER, caller_text)
+        started = time.perf_counter()
+        reply = self._respond(caller_text)
+        self.last_processing_ms = round((time.perf_counter() - started) * 1000)
+        self._record(Speaker.AGENT, reply, self.last_processing_ms)
+        return reply
+
+    def mark_last_reply_interrupted(self) -> None:
+        """Voice barge-in: the caller may not have heard the end of the last reply."""
+        for message in reversed(self._messages):
+            if message["role"] == "assistant" and message.get("content"):
+                message["content"] = f"{message['content']} {INTERRUPTED_NOTE}"
+                break
+        assert self.call_session_id is not None
+        try:
+            with self.sessions() as session, session.begin():
+                transcript_service.mark_last_agent_turn_interrupted(
+                    session, firm_id=self.firm_id, call_session_id=self.call_session_id
+                )
+        except Exception:
+            logger.exception("transcript_interrupt_mark_failed")
+
+    def _record(self, speaker: Speaker, text: str, processing_ms: int | None = None) -> None:
+        assert self.call_session_id is not None
+        try:
+            with self.sessions() as session, session.begin():
+                transcript_service.record_turn(
+                    session,
+                    firm_id=self.firm_id,
+                    call_session_id=self.call_session_id,
+                    speaker=speaker,
+                    text=text,
+                    processing_ms=processing_ms,
+                )
+        except Exception:
+            # A transcript write must never break the conversation itself.
+            logger.exception("transcript_record_failed")
+
+    def _respond(self, caller_text: str) -> str:
+        assert self._executor is not None
         self._messages.append({"role": "user", "content": caller_text})
 
         nudged = False

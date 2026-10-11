@@ -32,7 +32,21 @@ class Settings(BaseSettings):
     # Total time one model call may spend waiting out provider rate limits (429 + retry-after).
     llm_rate_limit_max_wait_seconds: float = 30.0
 
+    # Voice (Phase 4). LiveKit dev-mode credentials: local development only.
+    livekit_url: str = "ws://127.0.0.1:7880"
+    livekit_api_key: str = "devkey"
+    livekit_api_secret: SecretStr = SecretStr("secret")
+    # faster-whisper: base.en on CPU int8 measured ~0.13x real time on the dev laptop (2026-10-11).
+    stt_model: str = "base.en"
+    stt_device: str = "cpu"
+    stt_compute_type: str = "int8"
+    stt_language: str = "en"
+    # Piper voice trained on LJSpeech (public-domain dataset), 22.05 kHz.
+    tts_voice_path: Path = REPO_ROOT / "models" / "piper" / "en_US-ljspeech-medium.onnx"
+    models_dir: Path = REPO_ROOT / "models"
+    voice_web_port: int = 8000
+
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()  # type: ignore[call-arg]  # values come from the environment / .env
+    return Settings()  # values come from the environment / .env

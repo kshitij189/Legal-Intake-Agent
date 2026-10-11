@@ -23,6 +23,7 @@ def q(key: str) -> IntakeQuestion:
     [
         ("phone", " +91 98765-43210 ", "+919876543210"),
         ("phone", "(020) 555.1234", "0205551234"),
+        ("phone", "98,765 43,210", "9876543210"),  # how speech-to-text writes spoken numbers
         ("email", "Priya@Example.COM", "priya@example.com"),
         ("reported_deadline", "2026-10-13", "2026-10-13"),
         ("matter_category", " employment ", "EMPLOYMENT"),

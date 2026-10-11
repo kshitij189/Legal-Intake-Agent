@@ -1,0 +1,65 @@
+{
+  "checks": {
+    "greeting_heard": true,
+    "reply_heard": true,
+    "caller_transcribed": true,
+    "voice_session": true,
+    "deadline_saved_and_escalated": true,
+    "hangup_kept_partial_state": true
+  },
+  "worker_registration_s": 42.8,
+  "greeting_after_join_s": 1.7,
+  "response_latency_s": 2.8,
+  "heard_greeting": "Hello, thank you for contacting North Star Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your inquiry. May I ask you a few questions?",
+  "heard_reply": "Thank you. I have flagged the deadline for the team's prompt review.",
+  "db": {
+    "channel": "VOICE",
+    "session_status": "DISCONNECTED",
+    "intake_status": "INCOMPLETE",
+    "reported_deadline": "2026-10-12",
+    "escalations": [
+      "imminent_deadline"
+    ],
+    "transcript": [
+      [
+        "AGENT",
+        "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+        null
+      ],
+      [
+        "CALLER",
+        "Hello, my name is Test Caller and I must respond to a notice by tomorrow.",
+        null
+      ],
+      [
+        "AGENT",
+        "Thank you. I have flagged the deadline for the team's prompt review.",
+        200
+      ]
+    ]
+  },
+  "stage_timings_ms": {
+    "stt_ms": [
+      1440,
+      1440
+    ],
+    "tts_ms": [
+      482,
+      482,
+      623,
+      623,
+      670,
+      670,
+      469,
+      469,
+      207,
+      207,
+      315,
+      315
+    ],
+    "processing_ms": [
+      200,
+      200
+    ]
+  }
+}

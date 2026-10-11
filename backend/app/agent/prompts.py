@@ -5,12 +5,16 @@ from datetime import date, timedelta
 from app.schemas.firm_config import FirmConfig, QuestionType
 
 
-def greeting(firm_name: str) -> str:
-    return (
+def greeting(firm_name: str, disclosure: str | None = None) -> str:
+    parts = [
         f"Hello, thank you for contacting {firm_name}. I'm the firm's virtual intake assistant. "
         "I can collect some initial information and help arrange a callback or consultation, "
-        "but I can't give legal advice. May I ask you a few questions?"
-    )
+        "but I can't give legal advice.",
+    ]
+    if disclosure:
+        parts.append(disclosure)
+    parts.append("May I ask you a few questions?")
+    return " ".join(parts)
 
 
 def _question_lines(config: FirmConfig) -> str:

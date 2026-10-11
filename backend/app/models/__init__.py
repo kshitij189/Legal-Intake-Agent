@@ -4,6 +4,7 @@ from app.models.escalation import Escalation
 from app.models.firm import Firm, StaffMember
 from app.models.intake import IntakeRecord, intake_reference_seq
 from app.models.scheduling import Appointment, AvailabilitySlot
+from app.models.transcript import TranscriptTurn
 
 __all__ = [
     "Appointment",
@@ -14,5 +15,6 @@ __all__ = [
     "Firm",
     "IntakeRecord",
     "StaffMember",
+    "TranscriptTurn",
     "intake_reference_seq",
 ]

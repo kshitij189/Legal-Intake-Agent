@@ -325,3 +325,65 @@ quotas block repeated live evaluation; conversation-quality issues are left for 
 
 **Next:** Phase 4 — Voice loop (awaiting authorization). Before it, re-run both live sets once quotas
 reset, and re-check latency.
+
+---
+
+## 2026-10-11 — Phase 4: voice loop
+
+**Added**
+- Docker Compose `livekit` service (`livekit/livekit-server:v1.13.9`, dev mode, 127.0.0.1-bound
+  ports 7880/7881/7882-udp; ports confirmed from the server's own startup log).
+- `voice/audio.py`, `voice/stt.py` (`WhisperSTT`: faster-whisper, CPU int8, non-streaming per VAD
+  segment, silence-hallucination filter), `voice/tts.py` (`PiperTTS`), `voice/session_manager.py`
+  (prewarm, session wiring: interruption, close, metrics, outage hang-up), `agent/voice_agent.py`
+  (`IntakeVoiceAgent`, `ConversationOwnedLLM`).
+- `transcript_turns` table and `call_sessions.consent` (migration `1602d7e7af4d`, `{}` server
+  default for existing rows); `domain/transcript_service.py`; firm `privacy` policy; the greeting
+  speaks the disclosure; `IntakeConversation` records turns with `processing_ms` (text and voice).
+- `app/main.py` (FastAPI: `/voice` page, `/api/v1/voice/token`) and `app/web/voice.html`
+  (livekit-client 2.22.3 from jsDelivr, verified URL).
+- Scripts: `voice_worker.py`, `voice_smoke_worker.py` (deterministic model for audio tests only),
+  `voice_e2e_smoke.py` (`--barge-in`), `voice_browser_smoke.py` (Playwright), `download_voice_models.py`.
+- Tests: `test_voice_adapters.py` (fake Whisper/Piper through real LiveKit stream plumbing),
+  `test_voice_agent.py` (LiveKit text-mode session harness → conversation → DB),
+  `test_transcripts.py`.
+- Dependencies: livekit-agents 1.8.6, livekit-plugins-silero 1.8.6, livekit-api 1.2.1,
+  faster-whisper 1.2.1 (ctranslate2 4.8.2), piper-tts 1.8.0, fastapi 0.143.0, uvicorn 0.54.0; dev:
+  playwright 1.63.0 (+ Chromium). All installed with Windows/Python 3.13 wheels.
+
+**Decisions (with measurements)**
+- STT `base.en` CPU int8: 1.8 s for a 14 s utterance vs `small.en` 4.7 s, same transcript. GPU
+  skipped (≈2 GB CUDA libraries, 9.8 GB free disk).
+- TTS Piper `en_US-ljspeech-medium`: model card "License: public domain"; warm RTF 0.07. Kokoro
+  not evaluated (disk; Piper adequate) — revisit in Phase 8.
+- LiveKit skips replies when a session has no LLM (read in `agent_activity.py`), so a marker LLM is
+  set and `llm_node` delegates to the existing conversation.
+- Greeting not interruptible (disclosure integrity); replies interruptible.
+
+**Bugs found and fixed**
+- Whisper writes spoken numbers with commas ("98,765 43,210"): phone validation, omission check
+  and summary fact check now accept commas (regression tests added).
+- Race: a caller turn could reach `llm_node` before `on_enter` had started the conversation →
+  readiness event.
+- **Correction to earlier entries:** `mypy backend/app` run from the repository root did not load
+  `backend/pyproject.toml`, so the reported "mypy strict" results for Phases 1–3 were actually
+  mypy defaults. With `--config-file backend/pyproject.toml`, strict mode found 3 unused
+  `type: ignore`s and 3 missing generic parameters (all fixed); it is now clean on 56 files.
+  CLAUDE.md's command is corrected.
+- E2E check too strict: Whisper heard "Northster", so the greeting check now looks for role and
+  boundary wording instead of the proper noun (the first run reported FAIL only on that check).
+
+**Tests and validations executed (actual)**
+- `pytest` 265 passed; `ruff check` clean; `ruff format --check` clean;
+  `mypy --config-file backend/pyproject.toml backend/app` (strict): no issues in 56 files;
+  `alembic upgrade head` + `alembic check`: no drift.
+- WebRTC E2E (`voice_e2e_smoke.py`): run 1 FAIL (greeting proper-noun check only, all others
+  true), then runs 2, 3 and final PASS; barge-in PASS. Latency (end of speech → start of reply)
+  3.07 / 2.80 / 2.79 / 3.04 / 2.61 s.
+- Browser (`voice_browser_smoke.py`): 2/2 PASS.
+
+**Known limitations:** no live-LLM voice session yet (quota); no human-microphone session yet;
+English only; unauthenticated local token endpoint; with free-tier LLMs, turn latency will be
+dominated by the model.
+
+**Next:** Phase 5 — Durable workflows (awaiting authorization).

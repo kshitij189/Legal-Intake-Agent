@@ -119,3 +119,11 @@ def test_summary_facts_must_be_in_the_record() -> None:
         "email boss@corp.example",
         "phone +91 99999 11111",
     ]
+
+
+def test_summary_accepts_stt_formatted_stored_phone() -> None:
+    fields = filled(phone=FieldEntry(value="9876543210", status=FieldStatus.REPORTED_BY_CALLER))
+    assert policy_engine.unsupported_summary_facts("Call 98,765 43,210.", fields) == []
+    assert policy_engine.unsupported_summary_facts("Call 91,234 56,789.", fields) == [
+        "phone 91,234 56,789"
+    ]

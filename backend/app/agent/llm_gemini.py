@@ -85,7 +85,7 @@ class GeminiLLMClient:
         self, contents: list[types.Content], config: types.GenerateContentConfig
     ) -> types.GenerateContentResponse:
         try:
-            return self._client.models.generate_content(  # type: ignore[no-any-return]
+            return self._client.models.generate_content(
                 model=self.model, contents=contents, config=config
             )
         except errors.APIError as exc:

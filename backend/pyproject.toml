@@ -16,6 +16,14 @@ dependencies = [
     "tzdata>=2024.2",
     "groq>=0.37,<1",
     "google-genai>=1.75,<2",
+    # Phase 4 - voice loop
+    "livekit-agents>=1.8,<2",
+    "livekit-plugins-silero>=1.8,<2",
+    "livekit-api>=1.2,<2",
+    "faster-whisper>=1.2,<2",
+    "piper-tts>=1.8,<2",
+    "fastapi>=0.143,<1",
+    "uvicorn>=0.54,<1",
 ]
 
 [project.optional-dependencies]
@@ -23,6 +31,7 @@ dev = [
     "pytest>=8.3,<9",
     "ruff>=0.8,<1",
     "mypy>=1.13,<2",
+    "playwright>=1.63,<2",
 ]
 
 [tool.setuptools.packages.find]
@@ -38,3 +47,8 @@ markers = ["integration: requires the PostgreSQL test database"]
 python_version = "3.13"
 strict = true
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# Local voice model libraries ship without type information.
+module = ["faster_whisper", "faster_whisper.*", "piper", "piper.*"]
+ignore_missing_imports = true

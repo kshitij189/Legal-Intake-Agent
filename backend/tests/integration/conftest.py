@@ -25,7 +25,8 @@ from tests.helpers import DEMO_SLUG, NOW
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 TABLES = (
-    "audit_events, call_sessions, appointments, escalations, intake_records, availability_slots, "
+    "audit_events, transcript_turns, call_sessions, appointments, escalations, intake_records, "
+    "availability_slots, "
     "staff_members, firms"
 )
 
