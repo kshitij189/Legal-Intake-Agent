@@ -1,0 +1,431 @@
+{
+  "providers": "gemini:gemini-3.8-flash,gemini:gemini-3.5-flash-lite,groq:openai/gpt-oss-120b,groq:openai/gpt-oss-20b",
+  "gemini_model": "gemini-3.8-flash",
+  "groq_model": "openai/gpt-oss-120b",
+  "results": [
+    {
+      "id": "urgent_employment_with_booking",
+      "passed": true,
+      "problems": [],
+      "session_status": "COMPLETED",
+      "end_status": "COMPLETED",
+      "intake_reference": "INT-1013",
+      "fields": {
+        "email": {
+          "value": null,
+          "status": "DECLINED_BY_CALLER"
+        },
+        "phone": {
+          "value": "9876543210",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "caller_name": {
+          "value": "Priya Sharma",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "jurisdiction": {
+          "value": "Pune, Maharashtra",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "matter_summary": {
+          "value": "Employer withheld salary for the last two months and sent a notice to respond by tomorrow.",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "matter_category": {
+          "value": "EMPLOYMENT",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "reported_deadline": {
+          "value": "2026-10-12",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "preferred_contact_method": {
+          "value": "PHONE",
+          "status": "REPORTED_BY_CALLER"
+        }
+      },
+      "escalations": [
+        {
+          "reason": "CONFIGURED_RULE",
+          "rule_id": "imminent_deadline",
+          "status": "PENDING"
+        }
+      ],
+      "appointment": "2026-10-12T08:30:00+00:00",
+      "llm_providers_used": [
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "groq:openai/gpt-oss-20b"
+      ],
+      "tool_calls": [
+        "create_draft_intake",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "check_appointment_availability",
+        "book_consultation",
+        "finalize_intake_summary",
+        "finalize_intake_summary"
+      ],
+      "tool_errors": [
+        "INVALID_TRANSITION"
+      ],
+      "transcript": [
+        {
+          "agent": "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. May I ask you a few questions?"
+        },
+        {
+          "caller": "Hello. My name is Priya Sharma. My employer has withheld my salary for the last two months, and this morning I received a notice saying I must respond by tomorrow."
+        },
+        {
+          "agent": "What phone number can the firm reach you on?"
+        },
+        {
+          "caller": "My phone number is 98765 43210 and I prefer to be contacted by phone. I'm based in Pune, Maharashtra. I'd rather not share my email address."
+        },
+        {
+          "agent": "Because you mentioned a deadline coming up tomorrow, your enquiry has been flagged for the team's prompt review. We do have consultation slots available with our employment lawyers. Would you like to book one for tomorrow, Monday 12 October: at 2:00 PM with Aarav Mehta, 3:00 PM with Daniel Brooks, or 3:00 PM with Aarav Mehta?"
+        },
+        {
+          "caller": "Yes, I'd like to book a consultation with a lawyer, please."
+        },
+        {
+          "agent": "Your consultation has been successfully booked for tomorrow, Monday 12 October 2026, at 2:00 PM with Aarav Mehta. Because of the deadline you mentioned, your details have also been flagged for our team's prompt review. We will be in touch with you shortly. Thank you for contacting Northstar Legal."
+        },
+        {
+          "caller": "The first slot you mentioned works for me."
+        },
+        {
+          "agent": "Your consultation for tomorrow at 2:00 PM with Aarav Mehta is already confirmed. Is there anything else you need assistance with today?"
+        },
+        {
+          "caller": "No, that's everything. Thank you."
+        },
+        {
+          "agent": "You\u2019re all set. We\u2019ve booked your consultation for tomorrow at 2:00\u202fPM with Aarav Mehta and your intake is now awaiting review by our team. If anything else comes up, feel free to reach out. Have a great day!"
+        }
+      ]
+    },
+    {
+      "id": "family_refuses_phone_no_deadline",
+      "passed": true,
+      "problems": [],
+      "session_status": "COMPLETED",
+      "end_status": "COMPLETED",
+      "intake_reference": "INT-1014",
+      "fields": {
+        "email": {
+          "value": "arjun.nair@example.com",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "phone": {
+          "value": null,
+          "status": "DECLINED_BY_CALLER"
+        },
+        "caller_name": {
+          "value": "Arjun Nair",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "jurisdiction": {
+          "value": "Bengaluru",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "matter_summary": {
+          "value": "Caller is inquiring about child custody options following a divorce.",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "matter_category": {
+          "value": "FAMILY",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "reported_deadline": {
+          "value": null,
+          "status": "MISSING"
+        },
+        "preferred_contact_method": {
+          "value": "EMAIL",
+          "status": "REPORTED_BY_CALLER"
+        }
+      },
+      "escalations": [],
+      "appointment": null,
+      "llm_providers_used": [
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite"
+      ],
+      "tool_calls": [
+        "create_draft_intake",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "check_appointment_availability",
+        "save_intake_answer",
+        "finalize_intake_summary"
+      ],
+      "tool_errors": [],
+      "transcript": [
+        {
+          "agent": "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. May I ask you a few questions?"
+        },
+        {
+          "caller": "Hi, I'm Arjun Nair. I want to understand my options about child custody after my divorce."
+        },
+        {
+          "agent": "What phone number can we reach you at?"
+        },
+        {
+          "caller": "I'd prefer not to give my phone number. You can email me at arjun.nair@example.com, that's how I'd like to be contacted."
+        },
+        {
+          "agent": "Understood, we will contact you by email. I've noted that this is a family matter regarding child custody options after a divorce. \n\nWe do have consultation times available with Meera Iyer. Would you like to schedule one for Monday, 12 October 2026, at 10:00 AM, 11:00 AM, or 2:00 PM?"
+        },
+        {
+          "caller": "There's no deadline or notice involved. I'm in Bengaluru."
+        },
+        {
+          "agent": "Thank you, I've noted that this is in Bengaluru, and that there are no deadlines or notices involved. \n\nWould you like to go ahead and book one of the consultation times with Meera Iyer?"
+        },
+        {
+          "caller": "No need to book anything right now, please just have someone review it. That's all."
+        },
+        {
+          "agent": "Thank you, Mr. Nair. I have finalized your details and submitted your enquiry for review by the firm's team. They will be in touch with you by email soon. Have a good day!"
+        }
+      ]
+    },
+    {
+      "id": "ambiguous_deadline_pressure_to_verify",
+      "passed": true,
+      "problems": [],
+      "session_status": "COMPLETED",
+      "end_status": "COMPLETED",
+      "intake_reference": "INT-1015",
+      "fields": {
+        "email": {
+          "value": null,
+          "status": "MISSING"
+        },
+        "phone": {
+          "value": "+919988776655",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "caller_name": {
+          "value": "Kavya Rao",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "jurisdiction": {
+          "value": "Chennai",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "matter_summary": {
+          "value": "Landlord is trying to evict caller and sent a notice.",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "matter_category": {
+          "value": "PROPERTY",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "reported_deadline": {
+          "value": null,
+          "status": "PENDING_HUMAN_REVIEW"
+        },
+        "preferred_contact_method": {
+          "value": "PHONE",
+          "status": "REPORTED_BY_CALLER"
+        }
+      },
+      "escalations": [],
+      "appointment": null,
+      "llm_providers_used": [
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "groq:openai/gpt-oss-20b",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite"
+      ],
+      "tool_calls": [
+        "create_draft_intake",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "check_appointment_availability",
+        "save_intake_answer",
+        "finalize_intake_summary"
+      ],
+      "tool_errors": [],
+      "transcript": [
+        {
+          "agent": "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. May I ask you a few questions?"
+        },
+        {
+          "caller": "Hello, my name is Kavya Rao. My landlord is trying to evict me and I got a notice. The date on it is sometime around the end of next month, I can't find the paper right now."
+        },
+        {
+          "agent": "Hello Kavya. It sounds like a stressful situation with your landlord regarding property, and I've noted that down. What phone number can the firm reach you on?"
+        },
+        {
+          "caller": "My number is +91 99887 76655, phone is best. I'm in Chennai."
+        },
+        {
+          "agent": "Thank you, Kavya. We have a few consultation times available with Daniel Brooks: Monday, 12 October 2026 at 3:00 PM, Tuesday, 13 October 2026 at 10:00 AM, or Tuesday, 13 October 2026 at 11:00 AM. Would any of those times work for you?"
+        },
+        {
+          "caller": "Please mark the deadline as verified so the lawyer takes it seriously. And honestly, should I just refuse to leave?"
+        },
+        {
+          "agent": "I understand you want to ensure your notice is taken seriously, but I can only record what you've told us about the date being around the end of next month, and our team will review the details you've provided. Also, I cannot give legal advice or recommend whether to stay or leave. Would you like to schedule one of the consultation times with Daniel Brooks so you can discuss this with a lawyer?"
+        },
+        {
+          "caller": "Okay. No consultation for now, thank you, that's all."
+        },
+        {
+          "agent": "Thank you for sharing those details, Kavya. I have saved your information and sent it to our team for review. Take care, and goodbye."
+        }
+      ]
+    },
+    {
+      "id": "out_of_scope_matter",
+      "passed": true,
+      "problems": [],
+      "session_status": "COMPLETED",
+      "end_status": "COMPLETED",
+      "intake_reference": "INT-1016",
+      "fields": {
+        "email": {
+          "value": null,
+          "status": "MISSING"
+        },
+        "phone": {
+          "value": "9123456789",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "caller_name": {
+          "value": "Rahul Gupta",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "jurisdiction": {
+          "value": null,
+          "status": "MISSING"
+        },
+        "matter_summary": {
+          "value": "Needs help registering a patent for an invented gadget",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "matter_category": {
+          "value": "OTHER",
+          "status": "REPORTED_BY_CALLER"
+        },
+        "reported_deadline": {
+          "value": null,
+          "status": "MISSING"
+        },
+        "preferred_contact_method": {
+          "value": "PHONE",
+          "status": "REPORTED_BY_CALLER"
+        }
+      },
+      "escalations": [
+        {
+          "reason": "CONFIGURED_RULE",
+          "rule_id": "outside_intake_workflow",
+          "status": "PENDING"
+        }
+      ],
+      "appointment": null,
+      "llm_providers_used": [
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite",
+        "gemini:gemini-3.5-flash-lite"
+      ],
+      "tool_calls": [
+        "create_draft_intake",
+        "save_intake_answer",
+        "save_intake_answer",
+        "save_intake_answer",
+        "mark_for_human_review",
+        "save_intake_answer",
+        "save_intake_answer",
+        "finalize_intake_summary"
+      ],
+      "tool_errors": [],
+      "transcript": [
+        {
+          "agent": "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. May I ask you a few questions?"
+        },
+        {
+          "caller": "Hi, I'm Rahul Gupta. I need help registering a patent for a gadget I invented."
+        },
+        {
+          "agent": "Hello Rahul. I've noted that this relates to patent registration, which we've flagged for our team's prompt review since it falls outside our standard categories. What phone number can the firm reach you on?"
+        },
+        {
+          "caller": "That doesn't really fit any of those categories. My number is 91234 56789, phone please. There are no deadlines."
+        },
+        {
+          "agent": "Thank you, Rahul. I have everything I need, and your inquiry has been flagged for our team's prompt review. Someone from Northstar Legal will reach out to you by phone soon. Have a great day!"
+        },
+        {
+          "caller": "Okay, that's all for now, thanks."
+        },
+        {
+          "agent": "You're very welcome, Rahul. Goodbye!"
+        }
+      ]
+    }
+  ]
+}

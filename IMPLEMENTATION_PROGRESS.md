@@ -6,16 +6,16 @@ A phase is `COMPLETED` only when every acceptance criterion has recorded evidenc
 **Repository state at documentation setup (2026-10-11):** empty directory, no source code, no git
 repository. No prior implementation work existed, so every phase started `NOT_STARTED`.
 
-**Last updated:** 2026-10-11 — Phase 1 completed.
+**Last updated:** 2026-10-11 — Phases 1 and 2 completed.
 
-**Next phase to implement:** Phase 2 — Text-based intake agent (awaiting authorization).
+**Next phase to implement:** Phase 3 — Conversational state and safety (awaiting authorization).
 
 ## Summary
 
 | # | Phase | Status | Depends on |
 |---|---|---|---|
 | 1 | Domain and database foundation | COMPLETED (2026-10-11) | — |
-| 2 | Text-based intake agent | NOT_STARTED | 1 |
+| 2 | Text-based intake agent | COMPLETED (2026-10-11) | 1 |
 | 3 | Conversational state and safety | NOT_STARTED | 2 |
 | 4 | Voice loop | NOT_STARTED | 3 |
 | 5 | Durable workflows | NOT_STARTED | 1, 2 (3 recommended) |
@@ -93,48 +93,67 @@ escalation and audit data models with deterministic business rules and seed data
 
 ## Phase 2 — Text-based intake agent
 
-**Status:** NOT_STARTED
+**Status:** COMPLETED (2026-10-11)
 
-**Objective:** Connect the LLM (Groq, replacing the blueprint's Claude) to the backend through typed
-tool definitions; run a scripted text conversation that captures facts through real application
-services.
+**Objective:** Connect the LLM (Gemini primary, Groq fallback, replacing the blueprint's Claude) to
+the backend through typed tool definitions; run scripted text conversations that capture facts
+through real application services.
 
-**Dependencies:** Phase 1. Groq configuration (done 2026-10-11, see below).
-
-**Prerequisite done:** Groq settings in `app/config.py` (`GROQ_API_KEY` as `SecretStr`,
-`GROQ_MODEL` default `openai/gpt-oss-120b`, timeout/retry settings), `.env.example` updated,
-CLAUDE.md §5/§8 updated, `tests/unit/test_config.py`.
+**Dependencies:** Phase 1.
 
 **Tasks / deliverables**
-- [ ] `groq` SDK dependency + `LLMClient` protocol and Groq adapter (`app/agent/llm_client.py`)
-      with configurable model ID, timeouts, bounded retries and error mapping (timeout, rate
-      limit, 5xx → safe fallback).
-- [ ] Tool JSON schemas generated from Pydantic input models (OpenAI-compatible `function` format);
-      arguments re-validated with Pydantic; tool calls executed sequentially.
-- [ ] The nine blueprint tools with strict Pydantic schemas and structured results; tool registry.
-- [ ] Tool executor: validation, session-derived `firm_id`/intake/actor, domain-service calls,
-      unit of work, failure auditing, mapping `DomainError` codes to structured tool results, and
-      re-reading committed state (`get_appointment`, `get_escalation`) before reporting success.
-- [ ] `call_sessions` table + migration (session lifecycle for text and later voice).
-- [ ] System prompt: role disclosure, no legal advice, only speak verified tool outcomes.
-- [ ] Text conversation loop (CLI) for scripted conversations.
+- [x] LLM layer: `LLMClient` protocol, `FallbackLLMClient` and factory (`app/agent/llm_client.py`);
+      Gemini adapter via the official `google-genai` SDK with per-model thought-signature replay
+      (`llm_gemini.py`); Groq adapter (`llm_groq.py`). Ordered per-model chain (`LLM_PROVIDERS`),
+      quota cooldown, timeouts, bounded retries, rate-limit wait budget, `LLMUnavailable` mapping.
+- [x] Tool JSON schemas generated from Pydantic input models, narrowed with firm config enums
+      (field keys, category codes, rule ids); arguments re-validated; tool calls run sequentially.
+- [x] The nine blueprint tools (`app/tools/*_tools.py`, registry in `app/agent/tool_registry.py`).
+- [x] Tool executor (`app/tools/executor.py`): JSON + Pydantic validation, session-derived
+      firm/intake/actor, one transaction per call, post-commit verification for bookings and
+      escalations, structured errors, audit of rejected/failed calls, unexpected errors →
+      `INTERNAL_ERROR`.
+- [x] `call_sessions` table + migration `a03949963367`; `call_session_service` (start, attach
+      intake, end; DISCONNECTED/FAILED → intake `INCOMPLETE`); `intake_service.finalize_intake`.
+- [x] System prompt + fixed greeting (role disclosure, no legal advice, verified outcomes only).
+- [x] Conversation loop (`app/agent/conversation.py`) with an LLM-outage fallback (persist state,
+      `UNABLE_TO_COMPLETE` review, session `FAILED`, truthful caller message), CLI
+      `scripts/text_chat.py`, live runner `scripts/run_scripted_conversations.py` with 4 labelled
+      scripts in `fixtures/transcripts/phase2_scripted.json`.
 
-**Acceptance criteria**
-- The agent captures the labelled fields correctly for scripted conversations.
-- The agent cannot bypass business validation (invalid fields, unavailable slots, non-matching
-  escalation rules, setting `VERIFIED_BY_SYSTEM`, cross-firm IDs are all rejected by code).
-- No tool allows arbitrary SQL, shell or URL access.
+**Acceptance criteria → evidence**
+- [x] *Agent captures the labelled fields correctly for scripted conversations* — **two
+      consecutive live runs passed 4/4** (2026-10-11, reports in `docs/evidence/phase2/`): urgent
+      employment with booking, family with refused phone, ambiguous eviction deadline with pressure
+      to "verify", out-of-scope patent. Every session ended `COMPLETED`; run 2 had zero tool errors
+      (run 1 had one rejected `INVALID_TRANSITION`, from which the model recovered). Answers came from
+      `gemini:gemini-3.5-flash-lite` (49 responses in each run) with `groq:openai/gpt-oss-20b`
+      covering rate-limited calls (8 in each run). `gemini-3.8-flash` was on quota cooldown, and `gpt-oss-120b` did
+      not answer. Earlier Groq-only runs, before prompt fixes: 0/1, 0/1, 2/4.- [x] *Cannot bypass business validation* — `tests/integration/test_tool_executor.py`:
+      `VERIFIED_BY_SYSTEM`/`MISSING` statuses, injected `intake_id`/`firm_id`, unknown fields, invalid
+      dates/codes, non-matching or invented escalation rules, un-offered slots, duplicate bookings,
+      edits after finalization and cross-conversation access are all rejected and audited.
+      In live runs no field was ever marked verified, and the vague eviction date stayed
+      `PENDING_HUMAN_REVIEW`.
+- [x] *No arbitrary SQL/shell/URL tool* — `tests/unit/test_tool_registry.py` (exactly the nine
+      tools; closed schemas; no identity fields).
 
-**Required tests / evidence:** tool unit tests with a fake model client; integration tests of the
-tool executor against PostgreSQL; at least a small set of live Groq scripted runs (requires a real
-`GROQ_API_KEY` in `.env`; otherwise the live part is `BLOCKED`).
+**Validation (2026-10-11):** `pytest` 180 passed (unit + PostgreSQL integration, no live LLM
+calls); `ruff check` clean; `ruff format --check` clean; `mypy` strict: no issues in 44 files;
+`alembic check`: no drift; live Gemini smoke test: multi-turn tool calling with signature replay OK.
 
-**Blockers / decisions:** a real `GROQ_API_KEY` must be put in `.env` (it is currently a placeholder).
-The model defaults to `openai/gpt-oss-120b`; confirm or switch to `llama-3.3-70b-versatile` after the
-live runs. Groq free-tier rate limits may throttle live runs. **Next step:** awaiting authorization.
+**Known limitations (carried forward)**
+- Free-tier quotas are tight and per model: `gemini-3.8-flash` allows 20 requests/day (measured).
+  Groq gpt-oss allows 8k tokens/min and was exhausted for `gpt-oss-120b`. Results above come
+  mainly from `gemini-3.5-flash-lite`; quality on `gemini-3.8-flash` is untested at scale.
+- Latency: individual model calls took up to ~35 s (Gemini) and ~1 min per turn under Groq limits.
+  This is acceptable for text testing, **not for voice**: re-measure before Phase 4.
+- Behaviour observed for Phase 3: the agent sometimes offers consultation slots before being
+  asked; one model reply asked several questions at once. Live checks are heuristic (scripted
+  caller turns do not adapt to the agent's questions).
+- Live results are nondeterministic; the 4 scripts are a smoke set, not the Phase 6 dataset.
 
----
-
+**Blockers:** none.
 ## Phase 3 — Conversational state and safety
 
 **Status:** NOT_STARTED
@@ -294,8 +313,8 @@ dependency fails; blueprint §18 "definition of done" items 1–11 all verified.
    Proposed: Phases 1–6 call domain services in-process; the HTTP API is built in Phase 7 together
    with staff authentication (so no unauthenticated write endpoints exist). Override if you want the
    API earlier.
-2. **LLM provider and model.** Resolved 2026-10-11: provider is **Groq** (your decision; no Anthropic
-   key). Default model `openai/gpt-oss-120b`; to be confirmed by Phase 2 live runs.
+2. **LLM provider and model.** Resolved 2026-10-11: **Gemini primary (`gemini-3.8-flash`), Groq
+   fallback (`openai/gpt-oss-120b`)** (your decisions). Models to be confirmed by Phase 2 live runs.
 3. **TTS engine** (Piper vs. Kokoro) and voice licence — decide in Phase 4.
 4. **Supported languages** — English only until Hindi/Hinglish are tested explicitly.
 5. **Firm timezone** for the fictional firm — proposed `Asia/Kolkata`.

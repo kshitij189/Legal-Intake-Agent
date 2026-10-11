@@ -14,12 +14,23 @@ class Settings(BaseSettings):
     test_database_url: str | None = None
     demo_firm_slug: str = "northstar-legal"
 
-    # LLM provider: Groq (replaces the blueprint's Anthropic API - see CHANGE_LOG.md).
+    # Model chain in priority order, "provider[:model]" entries; each is tried until one answers.
+    # Replaces the blueprint's Anthropic API. Free-tier quotas are per model, so several models per
+    # provider add headroom. Entries whose provider has no key are skipped (see CHANGE_LOG.md).
+    llm_providers: str = (
+        "gemini:gemini-3.8-flash,gemini:gemini-3.5-flash-lite,"
+        "groq:openai/gpt-oss-120b,groq:openai/gpt-oss-20b"
+    )
+    gemini_api_key: SecretStr | None = None
+    # Stable Gemini Flash model recommended for new projects (checked 2026-10-11).
+    gemini_model: str = "gemini-3.8-flash"
     groq_api_key: SecretStr | None = None
-    # Production Groq model with tool calling; any tool-capable Groq model ID can be used.
+    # Production Groq model with tool calling (alternative available to this key: gpt-oss-20b).
     groq_model: str = "openai/gpt-oss-120b"
     llm_timeout_seconds: float = 20.0
     llm_max_retries: int = 2
+    # Total time one model call may spend waiting out provider rate limits (429 + retry-after).
+    llm_rate_limit_max_wait_seconds: float = 30.0
 
 
 @lru_cache

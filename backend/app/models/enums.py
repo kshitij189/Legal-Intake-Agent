@@ -57,6 +57,18 @@ class ActorType(StrEnum):
     SYSTEM = "SYSTEM"
 
 
+class SessionChannel(StrEnum):
+    TEXT = "TEXT"
+    VOICE = "VOICE"
+
+
+class CallSessionStatus(StrEnum):
+    ACTIVE = "ACTIVE"
+    COMPLETED = "COMPLETED"
+    DISCONNECTED = "DISCONNECTED"
+    FAILED = "FAILED"
+
+
 class AuditOutcome(StrEnum):
     SUCCESS = "SUCCESS"
     FAILURE = "FAILURE"

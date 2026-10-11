@@ -41,6 +41,7 @@ class Action(StrEnum):
     ESCALATION_ACCEPT = "escalation.accept"
     ESCALATION_RESOLVE = "escalation.resolve"
     ESCALATION_MARK_FAILED = "escalation.mark_failed"
+    SESSION_MANAGE = "session.manage"
 
 
 _REVIEWERS = {StaffRole.LAWYER, StaffRole.INTAKE_COORDINATOR}
@@ -56,6 +57,7 @@ ALLOWED_ACTOR_TYPES: dict[Action, set[ActorType]] = {
     Action.ESCALATION_ACCEPT: {ActorType.STAFF},
     Action.ESCALATION_RESOLVE: {ActorType.STAFF},
     Action.ESCALATION_MARK_FAILED: {ActorType.SYSTEM},
+    Action.SESSION_MANAGE: {ActorType.AGENT, ActorType.SYSTEM},
 }
 
 # Staff actions restricted to specific roles; unlisted actions allow any active staff member.

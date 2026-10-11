@@ -104,7 +104,7 @@ def create_escalation(
         if open_for_rule is not None:
             return EscalationResult(open_for_rule, created=False)
         priority, reason_text = rule.priority, rule.description
-        details = {"rule_id": rule_id, "field_key": match.field_key}
+        details: dict[str, str] = {"rule_id": rule_id, "field_key": match.field_key}
     else:
         if rule_id is not None:
             raise ValidationFailed("rule_id is only valid for CONFIGURED_RULE escalations")
@@ -167,8 +167,11 @@ def list_escalations(
     *,
     firm_id: uuid.UUID,
     statuses: Collection[EscalationStatus] | None = None,
+    intake_id: uuid.UUID | None = None,
 ) -> list[Escalation]:
     stmt = select(Escalation).where(Escalation.firm_id == firm_id)
+    if intake_id is not None:
+        stmt = stmt.where(Escalation.intake_id == intake_id)
     if statuses is not None:
         stmt = stmt.where(Escalation.status.in_(list(statuses)))
     return list(session.scalars(stmt.order_by(Escalation.created_at, Escalation.id)))

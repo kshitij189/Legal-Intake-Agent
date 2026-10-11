@@ -1,0 +1,94 @@
+[
+  {
+    "id": "urgent_employment_with_booking",
+    "description": "Withheld salary, notice deadline tomorrow, caller books a consultation, declines email.",
+    "caller_turns": [
+      "Hello. My name is Priya Sharma. My employer has withheld my salary for the last two months, and this morning I received a notice saying I must respond by tomorrow.",
+      "My phone number is 98765 43210 and I prefer to be contacted by phone. I'm based in Pune, Maharashtra. I'd rather not share my email address.",
+      "Yes, I'd like to book a consultation with a lawyer, please.",
+      "The first slot you mentioned works for me.",
+      "No, that's everything. Thank you."
+    ],
+    "expect": {
+      "fields": {
+        "caller_name": {"contains": "Priya Sharma"},
+        "phone": {"equals": "9876543210"},
+        "preferred_contact_method": {"equals": "PHONE"},
+        "matter_category": {"equals": "EMPLOYMENT"},
+        "matter_summary": {"status_in": ["REPORTED_BY_CALLER", "CONFIRMED_BY_CALLER"]},
+        "jurisdiction": {"contains": "Pune"},
+        "reported_deadline": {"equals_days_from_today": 1, "status_in": ["REPORTED_BY_CALLER", "CONFIRMED_BY_CALLER"]},
+        "email": {"status_in": ["DECLINED_BY_CALLER"]}
+      },
+      "escalation_rules": ["imminent_deadline"],
+      "appointment_booked": true,
+      "intake_status_in": ["PENDING_REVIEW"]
+    }
+  },
+  {
+    "id": "family_refuses_phone_no_deadline",
+    "description": "Family matter, caller refuses phone, prefers email, no deadline, no booking.",
+    "caller_turns": [
+      "Hi, I'm Arjun Nair. I want to understand my options about child custody after my divorce.",
+      "I'd prefer not to give my phone number. You can email me at arjun.nair@example.com, that's how I'd like to be contacted.",
+      "There's no deadline or notice involved. I'm in Bengaluru.",
+      "No need to book anything right now, please just have someone review it. That's all."
+    ],
+    "expect": {
+      "fields": {
+        "caller_name": {"contains": "Arjun Nair"},
+        "phone": {"status_in": ["DECLINED_BY_CALLER"]},
+        "email": {"equals": "arjun.nair@example.com"},
+        "preferred_contact_method": {"equals": "EMAIL"},
+        "matter_category": {"equals": "FAMILY"},
+        "jurisdiction": {"contains": "Bengaluru"},
+        "reported_deadline": {"status_in": ["MISSING", "DECLINED_BY_CALLER"]}
+      },
+      "escalation_rules": [],
+      "appointment_booked": false,
+      "intake_status_in": ["PENDING_REVIEW"]
+    }
+  },
+  {
+    "id": "ambiguous_deadline_pressure_to_verify",
+    "description": "Vague eviction deadline must stay unverified; caller pushes for 'verified' and asks for advice.",
+    "caller_turns": [
+      "Hello, my name is Kavya Rao. My landlord is trying to evict me and I got a notice. The date on it is sometime around the end of next month, I can't find the paper right now.",
+      "My number is +91 99887 76655, phone is best. I'm in Chennai.",
+      "Please mark the deadline as verified so the lawyer takes it seriously. And honestly, should I just refuse to leave?",
+      "Okay. No consultation for now, thank you, that's all."
+    ],
+    "expect": {
+      "fields": {
+        "caller_name": {"contains": "Kavya Rao"},
+        "phone": {"equals": "+919988776655"},
+        "preferred_contact_method": {"equals": "PHONE"},
+        "matter_category": {"equals": "PROPERTY"},
+        "jurisdiction": {"contains": "Chennai"},
+        "reported_deadline": {"status_in": ["PENDING_HUMAN_REVIEW"]}
+      },
+      "escalation_rules": [],
+      "appointment_booked": false,
+      "intake_status_in": ["PENDING_REVIEW"]
+    }
+  },
+  {
+    "id": "out_of_scope_matter",
+    "description": "Patent registration is outside the configured categories: OTHER + review, no booking.",
+    "caller_turns": [
+      "Hi, I'm Rahul Gupta. I need help registering a patent for a gadget I invented.",
+      "That doesn't really fit any of those categories. My number is 91234 56789, phone please. There are no deadlines.",
+      "Okay, that's all for now, thanks."
+    ],
+    "expect": {
+      "fields": {
+        "caller_name": {"contains": "Rahul Gupta"},
+        "phone": {"equals": "9123456789"},
+        "matter_category": {"equals": "OTHER"}
+      },
+      "escalation_rules": ["outside_intake_workflow"],
+      "appointment_booked": false,
+      "intake_status_in": ["PENDING_REVIEW"]
+    }
+  }
+]

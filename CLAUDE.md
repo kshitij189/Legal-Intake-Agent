@@ -60,7 +60,7 @@ legal matters (output is always a **draft intake pending human review**).
 
 ## 4. Architecture
 
-Pipeline: **Audio → VAD → STT → LLM (Groq) → validated tool call or text → TTS → Audio.**
+Pipeline: **Audio → VAD → STT → LLM (Gemini, fallback Groq) → validated tool call or text → TTS → Audio.**
 
 Three concerns, kept separate:
 1. **Realtime conversation** — LiveKit Agents worker (voice runtime, STT, VAD, TTS, agent service).
@@ -79,7 +79,7 @@ Temporal worker). No microservices.
 | ORM models | `backend/app/models/` | Table definitions and DB constraints | Contain business logic |
 | Schemas | `backend/app/schemas/` | Pydantic models for firm config, tool I/O, API I/O | — |
 | Tools | `backend/app/tools/` | Pydantic-validated adapters from LLM tool calls to domain services | Run SQL directly, bypass domain services |
-| Agent | `backend/app/agent/` | LLM client adapter (Groq), prompts, tool registry, conversation loop | Decide policy; state outcomes not returned by tools |
+| Agent | `backend/app/agent/` | LLM adapters (Gemini, Groq) + fallback chain, prompts, tool registry, conversation loop | Decide policy; state outcomes not returned by tools |
 | Voice | `backend/app/voice/` | STT/TTS/VAD/session adapters | Contain business logic |
 | Workflows | `backend/app/workflows/` | Temporal workflows/activities calling domain services | Duplicate domain rules |
 | API | `backend/app/api/` | Thin FastAPI routers over domain services | Duplicate domain rules |
@@ -92,8 +92,8 @@ replacement for required functionality.
 ## 5. Approved tech stack (do not deviate without a documented decision)
 
 Python 3.13 · LiveKit Agents (Python) · self-hosted LiveKit + WebRTC · faster-whisper (STT) ·
-Silero VAD · Piper-compatible TTS (evaluate Kokoro) · **Groq API via the `groq` Python SDK**
-(replaces the blueprint's Claude API, see §8; the SDK is added in Phase 2) ·
+Silero VAD · Piper-compatible TTS (evaluate Kokoro) · **Gemini (`google-genai` SDK) primary +
+Groq (`groq` SDK) fallback** (replaces the blueprint's Claude API, see §8) ·
 FastAPI · Pydantic v2 · PostgreSQL · SQLAlchemy 2.x + Alembic · self-hosted Temporal ·
 Next.js + TypeScript · pytest · Playwright · OpenTelemetry + structured logging ·
 optional self-hosted Langfuse · Docker + Docker Compose.
@@ -175,23 +175,40 @@ intake/slot row before read-modify-write.
 
 ## 8. AI model and tool rules
 
-- **LLM provider: Groq** (user decision 2026-10-11, replacing the blueprint's Claude API because no
-  Anthropic key is available). The LLM is used for conversation reasoning, extraction and tool
-  selection only.
-- Config: `GROQ_API_KEY` (a `SecretStr`, never logged), `GROQ_MODEL` (default
-  `openai/gpt-oss-120b`, a Groq production model with tool calling; alternative
-  `llama-3.3-70b-versatile`), `LLM_TIMEOUT_SECONDS`, `LLM_MAX_RETRIES`. Use only Groq
-  **production** models, not preview models (Groq may withdraw those at short notice).
-- Groq's chat API is OpenAI-compatible: tools are declared as JSON-schema `function`s. Generate
-  those schemas from the Pydantic tool-input models, and validate model arguments with Pydantic
-  again on our side. Never trust the provider to enforce a schema.
-- Do not depend on parallel tool calls: the `openai/gpt-oss-*` models do not support them. Execute
-  tool calls one at a time, in order.
-- Keep the provider behind one adapter (`app/agent/llm_client.py` with a small `LLMClient`
-  protocol). Agent, tools and domain code must not import the Groq SDK, so the provider (Groq,
-  Anthropic, ...) can be swapped without other changes, as blueprint §6 intends.
-- Look up current Groq docs (console.groq.com/docs) for model IDs, limits and SDK usage rather
-  than relying on memory; record the model chosen in `CHANGE_LOG.md`.
+- **LLM providers: Gemini primary, Groq fallback** (user decisions 2026-10-11). They replace the
+  blueprint's Claude API, because no Anthropic key is available. The LLM is used for conversation
+  reasoning, extraction and tool selection only.
+- `LLM_PROVIDERS` is an ordered model chain of `provider[:model]` entries. The default is
+  `gemini:gemini-3.8-flash,gemini:gemini-3.5-flash-lite,groq:openai/gpt-oss-120b,groq:openai/gpt-oss-20b`.
+  Free-tier quotas are **per model**: `gemini-3.8-flash` allows only **20 requests/day** (measured
+  2026-10-11), and one scenario needs about 15 requests. `FallbackLLMClient` tries each entry per
+  model call and moves on when an entry raises `LLMUnavailable`. An entry whose 429 asks to wait
+  more than 60 s (quota exhausted) is skipped until the stated reset. Entries whose provider key is
+  missing or `replace-me` are skipped. Only the **last** entry waits out short 429s, up to
+  `LLM_RATE_LIMIT_MAX_WAIT_SECONDS`. When every provider
+  fails, the conversation runs the safe fallback: keep state, queue an `UNABLE_TO_COMPLETE`
+  review, end the session `FAILED`.
+- Gemini: official `google-genai` SDK (native function calling, not the beta OpenAI-compatible
+  layer). `GEMINI_API_KEY`, `GEMINI_MODEL` (default `gemini-3.8-flash`, a stable Flash model).
+  Thought signatures: the adapter returns Gemini's `Content` as `provider_state`, keyed by the
+  model's chain name (`gemini:<model>`), and replays it **verbatim** to that same model only.
+  Function-call turns from any other model get Google's placeholder signature
+  `skip_thought_signature_validator` (verified live: mixed Gemini/Groq conversations work).
+- Groq: `GROQ_API_KEY`, `GROQ_MODEL` (default `openai/gpt-oss-120b`; the alternative available to
+  this key is `openai/gpt-oss-20b`, since `llama-3.3-70b-versatile` returns 404 for it). Measured
+  limits (2026-10-11): 8,000 tokens/minute and 1,000 requests/day per gpt-oss model. One agent
+  request is about 2.4k tokens of fixed prompt plus tool schemas, plus history. The Groq adapter
+  strips `_`-prefixed keys before sending.
+- Shared settings: `LLM_TIMEOUT_SECONDS`, `LLM_MAX_RETRIES`. Use only stable/production models,
+  never preview models.
+- Tool schemas are generated once from the Pydantic tool-input models (OpenAI function format).
+  The Gemini adapter passes them as `parameters_json_schema`. Model arguments are always
+  re-validated with Pydantic on our side; never trust a provider to enforce a schema.
+- Tool calls are executed one at a time, in order (gpt-oss models do not support parallel calls).
+- Only `app/agent/llm_gemini.py` and `app/agent/llm_groq.py` import provider SDKs. Agent, tools and
+  domain code depend on the `LLMClient` protocol in `app/agent/llm_client.py`.
+- Look up current provider docs (ai.google.dev, console.groq.com/docs) for model IDs, limits and
+  SDK usage rather than relying on memory; record model changes in `CHANGE_LOG.md`.
 - Exposed tools are exactly the blueprint set: `get_intake_questions`, `save_intake_answer`,
   `get_intake_status`, `check_appointment_availability`, `book_consultation`,
   `create_draft_intake`, `mark_for_human_review`, `get_handoff_status`, `finalize_intake_summary`.
@@ -205,8 +222,8 @@ intake/slot row before read-modify-write.
   fallback; never continue a critical transaction on invented data.
 - Human-approval gates: acceptance/resolution of escalations, verification of reported facts and any
   decision to take a matter are **staff-only** actions.
-- The Groq API key lives only in the git-ignored `.env`. Placeholders in `.env.example`.
-- Intake conversations go to Groq's servers. Only fictional data may be used.
+- API keys live only in the git-ignored `.env`. Placeholders in `.env.example`.
+- Intake conversations go to Google's and Groq's servers. Only fictional data may be used.
 
 ## 9. Error handling, retries, idempotency, recovery
 
@@ -259,6 +276,11 @@ copy .env.example .env   # then edit values
 .\.venv\Scripts\python scripts/seed_demo_data.py               # idempotent
 .\.venv\Scripts\python scripts/phase1_demo.py                  # manual Phase 1 walkthrough
 
+# text agent (Phase 2) - real LLMs (Gemini, fallback Groq) + real DB, fictional data only
+.\.venv\Scripts\python scripts/text_chat.py                    # /status /trace /quit
+.\.venv\Scripts\python -u scripts/run_scripted_conversations.py --report <file.json>
+#   labelled scripts: fixtures/transcripts/phase2_scripted.json; live results vary per run
+
 # checks (run pytest from backend/ so its pyproject settings apply)
 cd backend; ..\.venv\Scripts\python -m pytest; cd ..
 .\.venv\Scripts\ruff check backend scripts
@@ -274,6 +296,20 @@ Notes:
 - Ruff config lives in the root `ruff.toml`; `alembic` is pinned as third-party there because the
   `backend/alembic/` migrations folder would otherwise confuse import sorting.
 - Integration tests need the Compose Postgres running and refuse any database not ending in `_test`.
+- Automated tests never call a real LLM: they use `tests/fakes.py::ScriptedLLM` and fake SDK clients. Only the scripts above
+  make live calls.
+
+### Agent/tool layer conventions (Phase 2)
+- `app/tools/executor.py::ToolExecutor` is the only way model tool calls reach the domain: JSON
+  parse → strict Pydantic validation → one transaction → optional post-commit `verify` in a fresh
+  session → `{"ok", "data" | "error"}`. Rejected/failed calls are audited as `tool.<name>`
+  (outcome `REJECTED`/`FAILURE`) against the call session.
+- Escalation rules run deterministically inside `save_intake_answer`; the model is told the outcome.
+- Idempotency keys are derived in code (`book:<session>:<slot>`, `rule:<intake>:<rule>`,
+  `unable:<session>`), never supplied by the model.
+- Only slots returned by `check_appointment_availability` in the same conversation can be booked.
+- The blueprint's `agent/claude_client.py` is `agent/llm_client.py` (neutral types + fallback)
+  with `agent/llm_gemini.py` and `agent/llm_groq.py` adapters.
 
 Commands for later phases (voice worker, Temporal worker, frontend, evaluations) are added here when
 those phases are implemented.

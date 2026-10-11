@@ -181,6 +181,18 @@ def book_consultation(
     return BookingResult(appointment, replayed=False)
 
 
+def get_booked_appointment_for_intake(
+    session: Session, *, firm_id: uuid.UUID, intake_id: uuid.UUID
+) -> Appointment | None:
+    return session.scalar(
+        select(Appointment).where(
+            Appointment.firm_id == firm_id,
+            Appointment.intake_id == intake_id,
+            Appointment.status == AppointmentStatus.BOOKED,
+        )
+    )
+
+
 def get_appointment(
     session: Session, *, firm_id: uuid.UUID, appointment_id: uuid.UUID
 ) -> Appointment:

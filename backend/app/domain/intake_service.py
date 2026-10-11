@@ -151,3 +151,49 @@ def transition_intake(
         details={"from": str(previous), "to": str(target)},
     )
     return intake
+
+
+MAX_SUMMARY_LENGTH = 2000
+
+
+def finalize_intake(
+    session: Session,
+    *,
+    firm_id: uuid.UUID,
+    intake_id: uuid.UUID,
+    actor: Actor,
+    summary: str,
+) -> tuple[IntakeRecord, policy_engine.Completeness]:
+    """Store the summary and hand the draft to human review (status PENDING_REVIEW).
+
+    Missing, declined and pending-review fields do not block finalization; they are returned so the
+    reviewer (and the caller) know what is outstanding."""
+    authorize(session, firm_id, actor, Action.INTAKE_TRANSITION)
+    clean = summary.strip()
+    if not clean or len(clean) > MAX_SUMMARY_LENGTH:
+        raise ValidationFailed(f"summary must be 1-{MAX_SUMMARY_LENGTH} characters")
+    config = load_config(get_active_firm(session, firm_id))
+
+    intake = get_intake(session, firm_id=firm_id, intake_id=intake_id, for_update=True)
+    previous = intake.status
+    ensure_intake_transition(previous, IntakeStatus.PENDING_REVIEW)
+    intake.summary = clean
+    intake.status = IntakeStatus.PENDING_REVIEW
+    session.flush()
+    result = policy_engine.completeness(config, intake_fields(intake))
+    record_audit(
+        session,
+        firm_id=firm_id,
+        actor=actor,
+        action="intake.finalized",
+        entity_type=ENTITY,
+        entity_id=intake.id,
+        details={
+            "from": str(previous),
+            "to": str(IntakeStatus.PENDING_REVIEW),
+            "missing": list(result.missing),
+            "declined": list(result.declined),
+            "needs_review": list(result.needs_review),
+        },
+    )
+    return intake, result

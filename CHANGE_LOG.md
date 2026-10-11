@@ -151,3 +151,119 @@ a deliberate, user-approved deviation from the blueprint's "Claude API via the A
 **Tests executed (actual results):** `pytest` 113 passed (adds 2 config tests); ruff check passed;
 ruff format: 46 files unchanged; mypy strict: no issues in 28 files. No live Groq call was made: no
 real key is configured yet, and no code calls the LLM before Phase 2.
+
+---
+
+## 2026-10-11 — Phase 2 (part 1): text-based intake agent
+
+**Status at the time of this entry:** code and offline tests complete; live acceptance pending.
+Completed in the next entry.
+
+**Added**
+- `call_sessions` model + migration `a03949963367`; `domain/call_session_service.py`;
+  `intake_service.finalize_intake`; `list_escalations(intake_id=...)`;
+  `appointment_service.get_booked_appointment_for_intake`; `Action.SESSION_MANAGE`.
+- `app/tools/`: `schemas.py` (strict inputs; agent statuses exclude `VERIFIED_BY_SYSTEM`/`MISSING`),
+  `context.py`, `intake_tools.py`, `calendar_tools.py`, `escalation_tools.py`, `executor.py`.
+- `app/agent/`: `tool_registry.py` (nine tools, config-narrowed JSON schemas), `prompts.py`,
+  `conversation.py` (loop, LLM-outage fallback, trace), `llm_client.py` (neutral types,
+  `FallbackLLMClient`, factory), `llm_gemini.py`, `llm_groq.py`.
+- Scripts: `scripts/text_chat.py`, `scripts/run_scripted_conversations.py`; fixtures
+  `fixtures/transcripts/phase2_scripted.json` (4 labelled scenarios).
+- Tests: `tests/fakes.py` (ScriptedLLM), unit tests for the tool registry, prompts, Groq adapter,
+  fallback chain, Gemini conversion/errors; integration tests for the tool executor and the
+  conversation loop.
+- Dependencies: `groq` 0.37.1, `google-genai` 1.75.0.
+
+**Decisions**
+- Escalation rules are applied deterministically inside `save_intake_answer`; the model only
+  reports the outcome. Critical-escalation recall does not depend on the model choosing to escalate.
+- Idempotency keys are derived in code; only slots offered in the same conversation can be booked;
+  bookings and escalations are re-read after commit before success is reported.
+- An LLM outage keeps partial state, queues an `UNABLE_TO_COMPLETE` review (verified), ends the
+  session `FAILED` and tells the caller only what was persisted.
+- **Provider change (user decision):** Gemini primary, Groq fallback. Gemini uses the official
+  native SDK rather than the OpenAI-compatible layer, which Google labels beta. Community reports
+  show it dropping thought signatures in multi-turn tool calling. Gemini's own content is replayed
+  verbatim; Groq-produced function-call turns get Google's placeholder signature. Only the last
+  provider in the chain waits out rate limits.
+- Groq `llama-3.3-70b-versatile` returned 404 `model_not_found` for this key, so the documented
+  alternative is now `openai/gpt-oss-20b`.
+
+**Prompt iterations driven by live runs** (Groq `openai/gpt-oss-120b`)
+- Run 1: the model never saved the volunteered matter details, and recorded `matter_category` as
+  `DECLINED_BY_CALLER` although the caller never refused. Fix: save volunteered facts; infer the
+  category when clear; `DECLINED_BY_CALLER` only on an explicit refusal.
+- Run 2: correct booking (confirmed only after `verified=true`) and finalization; missed the email
+  refusal; read raw slot UUIDs to the caller and used markdown. Fix: explicit-refusal rule for
+  optional fields; no internal IDs; plain sentences.
+- Run 3: **2/4 scenarios passed** (family/refused-phone and out-of-scope/OTHER). Failures: missed
+  `jurisdiction`; missed `preferred_contact_method`; did not finalize when the caller said "that's
+  all". Safety held: the vague eviction date was stored as `PENDING_HUMAN_REVIEW`, the caller's
+  request to mark it verified was refused, and legal advice was declined. Fix: per-turn check
+  against every field; finalize immediately when the caller is done; one question per reply.
+- Runs 4 and 5: every scenario got 429 rate-limited (session `FAILED`,
+  `llm_unavailable:rate_limited`). These measure nothing about behavior, but they confirmed the
+  outage fallback on a real outage: partial intakes were kept as `INCOMPLETE` and
+  `UNABLE_TO_COMPLETE` reviews were queued.
+
+**Measured provider facts:** Groq gpt-oss-120b/20b for this key: 8,000 tokens/minute, 1,000
+requests/day (response headers). The system prompt is 4,725 characters and the tool schemas
+4,965 characters, roughly 2.4k tokens per request before history. One scenario took 2–5 minutes
+under these limits.
+
+**Tests executed (actual results):** `pytest` 177 passed, 0 failed; `ruff check` clean;
+`ruff format --check` clean; `mypy` strict: no issues in 44 files; `alembic upgrade head` +
+`alembic check` on the main DB: no drift.
+
+**Known issues:** live Gemini path unverified (no key yet); Phase 2 field-capture acceptance not
+yet met; per-turn latency under the Groq free tier is far too high for voice (Phase 4 concern).
+
+---
+
+## 2026-10-11 — Phase 2 (part 2): Gemini live verification, model chain, phase completed
+
+**Live Gemini smoke test** (`gemini-3.8-flash`, before quota exhaustion): the model ID exists for the
+key, our JSON tool schemas were accepted via `parameters_json_schema`, and a 3-turn tool-calling
+round trip with verbatim thought-signature replay succeeded. Gemini emitted parallel tool calls,
+which the executor runs sequentially. One call took 34.9 s.
+
+**Problem found:** first full Gemini run, 1/4 passed and every session ended `FAILED`
+(`gemini:rate_limited; groq:rate_limited`). The captured 429 showed quota
+`GenerateRequestsPerDayPerProjectPerModel-FreeTier`, **limit 20 requests/day** for
+`gemini-3.8-flash`, with `retryDelay` 34,487 s. `gemini-3.5-flash-lite` still answered (quotas are
+per model). Google does not publish free-tier numbers; they are only visible in AI Studio.
+
+**Changes**
+- `LLM_PROVIDERS` is now an ordered **per-model chain** of `provider[:model]` entries, default
+  `gemini:gemini-3.8-flash, gemini:gemini-3.5-flash-lite, groq:openai/gpt-oss-120b,
+  groq:openai/gpt-oss-20b`. Gemini stays primary and Groq the fallback, as requested.
+- `FallbackLLMClient` **quota cooldown**: an entry whose 429 retry delay exceeds 60 s is skipped
+  until the stated reset, instead of being retried on every call. `LLMUnavailable` carries
+  `retry_after`.
+- Adapters are named `provider:model`. Gemini provider state is keyed per model and replayed only
+  to the same model (signatures are model-specific); all other turns get the placeholder signature.
+- Live-run reports saved as evidence: `docs/evidence/phase2/live_run_1.json`, `live_run_2.json`
+  (fictional data; checked to contain no API keys).
+- Tests: per-model factory/chain, bare-entry defaults, cooldown, short-429 non-cooldown.
+
+**Live acceptance results (actual):**
+- Run 1: **4/4 passed**, all sessions `COMPLETED`, one rejected tool call (`INVALID_TRANSITION`,
+  model recovered).
+- Run 2: **4/4 passed**, all sessions `COMPLETED`, zero tool errors.
+- Each run had 49 responses from `gemini:gemini-3.5-flash-lite` and 8 from
+  `groq:openai/gpt-oss-20b`. `gemini-3.8-flash` was on cooldown; `gpt-oss-120b` never answered.
+- Mixed Gemini→Groq→Gemini conversations worked, which confirms live that the placeholder thought
+  signature is accepted.
+- Safety observations: no field was marked verified; the vague eviction date stayed
+  `PENDING_HUMAN_REVIEW`; the request to "mark it verified" was refused; legal advice was
+  declined; bookings were confirmed only after `verified=true`; escalations came only from
+  configured rules.
+
+**Tests executed (actual):** `pytest` 180 passed; `ruff check` clean; `ruff format --check` clean;
+`mypy` strict: no issues in 44 files.
+
+**Known limitations:** see Phase 2 → "Known limitations" in `IMPLEMENTATION_PROGRESS.md` (tight
+free-tier quotas, voice-unfriendly latency, proactive slot offers, heuristic live checks).
+
+**Next:** Phase 3 — Conversational state and safety (awaiting authorization).
