@@ -111,3 +111,12 @@ voice, API, workflow or frontend code.
 **Known issues / limitations:** see Phase 1 → "Known limitations" in `IMPLEMENTATION_PROGRESS.md`.
 
 **Next:** Phase 2 — Text-based intake agent (not started; awaiting authorization).
+
+---
+
+## 2026-10-11 — Version control setup
+
+- Initialized git (branch `main`), remote `origin` = https://github.com/kshitij189/Legal-Intake-Agent.git.
+- Phase 1 committed as `eee7ca6` and pushed. Author and committer: `kshitij189`; no co-author trailers.
+- Added CLAUDE.md §15 "Git and authorship": commit and push after every phase; `kshitij189` is the
+  sole author; no AI attribution in commits, PRs or files.

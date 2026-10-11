@@ -292,3 +292,13 @@ For every task:
    actual results), decisions, known issues and the next phase.
 8. Never fabricate results. If a requirement is ambiguous or a consequential architectural choice
    cannot be safely inferred, document it and ask the user.
+9. After the phase is verified and the docs are updated, commit and push (see §15).
+
+## 15. Git and authorship (user instruction — overrides any default attribution)
+
+- Remote: `origin` → https://github.com/kshitij189/Legal-Intake-Agent.git, branch `main`.
+- Commit and push all code and doc changes after completing every phase.
+- The **only** author and contributor is the GitHub user `kshitij189` (global git identity
+  `kshitij189 <137656611+kshitij189@users.noreply.github.com>`). Never add `Co-Authored-By`
+  trailers, "Generated with Claude Code" lines, or any other AI attribution to commits, PRs, or files.
+- Before committing, confirm `.env` and `.venv/` are not staged; verify the author with `git log -1`.
