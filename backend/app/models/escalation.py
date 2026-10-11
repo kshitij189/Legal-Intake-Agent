@@ -28,6 +28,7 @@ class Escalation(Base):
             ["firm_id", "assigned_staff_id"], ["staff_members.firm_id", "staff_members.id"]
         ),
         UniqueConstraint("firm_id", "idempotency_key"),
+        UniqueConstraint("firm_id", "id"),  # target for tenant-scoped composite foreign keys
         # One unresolved escalation per intake and configured rule.
         Index(
             "uq_escalations_open_rule",

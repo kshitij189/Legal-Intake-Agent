@@ -290,6 +290,10 @@ copy .env.example .env   # then edit values
 .\.venv\Scripts\python -u scripts/voice_e2e_smoke.py [--barge-in] --report <f>  # automated WebRTC test
 .\.venv\Scripts\python -u scripts/voice_browser_smoke.py --report <f>           # real Chromium + fake mic
 
+# durable workflows (Phase 5) - needs docker compose up -d postgres temporal; UI http://127.0.0.1:8233
+.\.venv\Scripts\python scripts/temporal_worker.py              # workflows + activities + outbox dispatcher
+.\.venv\Scripts\python -u scripts/workflow_restart_test.py --report <f>   # kill/restart + outage test (~4 min)
+
 # checks (run pytest from backend/ so its pyproject settings apply)
 cd backend; ..\.venv\Scripts\python -m pytest; cd ..
 .\.venv\Scripts\ruff check backend scripts
@@ -341,6 +345,35 @@ Notes:
 - Legal questions are saved in the configured optional field `caller_questions`, never answered.
 - Vague answers are saved at once as `PENDING_HUMAN_REVIEW` (with the caller's words), *then*
   clarified once. Deferring the save led the model to claim it had recorded things it had not.
+### Durable workflows (Phase 5)
+- Temporal (`temporalio/temporal:1.9.1` dev server, SQLite on a volume) + `temporalio` 1.34. One
+  worker process (`scripts/temporal_worker.py`) runs workflows, sync activities in a thread pool,
+  and the outbox dispatcher.
+- **Transactional outbox:** `workflow_executions` rows are written in the *same* transaction as the
+  business change: `create_escalation` → `handoff-<escalation id>`; `end_call_session` (with an
+  intake) → `post-call-<session id>`. The dispatcher starts `REQUESTED` rows with deterministic IDs and
+  `REJECT_DUPLICATE`; `WorkflowAlreadyStartedError` = already started. Never start these workflows
+  directly from request code.
+- `HandoffWorkflow`: reviewer alert (bounded retries = firm `handoff.delivery_attempts`). If it fails →
+  escalation `FAILED` + `HANDOFF_FAILED_FALLBACK` alert to `handoff.fallback_role`. Otherwise it waits for
+  acceptance (timer by priority, optional `status_changed` signal; the DB is authoritative), sends up to
+  `max_reminders` reminders, then `UNACKNOWLEDGED_FALLBACK`.
+- `BookingWorkflow` (in-call, `BOOKING_VIA_WORKFLOW=true`): one activity attempt at a time; on timeout or
+  transient error it **checks the booking by idempotency key before retrying** (max 3). Business
+  rejections are non-retryable. The tool waits up to `BOOKING_WAIT_SECONDS`; if not finished it returns
+  `BOOKING_NOT_CONFIRMED` (never claimed as booked). If Temporal itself is unreachable it books directly
+  (same key, same verification) and logs a warning.
+- `PostCallWorkflow`: an `INCOMPLETE` intake is re-checked after `handoff.incomplete_follow_up_minutes`; if
+  still incomplete, a system `INCOMPLETE_INTAKE` escalation is created (whose handoff goes via the outbox).
+- Activities are idempotent (notifications unique per `dedupe_key`, bookings per idempotency key,
+  escalation state checked before changes). Workflow code is deterministic: no I/O, no clocks, only
+  activities, timers and signals.
+- Fault injection (`CALENDAR_FAULT_INJECTION`, `NOTIFIER_FAULT_INJECTION`) is explicit opt-in for tests
+  and demos, logged loudly at worker start.
+- Tests: Temporal time-skipping environment (`tests/integration/test_workflows.py`; skip time explicitly
+  with `env.sleep` - implicit skipping returned no completion event). Restart, kill and outage behaviour:
+  `scripts/workflow_restart_test.py` against the real server.
+
 ### Voice layer (Phase 4)
 - LiveKit Agents 1.8 owns audio, VAD (Silero), turn-taking and barge-in. `IntakeVoiceAgent`
   (`agent/voice_agent.py`) overrides `llm_node` and calls `IntakeConversation.respond()`, so voice

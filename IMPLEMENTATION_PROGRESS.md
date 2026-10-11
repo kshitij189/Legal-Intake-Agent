@@ -6,13 +6,13 @@ A phase is `COMPLETED` only when every acceptance criterion has recorded evidenc
 **Repository state at documentation setup (2026-10-11):** empty directory, no source code, no git
 repository. No prior implementation work existed, so every phase started `NOT_STARTED`.
 
-**Last updated:** 2026-10-11 — Phases 1–4 completed.
+**Last updated:** 2026-10-12 — Phases 1–5 completed.
 
 > Correction (Phase 4): the "mypy strict" results recorded for Phases 1–3 were produced without the
 > strict config loaded (see CHANGE_LOG, Phase 4). Strict mode now runs via
 > `mypy --config-file backend/pyproject.toml backend/app` and is clean.
 
-**Next phase to implement:** Phase 5 — Durable workflows (awaiting authorization).
+**Next phase to implement:** Phase 6 — Evaluation harness (awaiting authorization).
 
 ## Summary
 
@@ -22,7 +22,7 @@ repository. No prior implementation work existed, so every phase started `NOT_ST
 | 2 | Text-based intake agent | COMPLETED (2026-10-11) | 1 |
 | 3 | Conversational state and safety | COMPLETED (2026-10-11) | 2 |
 | 4 | Voice loop | COMPLETED (2026-10-11) | 3 |
-| 5 | Durable workflows | NOT_STARTED | 1, 2 (3 recommended) |
+| 5 | Durable workflows | COMPLETED (2026-10-12) | 1, 2 (3 recommended) |
 | 6 | Evaluation harness | NOT_STARTED | 3 (audio mode: 4; recovery/fault cases: 5) |
 | 7 | Human-review dashboard | NOT_STARTED | 1, 5 |
 | 8 | Hardening and demonstration | NOT_STARTED | 1–7 |
@@ -321,28 +321,64 @@ Hindi voices graded C, a possible later option).
 ---
 ## Phase 5 — Durable workflows
 
-**Status:** NOT_STARTED
+**Status:** COMPLETED (2026-10-12)
 
 **Objective:** Temporal for finalization, booking, escalation and recovery.
 
 **Dependencies:** Phases 1–2 (Phase 3 recommended).
 
 **Tasks / deliverables**
-- [ ] Self-hosted Temporal in Docker Compose; Temporal worker process.
-- [ ] Workflows/activities for intake finalization, booking (timeout → state check before retry),
-      escalation/handoff (`FAILED` + configured fallback when the queue is unavailable).
-- [ ] `workflow_executions` table + migration; bounded retry policies.
+- [x] Self-hosted Temporal (`temporalio/temporal:1.9.1`, dev server with SQLite on a volume, UI
+      :8233) in Docker Compose; worker process `scripts/temporal_worker.py` (workflows + sync
+      activities in a thread pool + outbox dispatcher); SDK temporalio 1.34.0.
+- [x] `HandoffWorkflow` (reviewer alert with bounded retries → `FAILED` + fallback alert; timed
+      reminders by priority; unacknowledged fallback; `status_changed` signal), `BookingWorkflow`
+      (timeout/transient → **state check by idempotency key before retry**, max 3, rejections not
+      retried; used by the in-call `book_consultation` tool), `PostCallWorkflow` (incomplete intake →
+      `INCOMPLETE_INTAKE` follow-up escalation after the firm's delay).
+- [x] `workflow_executions` (transactional outbox + status) and `staff_notifications` (simulated
+      reviewer channel, idempotent per `dedupe_key`), migration `868d5e8c91bc` (also widens the
+      escalation-reason CHECK and adds a `(firm_id, id)` key on escalations); firm `handoff` policy.
+- [x] Bounded retry policies everywhere; explicit, logged fault injection
+      (`CALENDAR_FAULT_INJECTION`, `NOTIFIER_FAULT_INJECTION`).
 
-**Acceptance criteria:** a worker restart does not corrupt intake records or create duplicate side
-effects.
+**Acceptance criteria → evidence**
+- [x] *A worker restart does not corrupt intake records or create duplicate side effects* —
+      `scripts/workflow_restart_test.py` against the real Temporal server, **2 runs × 3/3 PASS**
+      (`docs/evidence/phase5/`):
+  - **booking:** the worker committed a booking, hung (fault) and was killed. A fresh worker
+    finished the workflow by state check (`replayed=True`) after 10.9 s. Exactly 1 appointment
+    for the key and the intake; execution `COMPLETED`.
+  - **handoff:** the worker was killed during the acknowledgement timer. After restart:
+    `NEW_ESCALATION`, `REMINDER`, `UNACKNOWLEDGED_FALLBACK`, exactly once each.
+  - **outbox:** with Temporal stopped, the escalation was still created and its handoff waited
+    as `REQUESTED`. After Temporal restarted, the dispatcher started it (one alert).
+- Time-skipping workflow tests (`tests/integration/test_workflows.py`, 11): the escalation requests
+  its handoff atomically; alert → 2 reminders → fallback; stop on acceptance + signal; unavailable
+  channel → `FAILED` + fallback (no reviewer alert); flaky channel → exactly one alert; booking +
+  execution record; timeout-after-commit resolved by state check (1 appointment); rejection not
+  retried; post-call follow-up created / not needed; lost dispatcher commit → no duplicate run.
+- Tool tests: durable booking verified from the DB; `SLOT_UNAVAILABLE` kept; calendar failure and
+  still-running → `BOOKING_NOT_CONFIRMED` (never claimed); unreachable Temporal → direct
+  idempotent booking.
 
-**Required tests / evidence:** Temporal test-environment workflow tests; a kill-and-restart worker
-test with DB assertions (no duplicates, correct final state).
+**Validation (2026-10-12):** `pytest` 291 passed; ruff + format clean; strict mypy clean (68
+files); `alembic check` no drift. Voice regression after Phase 5: 2/2 PASS (latency 3.16 s and
+1.81 s; stage timings normal, so the difference is end-of-speech/transport variance).
 
-**Blockers / decisions:** none known. **Next step:** after Phase 3/4.
+**Known limitations**
+- The reviewer channel is simulated (DB inbox). A real email/SMS/Slack adapter would plug in at
+  `notify_reviewers`.
+- The `status_changed` signal is not sent yet (the dashboard does that in Phase 7). Until then the
+  handoff learns of acceptance at its next timer check.
+- The Temporal dev server (SQLite) suits local use only; production would use a Temporal cluster
+  with PostgreSQL.
+- If Temporal is unreachable, in-call booking falls back to the direct path (logged); durable
+  retries are then unavailable for that booking.
+
+**Blockers:** none.
 
 ---
-
 ## Phase 6 — Evaluation harness
 
 **Status:** NOT_STARTED

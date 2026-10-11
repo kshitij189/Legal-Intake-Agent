@@ -12,3 +12,4 @@ models/
 voice_smoke_worker.log
 voice_web.log
 voice_browser_caller.wav
+restart_*.log

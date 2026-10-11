@@ -12,7 +12,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.agent.tool_registry import REGISTRY
-from app.domain import call_session_service, intake_service
+from app.domain import appointment_service, call_session_service, intake_service
 from app.domain.actors import Actor
 from app.domain.appointment_service import check_availability
 from app.models import Appointment, AuditEvent, Escalation, IntakeRecord
@@ -319,3 +319,88 @@ def test_unexpected_errors_become_internal_error_without_success(
     with harness.sessions() as s:
         outcome = s.scalar(select(AuditEvent.outcome).where(AuditEvent.action == "tool.broken"))
     assert outcome is AuditOutcome.FAILURE
+
+
+# --- durable booking path (Temporal workflow stubbed; the real workflow is in test_workflows) ---
+
+
+def offered_slot(h: Harness) -> str:
+    h.ok("create_draft_intake")
+    h.ok(
+        "save_intake_answer",
+        field_key="matter_category",
+        status="REPORTED_BY_CALLER",
+        value="EMPLOYMENT",
+    )
+    slot: str = h.ok("check_appointment_availability")["slots"][0]["slot_id"]
+    return slot
+
+
+def test_durable_booking_success_is_verified_from_the_database(
+    h: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.tools import calendar_tools
+    from app.workflows.types import BookingOutcome
+
+    def fake_workflow(settings: Any, inp: Any, wait: float) -> BookingOutcome:
+        with h.sessions() as s, s.begin():  # the workflow's activity books for real
+            result = appointment_service.book_consultation(
+                s,
+                firm_id=uuid.UUID(inp.firm_id),
+                actor=Actor.agent(),
+                intake_id=uuid.UUID(inp.intake_id),
+                slot_id=uuid.UUID(inp.slot_id),
+                idempotency_key=inp.idempotency_key,
+                now=NOW,
+            )
+        return BookingOutcome(status="BOOKED", appointment_id=str(result.appointment.id))
+
+    monkeypatch.setattr(calendar_tools, "run_booking_workflow", fake_workflow)
+    h.ctx.durable_booking = True
+    booked = h.ok("book_consultation", slot_id=offered_slot(h))
+    assert booked["verified"] is True and booked["status"] == "BOOKED"
+
+
+@pytest.mark.parametrize(
+    ("outcome", "code"),
+    [
+        (
+            {"status": "REJECTED", "error_code": "SLOT_UNAVAILABLE", "message": "taken"},
+            "SLOT_UNAVAILABLE",
+        ),
+        (
+            {"status": "FAILED", "error_code": "CALENDAR_UNAVAILABLE", "message": "timeout"},
+            "BOOKING_NOT_CONFIRMED",
+        ),
+        (None, "BOOKING_NOT_CONFIRMED"),  # still running after the wait: never claim it
+    ],
+)
+def test_durable_booking_failures_are_never_confirmed(
+    h: Harness, monkeypatch: pytest.MonkeyPatch, outcome: dict[str, str] | None, code: str
+) -> None:
+    from app.tools import calendar_tools
+    from app.workflows.types import BookingOutcome
+
+    monkeypatch.setattr(
+        calendar_tools,
+        "run_booking_workflow",
+        lambda *_: BookingOutcome(**outcome) if outcome else None,
+    )
+    h.ctx.durable_booking = True
+    assert h.error("book_consultation", slot_id=offered_slot(h)) == code
+    with h.sessions() as s:
+        assert s.scalar(select(func.count()).select_from(Appointment)) == 0
+
+
+def test_unreachable_temporal_falls_back_to_direct_booking(
+    h: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.tools import calendar_tools
+    from app.workflows.client import TemporalUnavailable
+
+    def unreachable(*_: Any) -> None:
+        raise TemporalUnavailable("connection refused")
+
+    monkeypatch.setattr(calendar_tools, "run_booking_workflow", unreachable)
+    h.ctx.durable_booking = True
+    assert h.ok("book_consultation", slot_id=offered_slot(h))["verified"] is True

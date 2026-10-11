@@ -57,6 +57,17 @@ class Settings(BaseSettings):
     # being oversubscribed (several idle processes filled 3.9 of 4 GB, measured 2026-10-12).
     voice_idle_processes: int = 1
 
+    # Durable workflows (Phase 5). Local dev server from docker compose.
+    temporal_address: str = "127.0.0.1:7233"
+    temporal_namespace: str = "default"
+    temporal_task_queue: str = "legal-intake"
+    # In-call bookings run as a Temporal workflow (timeout -> state check -> bounded retry).
+    booking_via_workflow: bool = True
+    booking_wait_seconds: float = 12.0
+    # Fault injection for tests and the failure demo only - see app/workflows/faults.py.
+    calendar_fault_injection: str | None = None
+    notifier_fault_injection: str | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:

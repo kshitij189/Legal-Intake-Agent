@@ -434,3 +434,61 @@ a turn 13.8 s, and the browser run failed to transcribe. `VOICE_IDLE_PROCESSES=1
   `mypy --config-file backend/pyproject.toml backend/app` clean (58 files).
 
 **Still pending:** voice with the live Gemini/Groq chain, and a human-microphone session.
+
+---
+
+## 2026-10-12 — Phase 5: durable workflows (Temporal)
+
+**Added**
+- Docker Compose `temporal` service (`temporalio/temporal:1.9.1`: Server 1.32.0, UI 2.54.1; dev
+  server with SQLite at `/data` on a named volume, run as root because the volume is root-owned;
+  127.0.0.1:7233 / 8233). SDK `temporalio` 1.34.0.
+- Models + migration `868d5e8c91bc`: `workflow_executions` (outbox/status; unique deterministic
+  `workflow_id`), `staff_notifications` (idempotent per `(firm_id, dedupe_key)`), `(firm_id, id)`
+  unique key on escalations (composite-FK target), escalation reason `INCOMPLETE_INTAKE`. The
+  CHECK constraint was widened by hand: autogenerate does not detect it, and `op.f()` was needed to
+  stop the naming convention double-prefixing the name.
+- Domain: `workflow_service` (request, claim with SKIP LOCKED, mark started/finished),
+  `notification_service`, `appointment_service.find_appointment_by_key`. `create_escalation` and
+  `end_call_session` request their workflows in the same transaction. `INCOMPLETE_INTAKE` is
+  system-only with fixed priority NORMAL. Firm `handoff` policy (delivery attempts, reviewer and
+  fallback roles, acknowledgement minutes by priority, reminders, incomplete follow-up delay).
+- `app/workflows/`: `types.py`, `faults.py`, `activities.py` (`IntakeActivities`), `workflows.py`
+  (`HandoffWorkflow`, `BookingWorkflow`, `PostCallWorkflow`), `worker.py` (worker + dispatcher),
+  `client.py` (booking from the sync tool). `scripts/temporal_worker.py`,
+  `scripts/workflow_restart_test.py`.
+- `book_consultation` uses `BookingWorkflow` when `ToolContext.durable_booking` (the conversation
+  sets it from `BOOKING_VIA_WORKFLOW`; tests keep the direct path). New error code
+  `BOOKING_NOT_CONFIRMED`.
+- Tests: `test_workflows.py` (11, time-skipping env + real DB), 5 durable-booking tool tests.
+
+**Decisions**
+- Transactional outbox rather than starting workflows from request code: business writes never
+  depend on Temporal being up, and nothing requested is lost.
+- `REJECT_DUPLICATE` workflow-ID policy + deterministic IDs: re-dispatch after a lost commit is
+  recognised (`WorkflowAlreadyStartedError`), never a second run.
+- The reviewer channel is an adapter (`notify_reviewers`, simulated by a DB inbox). The fallback
+  alert deliberately bypasses that channel.
+- Booking: one activity attempt per workflow attempt, with a state check between attempts. This
+  is the blueprint's "timeout → check state before retrying".
+
+**Problems found and fixed**
+- Time-skipping test server: awaiting `handle.result()` returned "No completion event found". The
+  workflow history showed a healthy run waiting on its timer, so tests now skip time explicitly
+  (`env.sleep`) and poll `describe()`. `list_workflows` is unimplemented there, so the no-duplicate
+  check compares run IDs.
+- Post-call follow-up initially used a non-existent cross-tenant intake lookup; `firm_id` is now
+  carried in the plan and the normal tenant-scoped lookup is used.
+
+**Tests and validations executed (actual)**
+- `pytest` 291 passed; ruff check + format clean; `mypy --config-file backend/pyproject.toml
+  backend/app` clean (68 files); `alembic upgrade head` + `alembic check` no drift.
+- `workflow_restart_test.py` run 1: booking PASS (state-check recovery 10.9 s after the kill, 1
+  appointment), handoff PASS (NEW, REMINDER, UNACKNOWLEDGED_FALLBACK once each), outbox PASS
+  (REQUESTED while Temporal was down, then started). Run 2: identical results, 3/3 PASS.
+- Voice regression after Phase 5: 2/2 PASS (1.81 s, 3.16 s; stage timings normal).
+
+**Known limitations:** see Phase 5 in `IMPLEMENTATION_PROGRESS.md` (simulated reviewer channel, no
+dashboard signal yet, dev-server Temporal, direct-booking fallback when Temporal is unreachable).
+
+**Next:** Phase 6 — Evaluation harness (awaiting authorization).

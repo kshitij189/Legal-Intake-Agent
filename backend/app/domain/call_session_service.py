@@ -13,8 +13,9 @@ from app.domain.clock import resolve_now
 from app.domain.errors import InvalidTransition, NotFound, ValidationFailed
 from app.domain.firm_config_service import get_active_firm
 from app.domain.intake_service import get_intake, transition_intake
+from app.domain.workflow_service import post_call_workflow_id, request_workflow
 from app.models import CallSession
-from app.models.enums import CallSessionStatus, IntakeStatus, SessionChannel
+from app.models.enums import CallSessionStatus, IntakeStatus, SessionChannel, WorkflowType
 
 ENTITY = "call_session"
 _ENDED_EARLY = {CallSessionStatus.DISCONNECTED, CallSessionStatus.FAILED}
@@ -127,4 +128,14 @@ def end_call_session(
         entity_id=call.id,
         details={"status": str(status), "reason": call.end_reason},
     )
+    if call.intake_id is not None:
+        # Post-call work (follow-up of unfinished intakes) is durable: requested atomically here.
+        request_workflow(
+            session,
+            firm_id=firm_id,
+            workflow_id=post_call_workflow_id(call.id),
+            workflow_type=WorkflowType.POST_CALL,
+            entity_type=ENTITY,
+            entity_id=call.id,
+        )
     return call

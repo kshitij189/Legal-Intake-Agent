@@ -21,6 +21,8 @@ class ToolContext:
     actor: Actor
     intake_id: uuid.UUID | None = None
     offered_slot_ids: set[uuid.UUID] = field(default_factory=set)
+    # Book through the durable Temporal workflow (set from settings by the conversation).
+    durable_booking: bool = False
     clock: Callable[[], datetime] = _utc_now
 
 

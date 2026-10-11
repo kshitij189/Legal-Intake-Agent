@@ -43,6 +43,27 @@ class EscalationStatus(StrEnum):
 class EscalationReason(StrEnum):
     CONFIGURED_RULE = "CONFIGURED_RULE"
     UNABLE_TO_COMPLETE = "UNABLE_TO_COMPLETE"
+    INCOMPLETE_INTAKE = "INCOMPLETE_INTAKE"  # caller left before finishing; staff follow-up
+
+
+class WorkflowType(StrEnum):
+    HANDOFF = "HANDOFF"
+    BOOKING = "BOOKING"
+    POST_CALL = "POST_CALL"
+
+
+class WorkflowStatus(StrEnum):
+    REQUESTED = "REQUESTED"  # in the outbox, not yet started in Temporal
+    STARTED = "STARTED"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class NotificationKind(StrEnum):
+    NEW_ESCALATION = "NEW_ESCALATION"
+    REMINDER = "REMINDER"
+    HANDOFF_FAILED_FALLBACK = "HANDOFF_FAILED_FALLBACK"
+    UNACKNOWLEDGED_FALLBACK = "UNACKNOWLEDGED_FALLBACK"
 
 
 class Priority(StrEnum):

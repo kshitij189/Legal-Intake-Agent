@@ -1,0 +1,35 @@
+{
+  "started_at": "2026-10-11T20:03:48.377483+00:00",
+  "task_queue": "restart-test-979e2461",
+  "booking": {
+    "outcome": {
+      "status": "BOOKED",
+      "appointment_id": "207d1a37-cc3e-4ae6-ba16-be626beb024f",
+      "replayed": true,
+      "error_code": null,
+      "message": null
+    },
+    "recovered_after_kill_s": 10.9,
+    "appointments_for_key": 1,
+    "appointments_for_intake": 1,
+    "execution_status": "COMPLETED",
+    "passed": true
+  },
+  "handoff": {
+    "notifications": [
+      "NEW_ESCALATION",
+      "REMINDER",
+      "UNACKNOWLEDGED_FALLBACK"
+    ],
+    "result": "UNACKNOWLEDGED",
+    "passed": true
+  },
+  "outbox": {
+    "status_while_temporal_down": "REQUESTED",
+    "status_after_recovery": "STARTED",
+    "notifications": [
+      "NEW_ESCALATION"
+    ],
+    "passed": true
+  }
+}

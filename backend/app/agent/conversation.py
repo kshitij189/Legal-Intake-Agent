@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.agent import omission_check, prompts, reply_guard
 from app.agent.llm_client import PROVIDER_STATE_KEY, LLMClient, LLMResponse, LLMUnavailable
 from app.agent.tool_registry import REGISTRY, tool_definitions
+from app.config import get_settings
 from app.domain import escalation_service, intake_service, transcript_service
 from app.domain.actors import Actor
 from app.domain.audit import record_audit
@@ -86,6 +87,8 @@ class IntakeConversation:
     clock: Callable[[], datetime] = _utc_now
     channel: SessionChannel = SessionChannel.TEXT
     max_tool_rounds: int = MAX_TOOL_ROUNDS
+    # None = follow settings.booking_via_workflow (tests pass False for the direct path).
+    durable_booking: bool | None = None
 
     call_session_id: uuid.UUID | None = field(default=None, init=False)
     ended: bool = field(default=False, init=False)
@@ -121,7 +124,15 @@ class IntakeConversation:
             )
             opening = prompts.greeting(firm.name, disclosure)
         ctx = ToolContext(
-            firm_id=self.firm_id, call_session_id=call.id, actor=self.actor, clock=self.clock
+            firm_id=self.firm_id,
+            call_session_id=call.id,
+            actor=self.actor,
+            clock=self.clock,
+            durable_booking=(
+                get_settings().booking_via_workflow
+                if self.durable_booking is None
+                else self.durable_booking
+            ),
         )
         self._executor = ToolExecutor(self.sessions, ctx, REGISTRY)
         self._tools = tool_definitions(config)

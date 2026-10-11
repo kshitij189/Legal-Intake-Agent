@@ -5,6 +5,7 @@ from app.models.firm import Firm, StaffMember
 from app.models.intake import IntakeRecord, intake_reference_seq
 from app.models.scheduling import Appointment, AvailabilitySlot
 from app.models.transcript import TranscriptTurn
+from app.models.workflow import StaffNotification, WorkflowExecution
 
 __all__ = [
     "Appointment",
@@ -15,6 +16,8 @@ __all__ = [
     "Firm",
     "IntakeRecord",
     "StaffMember",
+    "StaffNotification",
     "TranscriptTurn",
+    "WorkflowExecution",
     "intake_reference_seq",
 ]

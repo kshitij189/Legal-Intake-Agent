@@ -27,5 +27,18 @@ services:
       - "127.0.0.1:7881:7881"   # WebRTC over TCP
       - "127.0.0.1:7882:7882/udp"  # WebRTC over UDP (single muxed port)
 
+  # Self-hosted Temporal (dev server, SQLite file on a volume so history survives restarts).
+  # gRPC 7233 for workers/clients, web UI on http://127.0.0.1:8233. Local development only.
+  temporal:
+    image: temporalio/temporal:1.9.1
+    command: ["server", "start-dev", "--ip", "0.0.0.0", "--db-filename", "/data/temporal.db"]
+    user: "0:0"  # the named volume is root-owned; the dev server must write its SQLite file there
+    ports:
+      - "127.0.0.1:7233:7233"
+      - "127.0.0.1:8233:8233"
+    volumes:
+      - temporal_data:/data
+
 volumes:
   postgres_data:
+  temporal_data:

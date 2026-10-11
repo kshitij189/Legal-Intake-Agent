@@ -19,6 +19,7 @@ from app.domain.clock import resolve_now
 from app.domain.errors import (
     IdempotencyConflict,
     NotFound,
+    PermissionDenied,
     RuleNotMatched,
     ValidationFailed,
 )
@@ -26,12 +27,17 @@ from app.domain.firm_config_service import firm_today, get_active_firm, load_con
 from app.domain.idempotency import validate_idempotency_key
 from app.domain.intake_service import get_intake, intake_fields
 from app.domain.transitions import ensure_escalation_transition
+from app.domain.workflow_service import handoff_workflow_id, request_workflow
 from app.models import Escalation
-from app.models.enums import EscalationReason, EscalationStatus, Priority
+from app.models.enums import ActorType, EscalationReason, EscalationStatus, Priority, WorkflowType
 
 ENTITY = "escalation"
 # Not tied to a firm rule, so the priority is fixed in code rather than chosen by the model.
-UNABLE_TO_COMPLETE_PRIORITY = Priority.HIGH
+FIXED_PRIORITIES = {
+    EscalationReason.UNABLE_TO_COMPLETE: Priority.HIGH,
+    EscalationReason.INCOMPLETE_INTAKE: Priority.NORMAL,
+}
+UNABLE_TO_COMPLETE_PRIORITY = FIXED_PRIORITIES[EscalationReason.UNABLE_TO_COMPLETE]
 MAX_TEXT_LENGTH = 1000
 
 
@@ -108,12 +114,14 @@ def create_escalation(
     else:
         if rule_id is not None:
             raise ValidationFailed("rule_id is only valid for CONFIGURED_RULE escalations")
+        if reason_code is EscalationReason.INCOMPLETE_INTAKE and actor.type is not ActorType.SYSTEM:
+            raise PermissionDenied("only the system raises INCOMPLETE_INTAKE follow-ups")
         reason_text = (description or "").strip()
         if not reason_text or len(reason_text) > MAX_TEXT_LENGTH:
             raise ValidationFailed(
-                f"UNABLE_TO_COMPLETE needs a description of 1-{MAX_TEXT_LENGTH} characters"
+                f"{reason_code} needs a description of 1-{MAX_TEXT_LENGTH} characters"
             )
-        priority = UNABLE_TO_COMPLETE_PRIORITY
+        priority = FIXED_PRIORITIES[reason_code]
         details = {}
 
     escalation = Escalation(
@@ -141,6 +149,16 @@ def create_escalation(
             "priority": str(priority),
             **details,
         },
+    )
+    # Outbox: the durable handoff (reviewer alert, reminders, fallback) is requested atomically
+    # with the escalation, so it cannot be lost if Temporal is unreachable right now.
+    request_workflow(
+        session,
+        firm_id=firm_id,
+        workflow_id=handoff_workflow_id(escalation.id),
+        workflow_type=WorkflowType.HANDOFF,
+        entity_type=ENTITY,
+        entity_id=escalation.id,
     )
     return EscalationResult(escalation, created=True)
 

@@ -9,7 +9,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from app.models.enums import Priority
+from app.models.enums import Priority, StaffRole
 
 KEY_PATTERN = r"^[a-z][a-z0-9_]*$"
 CODE_PATTERN = r"^[A-Z][A-Z0-9_]*$"
@@ -101,11 +101,35 @@ class PrivacyPolicy(StrictModel):
     )
 
 
+class HandoffPolicy(StrictModel):
+    """How a queued escalation reaches a human, and what happens when it does not."""
+
+    # Reviewer-alert delivery attempts before the handoff is marked FAILED and the fallback used.
+    delivery_attempts: int = Field(default=4, ge=1, le=10)
+    reviewer_role: StaffRole = StaffRole.INTAKE_COORDINATOR
+    fallback_role: StaffRole = StaffRole.ADMINISTRATOR
+    # Minutes to wait for a staff member to accept, by priority, before each reminder.
+    ack_minutes_urgent: int = Field(default=15, ge=1, le=1440)
+    ack_minutes_high: int = Field(default=60, ge=1, le=1440)
+    ack_minutes_normal: int = Field(default=240, ge=1, le=10_080)
+    max_reminders: int = Field(default=2, ge=0, le=10)
+    # An intake left INCOMPLETE (caller disconnected) is queued for follow-up after this delay.
+    incomplete_follow_up_minutes: int = Field(default=60, ge=1, le=10_080)
+
+    def ack_minutes(self, priority: Priority) -> int:
+        return {
+            Priority.URGENT: self.ack_minutes_urgent,
+            Priority.HIGH: self.ack_minutes_high,
+            Priority.NORMAL: self.ack_minutes_normal,
+        }[priority]
+
+
 class FirmConfig(StrictModel):
     intake_questions: tuple[IntakeQuestion, ...] = Field(min_length=1)
     escalation_rules: tuple[EscalationRule, ...] = ()
     scheduling: SchedulingPolicy
     privacy: PrivacyPolicy = PrivacyPolicy()
+    handoff: HandoffPolicy = HandoffPolicy()
 
     @model_validator(mode="after")
     def _check_references(self) -> Self:

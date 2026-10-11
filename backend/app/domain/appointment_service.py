@@ -181,6 +181,17 @@ def book_consultation(
     return BookingResult(appointment, replayed=False)
 
 
+def find_appointment_by_key(
+    session: Session, *, firm_id: uuid.UUID, idempotency_key: str
+) -> Appointment | None:
+    """State check used before retrying a booking whose outcome is unknown (e.g. timeout)."""
+    return session.scalar(
+        select(Appointment).where(
+            Appointment.firm_id == firm_id, Appointment.idempotency_key == idempotency_key
+        )
+    )
+
+
 def get_booked_appointment_for_intake(
     session: Session, *, firm_id: uuid.UUID, intake_id: uuid.UUID
 ) -> Appointment | None:
