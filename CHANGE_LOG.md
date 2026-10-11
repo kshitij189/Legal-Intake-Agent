@@ -120,3 +120,34 @@ voice, API, workflow or frontend code.
 - Phase 1 committed as `eee7ca6` and pushed. Author and committer: `kshitij189`; no co-author trailers.
 - Added CLAUDE.md §15 "Git and authorship": commit and push after every phase; `kshitij189` is the
   sole author; no AI attribution in commits, PRs or files.
+
+---
+
+## 2026-10-11 — LLM provider switched from Anthropic (Claude) to Groq
+
+**Reason:** the user no longer has an active Anthropic API key and will use a Groq API key. This is
+a deliberate, user-approved deviation from the blueprint's "Claude API via the Anthropic SDK".
+
+**Changes**
+- `backend/app/config.py`: added `groq_api_key` (`SecretStr`, never printed), `groq_model` (default
+  `openai/gpt-oss-120b`), `llm_timeout_seconds` (20) and `llm_max_retries` (2).
+- `.env.example` (and the local, git-ignored `.env`): `ANTHROPIC_API_KEY` replaced by
+  `GROQ_API_KEY`, `GROQ_MODEL`, `LLM_TIMEOUT_SECONDS` and `LLM_MAX_RETRIES`.
+- CLAUDE.md §4/§5/§8 and IMPLEMENTATION_PROGRESS.md (Phase 2, Phase 6, Outstanding decision 2) now
+  name Groq as the provider.
+- Added `backend/tests/unit/test_config.py`.
+
+**Decisions**
+- Default model `openai/gpt-oss-120b`: a Groq **production** model with tool calling and a 131k
+  context window (checked against console.groq.com/docs/models and /docs/tool-use on 2026-10-11).
+  Fallback: `llama-3.3-70b-versatile`. Preview models are excluded because Groq may withdraw them at
+  short notice.
+- The gpt-oss models do not support parallel tool calls, so the agent runs tool calls one at a time,
+  in order.
+- The provider sits behind an `LLMClient` adapter so the rest of the code never imports the Groq SDK,
+  and Anthropic can be restored later.
+- The `groq` SDK is not installed yet. It will be added in Phase 2, when the code first uses it.
+
+**Tests executed (actual results):** `pytest` 113 passed (adds 2 config tests); ruff check passed;
+ruff format: 46 files unchanged; mypy strict: no issues in 28 files. No live Groq call was made: no
+real key is configured yet, and no code calls the LLM before Phase 2.

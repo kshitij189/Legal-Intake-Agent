@@ -60,7 +60,7 @@ legal matters (output is always a **draft intake pending human review**).
 
 ## 4. Architecture
 
-Pipeline: **Audio → VAD → STT → Claude → validated tool call or text → TTS → Audio.**
+Pipeline: **Audio → VAD → STT → LLM (Groq) → validated tool call or text → TTS → Audio.**
 
 Three concerns, kept separate:
 1. **Realtime conversation** — LiveKit Agents worker (voice runtime, STT, VAD, TTS, agent service).
@@ -74,25 +74,26 @@ Temporal worker). No microservices.
 
 | Component | Location | Owns | Must not |
 |---|---|---|---|
-| Domain services | `backend/app/domain/` | All business rules, state transitions, authorization checks, audit writes | Import LiveKit, Anthropic, FastAPI or Temporal |
+| Domain services | `backend/app/domain/` | All business rules, state transitions, authorization checks, audit writes | Import LiveKit, LLM SDKs, FastAPI or Temporal |
 | Policy engine | `backend/app/domain/policy_engine.py` | Pure evaluation of firm escalation rules | Touch the DB or the clock implicitly (pass `today`) |
 | ORM models | `backend/app/models/` | Table definitions and DB constraints | Contain business logic |
 | Schemas | `backend/app/schemas/` | Pydantic models for firm config, tool I/O, API I/O | — |
-| Tools | `backend/app/tools/` | Pydantic-validated adapters from Claude tool calls to domain services | Run SQL directly, bypass domain services |
-| Agent | `backend/app/agent/` | Claude client, prompts, tool registry, conversation loop | Decide policy; state outcomes not returned by tools |
+| Tools | `backend/app/tools/` | Pydantic-validated adapters from LLM tool calls to domain services | Run SQL directly, bypass domain services |
+| Agent | `backend/app/agent/` | LLM client adapter (Groq), prompts, tool registry, conversation loop | Decide policy; state outcomes not returned by tools |
 | Voice | `backend/app/voice/` | STT/TTS/VAD/session adapters | Contain business logic |
 | Workflows | `backend/app/workflows/` | Temporal workflows/activities calling domain services | Duplicate domain rules |
 | API | `backend/app/api/` | Thin FastAPI routers over domain services | Duplicate domain rules |
 | Frontend | `frontend/` | Review/admin dashboard (Next.js + TS) | Re-implement business rules |
 
-Integrations (Claude, STT, TTS, LiveKit, Temporal) sit behind small adapters so they can be swapped
+Integrations (LLM, STT, TTS, LiveKit, Temporal) sit behind small adapters so they can be swapped
 or faked in tests. A fake is only allowed in tests or when explicitly configured — never as a silent
 replacement for required functionality.
 
 ## 5. Approved tech stack (do not deviate without a documented decision)
 
 Python 3.13 · LiveKit Agents (Python) · self-hosted LiveKit + WebRTC · faster-whisper (STT) ·
-Silero VAD · Piper-compatible TTS (evaluate Kokoro) · Claude API via the `anthropic` Python SDK ·
+Silero VAD · Piper-compatible TTS (evaluate Kokoro) · **Groq API via the `groq` Python SDK**
+(replaces the blueprint's Claude API, see §8; the SDK is added in Phase 2) ·
 FastAPI · Pydantic v2 · PostgreSQL · SQLAlchemy 2.x + Alembic · self-hosted Temporal ·
 Next.js + TypeScript · pytest · Playwright · OpenTelemetry + structured logging ·
 optional self-hosted Langfuse · Docker + Docker Compose.
@@ -174,9 +175,23 @@ intake/slot row before read-modify-write.
 
 ## 8. AI model and tool rules
 
-- Claude is used for conversation reasoning, extraction and tool selection only. Model ID comes from
-  config (`ANTHROPIC_MODEL`); choose and record it in Phase 2. Consult current Anthropic docs (the
-  `claude-api` skill) rather than memory for SDK usage, model IDs and pricing.
+- **LLM provider: Groq** (user decision 2026-10-11, replacing the blueprint's Claude API because no
+  Anthropic key is available). The LLM is used for conversation reasoning, extraction and tool
+  selection only.
+- Config: `GROQ_API_KEY` (a `SecretStr`, never logged), `GROQ_MODEL` (default
+  `openai/gpt-oss-120b`, a Groq production model with tool calling; alternative
+  `llama-3.3-70b-versatile`), `LLM_TIMEOUT_SECONDS`, `LLM_MAX_RETRIES`. Use only Groq
+  **production** models, not preview models (Groq may withdraw those at short notice).
+- Groq's chat API is OpenAI-compatible: tools are declared as JSON-schema `function`s. Generate
+  those schemas from the Pydantic tool-input models, and validate model arguments with Pydantic
+  again on our side. Never trust the provider to enforce a schema.
+- Do not depend on parallel tool calls: the `openai/gpt-oss-*` models do not support them. Execute
+  tool calls one at a time, in order.
+- Keep the provider behind one adapter (`app/agent/llm_client.py` with a small `LLMClient`
+  protocol). Agent, tools and domain code must not import the Groq SDK, so the provider (Groq,
+  Anthropic, ...) can be swapped without other changes, as blueprint §6 intends.
+- Look up current Groq docs (console.groq.com/docs) for model IDs, limits and SDK usage rather
+  than relying on memory; record the model chosen in `CHANGE_LOG.md`.
 - Exposed tools are exactly the blueprint set: `get_intake_questions`, `save_intake_answer`,
   `get_intake_status`, `check_appointment_availability`, `book_consultation`,
   `create_draft_intake`, `mark_for_human_review`, `get_handoff_status`, `finalize_intake_summary`.
@@ -186,11 +201,12 @@ intake/slot row before read-modify-write.
 - `firm_id`, `intake_id` and the actor come from the session context, never from model arguments.
 - The agent may only speak outcomes present in a tool result. Prompts state the no-legal-advice
   boundary, but enforcement lives in code.
-- If Claude is unavailable: persist current state, give a safe failure message, follow the human
+- If the LLM is unavailable (timeout, rate limit, 5xx): persist current state, give a safe failure message, follow the human
   fallback; never continue a critical transaction on invented data.
 - Human-approval gates: acceptance/resolution of escalations, verification of reported facts and any
   decision to take a matter are **staff-only** actions.
-- The Anthropic API key lives only in the git-ignored `.env`. Placeholders in `.env.example`.
+- The Groq API key lives only in the git-ignored `.env`. Placeholders in `.env.example`.
+- Intake conversations go to Groq's servers. Only fictional data may be used.
 
 ## 9. Error handling, retries, idempotency, recovery
 

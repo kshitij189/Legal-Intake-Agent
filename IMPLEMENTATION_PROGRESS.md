@@ -95,13 +95,22 @@ escalation and audit data models with deterministic business rules and seed data
 
 **Status:** NOT_STARTED
 
-**Objective:** Connect Claude to the backend through typed tool definitions; run a scripted text
-conversation that captures facts through real application services.
+**Objective:** Connect the LLM (Groq, replacing the blueprint's Claude) to the backend through typed
+tool definitions; run a scripted text conversation that captures facts through real application
+services.
 
-**Dependencies:** Phase 1.
+**Dependencies:** Phase 1. Groq configuration (done 2026-10-11, see below).
+
+**Prerequisite done:** Groq settings in `app/config.py` (`GROQ_API_KEY` as `SecretStr`,
+`GROQ_MODEL` default `openai/gpt-oss-120b`, timeout/retry settings), `.env.example` updated,
+CLAUDE.md §5/§8 updated, `tests/unit/test_config.py`.
 
 **Tasks / deliverables**
-- [ ] Anthropic SDK client adapter with configurable model ID, timeouts and bounded retries.
+- [ ] `groq` SDK dependency + `LLMClient` protocol and Groq adapter (`app/agent/llm_client.py`)
+      with configurable model ID, timeouts, bounded retries and error mapping (timeout, rate
+      limit, 5xx → safe fallback).
+- [ ] Tool JSON schemas generated from Pydantic input models (OpenAI-compatible `function` format);
+      arguments re-validated with Pydantic; tool calls executed sequentially.
 - [ ] The nine blueprint tools with strict Pydantic schemas and structured results; tool registry.
 - [ ] Tool executor: validation, session-derived `firm_id`/intake/actor, domain-service calls,
       unit of work, failure auditing, mapping `DomainError` codes to structured tool results, and
@@ -117,10 +126,12 @@ conversation that captures facts through real application services.
 - No tool allows arbitrary SQL, shell or URL access.
 
 **Required tests / evidence:** tool unit tests with a fake model client; integration tests of the
-tool executor against PostgreSQL; at least a small set of live Claude scripted runs (requires
-`ANTHROPIC_API_KEY` — otherwise `BLOCKED` for the live part).
+tool executor against PostgreSQL; at least a small set of live Groq scripted runs (requires a real
+`GROQ_API_KEY` in `.env`; otherwise the live part is `BLOCKED`).
 
-**Blockers / decisions:** Anthropic API key; model choice. **Next step:** after Phase 1.
+**Blockers / decisions:** a real `GROQ_API_KEY` must be put in `.env` (it is currently a placeholder).
+The model defaults to `openai/gpt-oss-120b`; confirm or switch to `llama-3.3-70b-versatile` after the
+live runs. Groq free-tier rate limits may throttle live runs. **Next step:** awaiting authorization.
 
 ---
 
@@ -216,7 +227,7 @@ injection and regression reports.
 **Tasks / deliverables**
 - [ ] 30–50 labelled scenarios in `fixtures/scenarios/` covering blueprint §13.
 - [ ] Transcript-mode runner (Mode A) and audio-mode runner (Mode B) with a simulated caller.
-- [ ] Fault injection: calendar timeout, review-queue outage, disconnects, Claude/DB failures.
+- [ ] Fault injection: calendar timeout, review-queue outage, disconnects, LLM (Groq)/DB failures.
 - [ ] Metrics report (all blueprint §13 metrics) via `scripts/run_evaluations.py`.
 
 **Acceptance criteria:** a single command runs the suite and reports the exact passing and failing
@@ -225,7 +236,7 @@ scenarios.
 **Required tests / evidence:** the generated report with actual numbers (targets: zero false booking
 confirmations, zero duplicate appointments, all critical escalations handled).
 
-**Blockers / decisions:** live Claude runs consume API credits. **Next step:** after Phases 3–5.
+**Blockers / decisions:** live Groq runs are subject to API rate limits and usage. **Next step:** after Phases 3–5.
 
 ---
 
@@ -283,7 +294,8 @@ dependency fails; blueprint §18 "definition of done" items 1–11 all verified.
    Proposed: Phases 1–6 call domain services in-process; the HTTP API is built in Phase 7 together
    with staff authentication (so no unauthenticated write endpoints exist). Override if you want the
    API earlier.
-2. **Claude model ID** for the realtime loop (latency vs. quality) — decide in Phase 2.
+2. **LLM provider and model.** Resolved 2026-10-11: provider is **Groq** (your decision; no Anthropic
+   key). Default model `openai/gpt-oss-120b`; to be confirmed by Phase 2 live runs.
 3. **TTS engine** (Piper vs. Kokoro) and voice licence — decide in Phase 4.
 4. **Supported languages** — English only until Hindi/Hinglish are tested explicitly.
 5. **Firm timezone** for the fictional firm — proposed `Asia/Kolkata`.
