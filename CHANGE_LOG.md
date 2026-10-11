@@ -387,3 +387,50 @@ English only; unauthenticated local token endpoint; with free-tier LLMs, turn la
 dominated by the model.
 
 **Next:** Phase 5 — Durable workflows (awaiting authorization).
+
+---
+
+## 2026-10-12 — Phase 4 follow-up: Kokoro TTS and GPU speech (disk freed by the user)
+
+**Trigger:** disk space was no longer a constraint (69 GB free), so the two items deferred for disk
+were evaluated: Kokoro (blueprint: "evaluate Kokoro if suitable") and GPU speech recognition.
+
+**Kokoro evaluation (CPU, 5 agent-style sentences; intelligibility = Whisper `small.en` WER)**
+- Piper `en_US-ljspeech-medium`: RTF 0.048, first sentence 0.18 s, WER 0.14.
+- Kokoro v1.0 fp32 `af_heart`: RTF 0.557, first sentence 1.88 s, WER **0.061**; `af_bella` WER
+  0.107; the int8 model was slower on this CPU (RTF 0.60).
+- Licence: Kokoro-82M weights Apache-2.0, trained on permissive or public-domain audio (two small
+  CC BY datasets, Japanese and French, credited by the authors).
+- Kokoro on GPU (onnxruntime-gpu CUDA provider): 0.29–0.32 s for 3.8 s of audio.
+
+**GPU STT (Whisper, 11.5 s utterance):** `base.en` CPU int8 0.88–1.01 s; `base.en` CUDA float16
+0.22–0.25 s (same transcript); `small.en` CUDA mis-transcribed the phone number; `medium.en` CUDA
+no faster (0.76 s).
+
+**Changes**
+- `voice/gpu.py` (DLL registration for NVIDIA pip wheels on Windows; `auto` resolution),
+  `voice/tts_kokoro.py` (`KokoroTTS`, `load_kokoro`), session manager selects engines and warms up
+  models in `prewarm`. Settings: `STT_DEVICE=auto`, `STT_COMPUTE_TYPE=auto`, `TTS_ENGINE=auto`,
+  `KOKORO_VOICE=af_heart`, `VOICE_IDLE_PROCESSES=1`. `scripts/enable_gpu.py` (pinned versions),
+  `download_voice_models.py` now fetches Kokoro. Dependency: kokoro-onnx 0.6.1.
+- Tests: Kokoro adapter through LiveKit's stream plumbing; device and engine resolution.
+
+**Environment findings**
+- onnxruntime-gpu 1.31 needs CUDA 13, while ctranslate2 4.8 needs CUDA 12. The CUDA 13 wheels
+  install to `nvidia/cu13/...` (no clash), but both cuDNN 9 builds write `nvidia/cudnn/bin/cudnn64_9.dll`.
+  Only `nvidia-cudnn-cu13` is installed, and it was verified to serve both libraries in one process.
+- `onnxruntime-gpu` and CPU `onnxruntime` (required by silero/piper/faster-whisper) share one
+  module, so `enable_gpu.py` must be re-run after dependency installs. The code falls back to CPU
+  without it.
+
+**Bug found and fixed:** with default settings LiveKit pre-spawned several job processes, each
+loading Whisper and Kokoro onto the GPU (3,943 / 4,096 MiB used while idle). STT then took 5.8 s and
+a turn 13.8 s, and the browser run failed to transcribe. `VOICE_IDLE_PROCESSES=1` → 793 MiB idle.
+
+**Results (actual)**
+- GPU Whisper + Kokoro: WebRTC basic PASS ×2 (latency 1.74 s, 1.75 s), barge-in PASS (2.13 s;
+  3.31 s after the interruption), browser PASS. STT 0.30–0.43 s, TTS 0.34–0.99 s per sentence.
+- `pytest` 275 passed; `ruff check` / `ruff format --check` clean;
+  `mypy --config-file backend/pyproject.toml backend/app` clean (58 files).
+
+**Still pending:** voice with the live Gemini/Groq chain, and a human-microphone session.

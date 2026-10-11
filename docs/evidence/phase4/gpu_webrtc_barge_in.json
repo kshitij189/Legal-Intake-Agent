@@ -1,0 +1,113 @@
+{
+  "mode": "barge-in",
+  "checks": {
+    "greeting_heard": true,
+    "reply_heard": true,
+    "reply_marked_interrupted": true,
+    "greeting_not_interrupted": true,
+    "interruption_transcribed": true,
+    "agent_answered_interruption": true,
+    "caller_transcribed": true,
+    "voice_session": true,
+    "deadline_saved_and_escalated": true,
+    "hangup_kept_partial_state": true
+  },
+  "worker_registration_s": 12.3,
+  "greeting_after_join_s": 1.29,
+  "latency_after_interruption_s": 3.31,
+  "response_latency_s": 2.13,
+  "heard_greeting": "Hello, thank you for contacting NorthStar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a call back or consultation. But I can't give legal advice. This conversation is transcribed, so the firm's team can review your inquiry. May I ask you a few questions?",
+  "heard_reply": "Thank you. I have flagged the deadline for the team's process.",
+  "db": {
+    "channel": "VOICE",
+    "session_status": "DISCONNECTED",
+    "intake_status": "INCOMPLETE",
+    "reported_deadline": "2026-10-13",
+    "escalations": [
+      "imminent_deadline"
+    ],
+    "transcript": [
+      [
+        "AGENT",
+        "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+        null
+      ],
+      [
+        "CALLER",
+        "Hello, my name is Test Caller and I must respond to a notice by tomorrow.",
+        null
+      ],
+      [
+        "AGENT",
+        "Thank you. I have flagged the deadline for the team's prompt review. A member of the firm's team will look at your enquiry as soon as possible, and I can also note any other details you would like them to know before they contact you.",
+        170
+      ],
+      [
+        "CALLER",
+        "Sorry to interrupt, my phone number is 98,765 43,210.",
+        null
+      ],
+      [
+        "AGENT",
+        "Thank you. I have flagged the deadline for the team's prompt review. A member of the firm's team will look at your enquiry as soon as possible, and I can also note any other details you would like them to know before they contact you.",
+        54
+      ]
+    ],
+    "interrupted_flags": [
+      [
+        "AGENT",
+        false
+      ],
+      [
+        "CALLER",
+        false
+      ],
+      [
+        "AGENT",
+        true
+      ],
+      [
+        "CALLER",
+        false
+      ],
+      [
+        "AGENT",
+        false
+      ]
+    ]
+  },
+  "stage_timings_ms": {
+    "stt_ms": [
+      391,
+      391,
+      429,
+      429
+    ],
+    "tts_ms": [
+      581,
+      581,
+      378,
+      378,
+      567,
+      567,
+      561,
+      561,
+      353,
+      353,
+      512,
+      512,
+      987,
+      987,
+      407,
+      407,
+      737,
+      737
+    ],
+    "processing_ms": [
+      170,
+      170,
+      54,
+      54
+    ]
+  }
+}

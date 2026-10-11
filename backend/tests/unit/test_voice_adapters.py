@@ -112,3 +112,82 @@ def test_piper_synthesis_streams_all_audio() -> None:
 def test_missing_voice_file_is_a_clear_error(tmp_path: Any) -> None:
     with pytest.raises(FileNotFoundError, match="Piper voice not found"):
         PiperTTS(voice_path=tmp_path / "missing.onnx")
+
+
+class FakeKokoro:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, str]] = []
+
+    def create(self, text: str, voice: str, lang: str = "en-us") -> tuple[np.ndarray, int]:
+        self.calls.append((text, voice))
+        return (0.2 * np.ones(24_000, dtype=np.float32)), 24_000
+
+
+def test_kokoro_synthesis_uses_the_configured_voice() -> None:
+    from app.voice.tts_kokoro import KokoroTTS
+
+    fake = FakeKokoro()
+    tts = KokoroTTS(kokoro=fake, voice="af_heart")
+    assert (tts.sample_rate, tts.model, tts.provider) == (
+        24_000,
+        "kokoro-v1.0:af_heart",
+        "kokoro-onnx",
+    )
+
+    async def collect() -> int:
+        samples = 0
+        async with tts.synthesize("Hello there.", conn_options=NO_RETRY) as stream:
+            async for audio in stream:
+                samples += audio.frame.samples_per_channel
+        return samples
+
+    total = asyncio.run(collect())
+    assert fake.calls == [("Hello there.", "af_heart")]
+    assert 24_000 <= total < 24_000 + 24_000 // 20
+
+
+def test_missing_kokoro_files_are_a_clear_error(tmp_path: Any) -> None:
+    from app.voice.tts_kokoro import load_kokoro
+
+    with pytest.raises(FileNotFoundError, match="Kokoro file not found"):
+        load_kokoro(tmp_path / "m.onnx", tmp_path / "v.bin", use_gpu=False)
+
+
+@pytest.mark.parametrize(
+    ("device", "compute", "cuda", "expected"),
+    [
+        ("auto", "auto", True, ("cuda", "float16")),
+        ("auto", "auto", False, ("cpu", "int8")),
+        ("cpu", "auto", True, ("cpu", "int8")),
+        ("cuda", "int8_float16", True, ("cuda", "int8_float16")),
+    ],
+)
+def test_stt_device_resolution(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    compute: str,
+    cuda: bool,
+    expected: tuple[str, str],
+) -> None:
+    from app.voice import gpu
+
+    monkeypatch.setattr(gpu, "whisper_cuda_available", lambda: cuda)
+    assert gpu.resolve_stt(device, compute) == expected
+
+
+@pytest.mark.parametrize(
+    ("engine", "cuda", "expected"),
+    [
+        ("auto", True, "kokoro"),
+        ("auto", False, "piper"),
+        ("piper", True, "piper"),
+        ("kokoro", False, "kokoro"),
+    ],
+)
+def test_tts_engine_resolution(
+    monkeypatch: pytest.MonkeyPatch, engine: str, cuda: bool, expected: str
+) -> None:
+    from app.voice import gpu
+
+    monkeypatch.setattr(gpu, "onnx_cuda_available", lambda: cuda)
+    assert gpu.resolve_tts_engine(engine) == expected

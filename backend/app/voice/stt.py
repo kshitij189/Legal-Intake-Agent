@@ -17,6 +17,7 @@ from livekit.agents.types import NOT_GIVEN, NotGivenOr
 from livekit.agents.utils import AudioBuffer
 
 from app.voice.audio import to_whisper_input
+from app.voice.gpu import register_cuda_dlls
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +58,7 @@ class WhisperSTT(stt.STT[Literal["metrics_collected"]]):
     def load(self) -> None:
         """Load the model eagerly (call once per worker process, before the first call)."""
         if self._whisper is None:
+            register_cuda_dlls()
             from faster_whisper import WhisperModel  # heavy import, deferred
 
             self._whisper = WhisperModel(

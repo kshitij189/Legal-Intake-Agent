@@ -22,6 +22,7 @@ dependencies = [
     "livekit-api>=1.2,<2",
     "faster-whisper>=1.2,<2",
     "piper-tts>=1.8,<2",
+    "kokoro-onnx>=0.6,<1",  # GPU path: run scripts/enable_gpu.py (onnxruntime-gpu + CUDA wheels)
     "fastapi>=0.143,<1",
     "uvicorn>=0.54,<1",
 ]
@@ -50,5 +51,8 @@ plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 # Local voice model libraries ship without type information.
-module = ["faster_whisper", "faster_whisper.*", "piper", "piper.*"]
+module = [
+    "faster_whisper", "faster_whisper.*", "piper", "piper.*", "ctranslate2", "ctranslate2.*",
+    "onnxruntime", "onnxruntime.*", "kokoro_onnx", "kokoro_onnx.*",
+]
 ignore_missing_imports = true

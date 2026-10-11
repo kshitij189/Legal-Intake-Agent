@@ -20,6 +20,7 @@ server = AgentServer(
     ws_url=settings.livekit_url,
     api_key=settings.livekit_api_key,
     api_secret=settings.livekit_api_secret.get_secret_value(),
+    num_idle_processes=settings.voice_idle_processes,
     initialize_process_timeout=120.0,  # loading Whisper + Piper on CPU takes a while
 )
 

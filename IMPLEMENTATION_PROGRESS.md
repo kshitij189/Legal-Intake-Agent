@@ -280,15 +280,33 @@ Kokoro), browser microphone interface.
 A real LLM adds its own time to every turn: Gemini/Groq calls took 2–35 s in Phases 2–3, often
 several calls per turn. **Not yet measured in voice.**
 
-**Hardware / model constraints:** Ryzen 7 4800H (8 cores), 16 GB RAM, RTX 3050 Ti 4 GB, ~9.6 GB
-free disk. STT runs on CPU (`base.en` int8). `small.en` measured 2.6× slower with no accuracy gain on
-the test sentence, and GPU/CUDA libraries (~2 GB) were skipped for disk space. Models ~210 MB in
-`models/` (git-ignored).
+**GPU + Kokoro follow-up (2026-10-12, after disk was freed):**
 
-**Decisions:** Piper (LJSpeech voice, public-domain dataset) chosen. **Kokoro was not evaluated**:
-Piper already meets latency, and disk is tight; revisit in Phase 8 if voice quality matters.
-English only: Hindi/Hinglish untested, so not supported.
+| Configuration | End of speech → reply | STT per turn | TTS per sentence | Intelligibility (Whisper WER) |
+|---|---|---|---|---|
+| CPU Whisper int8 + Piper (Phase 4 baseline) | 2.61–3.07 s | 1.18–1.44 s | 0.2–0.85 s | 0.14 |
+| **GPU Whisper float16 + Kokoro `af_heart` (now the `auto` default)** | **1.74 / 1.75 / 2.13 s** | **0.30–0.43 s** | 0.34–0.99 s | **0.061** |
 
+- GPU voice runs: 3/3 WebRTC PASS (basic ×2, barge-in) and browser PASS
+  (`docs/evidence/phase4/gpu_*.json`).
+- Kokoro on CPU: real-time factor 0.54–0.60 (≈11× slower than Piper), so `TTS_ENGINE=auto` uses
+  Kokoro only on GPU. The int8 Kokoro model was no faster on this CPU. Listening comparison:
+  `docs/evidence/phase4/tts_comparison/*.wav`.
+- Whisper `small.en` on GPU mis-transcribed the phone number ("90, 8,765"); `medium.en` was no
+  faster. `base.en` kept.
+- Bug found and fixed: LiveKit pre-spawned several job processes, each loading the models onto the
+  GPU (3.9 / 4 GB used while idle), which made STT 5.8 s and latency 13.8 s. Fixed with
+  `VOICE_IDLE_PROCESSES=1` (idle use: 793 MiB).
+- Setup: `scripts/enable_gpu.py` (pinned CUDA 12 + 13 wheels, onnxruntime-gpu 1.31, one cuDNN 9).
+  It must be re-run after `pip install` because CPU `onnxruntime` shares the Python module. Without
+  it, the code falls back to CPU automatically (Piper, CPU Whisper).
+
+**Hardware:** Ryzen 7 4800H (8 cores), 16 GB RAM, RTX 3050 Ti 4 GB (driver 592), ~62 GB free disk
+after the GPU wheels (~5 GB) and models (~550 MB, `models/`, git-ignored).
+
+**Decisions:** Kokoro (Apache-2.0 weights; GPU) is the default voice with Piper as the CPU
+fallback; Whisper `base.en` on GPU. English only: Hindi/Hinglish untested (Kokoro has
+Hindi voices graded C, a possible later option).
 **Known limitations / pending**
 - Voice with the real LLM chain: blocked today by free-tier quota exhaustion. Run
   `scripts/voice_worker.py start` + the web page once quotas reset, and measure turn latency.

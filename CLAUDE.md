@@ -282,7 +282,8 @@ copy .env.example .env   # then edit values
 #   labelled scripts: fixtures/transcripts/phase2_scripted.json; live results vary per run
 
 # voice (Phase 4) - needs `docker compose up -d postgres livekit`
-.\.venv\Scripts\python scripts/download_voice_models.py        # Piper voice + Whisper model -> models/
+.\.venv\Scripts\python scripts/download_voice_models.py        # Piper, Kokoro, Whisper -> models/
+.\.venv\Scripts\python scripts/enable_gpu.py                   # optional GPU path (re-run after pip installs)
 .\.venv\Scripts\python scripts/voice_worker.py start           # real worker (Gemini/Groq chain)
 .\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 8000   # http://127.0.0.1:8000/voice
 .\.venv\Scripts\python scripts/voice_worker.py console         # talk via this PC's mic, no browser
@@ -345,12 +346,21 @@ Notes:
   (`agent/voice_agent.py`) overrides `llm_node` and calls `IntakeConversation.respond()`, so voice
   uses exactly the tested text code path. A marker `ConversationOwnedLLM` must be set on the
   session: LiveKit skips replies when no LLM is configured. Its `chat()` must never be reached.
-- STT: `voice/stt.py` = faster-whisper `base.en` int8 on CPU, non-streaming per VAD segment.
+- STT: `voice/stt.py` = faster-whisper `base.en`, non-streaming per VAD segment. `STT_DEVICE=auto`:
+  CUDA float16 (~0.3–0.4 s per caller turn) when available, else CPU int8 (~1.2–1.4 s).
   Segments with `no_speech_prob >= 0.6` are dropped (Whisper hallucinates "Thank you." on silence).
   An empty transcript gets "Sorry, I didn't catch that". STT writes numbers like "98,765 43,210",
   so phone parsing accepts commas.
-- TTS: `voice/tts.py` = Piper `en_US-ljspeech-medium` (public-domain dataset), 22.05 kHz.
+- TTS: `TTS_ENGINE=auto` picks **Kokoro** (`voice/tts_kokoro.py`, Kokoro-82M v1.0, Apache-2.0,
+  voice `af_heart`, 24 kHz) when its GPU path works, else **Piper** (`voice/tts.py`,
+  `en_US-ljspeech-medium`, public-domain dataset, 22.05 kHz). Kokoro is ~2× more intelligible (Whisper
+  WER 0.061 vs 0.14) but ~11× slower than Piper on CPU, so never default to Kokoro on CPU.
   LiveKit splits replies into sentences and synthesizes each one.
+- GPU (optional): `scripts/enable_gpu.py` installs pinned NVIDIA CUDA 12 + 13 runtime wheels,
+  `onnxruntime-gpu` and a single cuDNN 9 (cu13) that serves both libraries; `voice/gpu.py`
+  registers the DLL folders. Re-run it after any `pip install` (CPU `onnxruntime` shares the
+  module). `VOICE_IDLE_PROCESSES=1`: each LiveKit job process loads its own models, and several
+  filled the 4 GB GPU (3.9 GB), making STT 5.8 s instead of 0.3 s. Models are warmed up in `prewarm`.
 - The greeting is **not interruptible** (it carries the transcript disclosure); replies are. An
   interrupted reply is flagged on its `transcript_turns` row and in the model's history.
 - Consent: `call_sessions.consent` records what was disclosed. Turns are stored only if the firm's

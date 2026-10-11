@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -36,15 +37,25 @@ class Settings(BaseSettings):
     livekit_url: str = "ws://127.0.0.1:7880"
     livekit_api_key: str = "devkey"
     livekit_api_secret: SecretStr = SecretStr("secret")
-    # faster-whisper: base.en on CPU int8 measured ~0.13x real time on the dev laptop (2026-10-11).
+    # faster-whisper base.en: CPU int8 ~0.9 s, CUDA float16 ~0.25 s per 11 s utterance
+    # (measured 2026-10-12). "auto" = CUDA when available, else CPU.
     stt_model: str = "base.en"
-    stt_device: str = "cpu"
-    stt_compute_type: str = "int8"
+    stt_device: str = "auto"
+    stt_compute_type: str = "auto"
     stt_language: str = "en"
+    # "auto" = Kokoro when its GPU path works, else Piper; or force "piper" / "kokoro".
+    tts_engine: Literal["auto", "piper", "kokoro"] = "auto"
     # Piper voice trained on LJSpeech (public-domain dataset), 22.05 kHz.
     tts_voice_path: Path = REPO_ROOT / "models" / "piper" / "en_US-ljspeech-medium.onnx"
+    # Kokoro-82M v1.0 (Apache-2.0 weights), 24 kHz; af_heart is the highest-graded voice.
+    kokoro_model_path: Path = REPO_ROOT / "models" / "kokoro" / "kokoro-v1.0.onnx"
+    kokoro_voices_path: Path = REPO_ROOT / "models" / "kokoro" / "voices-v1.0.bin"
+    kokoro_voice: str = "af_heart"
     models_dir: Path = REPO_ROOT / "models"
     voice_web_port: int = 8000
+    # Pre-spawned job processes; each loads its own STT/TTS models. One keeps a 4 GB GPU from
+    # being oversubscribed (several idle processes filled 3.9 of 4 GB, measured 2026-10-12).
+    voice_idle_processes: int = 1
 
 
 @lru_cache

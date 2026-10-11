@@ -1,0 +1,67 @@
+{
+  "piper_ljspeech": {
+    "load_s": 4.64,
+    "warm_synth_s_per_sentence": [
+      0.18,
+      0.35,
+      0.22,
+      0.13,
+      0.28
+    ],
+    "mean_rtf": 0.048,
+    "first_sentence_s": 0.18,
+    "mean_wer": 0.14
+  },
+  "kokoro-v1.0_af_heart": {
+    "load_s": 1.98,
+    "warm_synth_s_per_sentence": [
+      1.88,
+      3.95,
+      2.34,
+      1.54,
+      3.14
+    ],
+    "mean_rtf": 0.557,
+    "first_sentence_s": 1.88,
+    "mean_wer": 0.061
+  },
+  "kokoro-v1.0_af_bella": {
+    "load_s": 1.98,
+    "warm_synth_s_per_sentence": [
+      1.93,
+      3.16,
+      2.74,
+      1.7,
+      3.45
+    ],
+    "mean_rtf": 0.542,
+    "first_sentence_s": 1.93,
+    "mean_wer": 0.107
+  },
+  "kokoro-v1.0.int8_af_heart": {
+    "load_s": 1.73,
+    "warm_synth_s_per_sentence": [
+      2.48,
+      3.78,
+      2.28,
+      1.62,
+      3.7
+    ],
+    "mean_rtf": 0.596,
+    "first_sentence_s": 2.48,
+    "mean_wer": 0.061
+  },
+  "kokoro-v1.0.int8_af_bella": {
+    "load_s": 1.73,
+    "warm_synth_s_per_sentence": [
+      2.64,
+      3.85,
+      2.68,
+      1.73,
+      3.34
+    ],
+    "mean_rtf": 0.595,
+    "first_sentence_s": 2.64,
+    "mean_wer": 0.086
+  }
+}

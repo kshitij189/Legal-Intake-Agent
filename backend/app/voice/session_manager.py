@@ -10,6 +10,7 @@ import uuid
 from collections.abc import Callable
 from typing import Any
 
+import numpy as np
 from livekit.agents import (
     AgentSession,
     AgentStateChangedEvent,
@@ -31,27 +32,45 @@ from app.config import Settings, get_settings
 from app.db.session import make_engine, make_session_factory
 from app.models import Firm
 from app.models.enums import SessionChannel
+from app.voice.gpu import onnx_cuda_available, resolve_stt, resolve_tts_engine
 from app.voice.stt import WhisperSTT
 from app.voice.tts import PiperTTS
+from app.voice.tts_kokoro import KokoroTTS, load_kokoro
 
 logger = logging.getLogger(__name__)
 _background_tasks: set[asyncio.Future[None]] = set()
 
 
 def load_voice_models(settings: Settings) -> dict[str, Any]:
+    device, compute_type = resolve_stt(settings.stt_device, settings.stt_compute_type)
     stt = WhisperSTT(
         model_size=settings.stt_model,
-        device=settings.stt_device,
-        compute_type=settings.stt_compute_type,
+        device=device,
+        compute_type=compute_type,
         language=settings.stt_language,
         download_root=settings.models_dir / "whisper",
     )
     stt.load()
-    return {
-        "vad": silero.VAD.load(),
-        "stt": stt,
-        "tts": PiperTTS(voice_path=settings.tts_voice_path),
-    }
+    engine = resolve_tts_engine(settings.tts_engine)
+    tts: PiperTTS | KokoroTTS
+    if engine == "kokoro":
+        kokoro = load_kokoro(
+            settings.kokoro_model_path, settings.kokoro_voices_path, use_gpu=onnx_cuda_available()
+        )
+        tts = KokoroTTS(kokoro=kokoro, voice=settings.kokoro_voice)
+    else:
+        tts = PiperTTS(voice_path=settings.tts_voice_path)
+    # Warm-up: the first CUDA call costs ~2 s; pay it here instead of on the caller's first turn.
+    stt.transcribe_samples(np.zeros(16_000, dtype=np.float32), settings.stt_language)
+    tts.synthesize_pcm("Hello.")
+    logger.info(
+        "voice_models_ready stt=%s/%s/%s tts=%s",
+        settings.stt_model,
+        device,
+        compute_type,
+        tts.model,
+    )
+    return {"vad": silero.VAD.load(), "stt": stt, "tts": tts}
 
 
 def prewarm(proc: JobProcess) -> None:
