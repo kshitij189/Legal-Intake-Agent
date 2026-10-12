@@ -42,7 +42,11 @@ include = ["app*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["integration: requires the PostgreSQL test database"]
+markers = [
+    "integration: requires the PostgreSQL test database",
+    "ui: Playwright dashboard tests; need the built frontend and free ports 3000/8000 (pytest -m ui)",
+]
+addopts = "-m 'not ui'"
 
 # Ruff is configured in the repository-root ruff.toml (covers backend/ and scripts/).
 

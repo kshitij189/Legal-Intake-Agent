@@ -6,13 +6,13 @@ A phase is `COMPLETED` only when every acceptance criterion has recorded evidenc
 **Repository state at documentation setup (2026-10-11):** empty directory, no source code, no git
 repository. No prior implementation work existed, so every phase started `NOT_STARTED`.
 
-**Last updated:** 2026-10-12 — Phases 1–6 completed.
+**Last updated:** 2026-10-12 — Phases 1–7 completed.
 
 > Correction (Phase 4): the "mypy strict" results recorded for Phases 1–3 were produced without the
 > strict config loaded (see CHANGE_LOG, Phase 4). Strict mode now runs via
 > `mypy --config-file backend/pyproject.toml backend/app` and is clean.
 
-**Next phase to implement:** Phase 7 — Human-review dashboard (awaiting authorization).
+**Next phase to implement:** Phase 8 — Hardening and demonstration (awaiting authorization).
 
 ## Summary
 
@@ -24,7 +24,7 @@ repository. No prior implementation work existed, so every phase started `NOT_ST
 | 4 | Voice loop | COMPLETED (2026-10-11) | 3 |
 | 5 | Durable workflows | COMPLETED (2026-10-12) | 1, 2 (3 recommended) |
 | 6 | Evaluation harness | COMPLETED (2026-10-12) | 3 (audio mode: 4; recovery/fault cases: 5) |
-| 7 | Human-review dashboard | NOT_STARTED | 1, 5 |
+| 7 | Human-review dashboard | COMPLETED (2026-10-12) | 1, 5 |
 | 8 | Hardening and demonstration | NOT_STARTED | 1–7 |
 
 ---
@@ -314,7 +314,7 @@ Hindi voices graded C, a possible later option).
 - With live free-tier LLMs, expect multi-second to tens-of-seconds pauses per turn; a paid tier
   is likely needed for a fluid demo.
 - Speech said during the greeting is discarded (the greeting is uninterruptible by design).
-- The token endpoint is unauthenticated (local only, 127.0.0.1); real auth comes in Phase 7.
+- The token endpoint is unauthenticated (local only, 127.0.0.1). Staff auth was added in Phase 7 (the voice token endpoint stays open by design).
 
 **Blockers:** none for the phase.
 
@@ -369,7 +369,7 @@ files); `alembic check` no drift. Voice regression after Phase 5: 2/2 PASS (late
 **Known limitations**
 - The reviewer channel is simulated (DB inbox). A real email/SMS/Slack adapter would plug in at
   `notify_reviewers`.
-- The `status_changed` signal is not sent yet (the dashboard does that in Phase 7). Until then the
+- (Resolved in Phase 7: accept/resolve now send the signal.) Originally: the `status_changed` signal was not sent yet. Until then the
   handoff learns of acceptance at its next timer check.
 - The Temporal dev server (SQLite) suits local use only; production would use a Temporal cluster
   with PostgreSQL.
@@ -482,7 +482,7 @@ injection and regression reports.
 
 ## Phase 7 — Human-review dashboard
 
-**Status:** NOT_STARTED
+**Status:** COMPLETED (2026-10-12)
 
 **Objective:** Intake list, intake details, booking list, escalation queue, workflow state and audit
 timeline for a simulated coordinator.
@@ -490,16 +490,83 @@ timeline for a simulated coordinator.
 **Dependencies:** Phases 1 and 5.
 
 **Tasks / deliverables**
-- [ ] FastAPI surface (blueprint §12) over the domain services, with staff authentication/authorization.
-- [ ] Next.js + TypeScript dashboard pages.
-- [ ] Coordinator actions: accept/resolve escalations, review intakes.
+- [x] **Staff API** (`app/api/`, under `/api/v1`), thin routes over domain services. Every query
+  is scoped to the signed-in staff member's firm.
+  - Auth: `POST auth/login|logout`, `GET auth/me`.
+  - Intakes: `GET intakes[?status]`, `GET intakes/{id}`, `PATCH intakes/{id}/fields/{key}`,
+    `POST intakes/{id}/close`.
+  - Escalations: `GET escalations[?status]`, `GET escalations/{id}`, `POST .../accept`,
+    `POST .../resolve`.
+  - Other reads and inbox: `GET appointments[?upcoming]`, `GET appointments/{id}`,
+    `GET workflows`, `GET notifications`, `POST notifications/{id}/read`.
 
-**Acceptance criteria:** a simulated coordinator can review the results and complete the next action;
-the dashboard shows the real handoff state.
+  Agent-side blueprint endpoints (calls, intake creation, bookings) stay in-process via the
+  validated tools (decision 1 below).
+- [x] **Authentication (local-demo decision):**
+  - staff email + password (scrypt, stdlib);
+  - opaque session tokens hashed in `staff_sessions` (migration `4b103e7be80c`, which also adds
+    `staff_members.password_hash`); 8 h TTL; revoked on logout;
+  - an HttpOnly, SameSite=Strict cookie, or a Bearer header;
+  - login failures that cannot be told apart;
+  - passwords only from `DEMO_STAFF_PASSWORD` in `.env`.
+- [x] **Next.js + TypeScript dashboard** (`frontend/`; Next 16.3.6, React 19.3.0, TS 5.9.3, pinned):
+  - pages: sign-in, overview (counts + reviewer inbox), escalation queue (status filters),
+    intakes list, intake detail, bookings, workflows;
+  - `/api` proxied to FastAPI (same-origin cookie).
+- [x] **Coordinator actions:**
+  - accept / resolve escalations (reviewers only; FAILED can only be resolved);
+  - verify or correct fields: provenance kept, correction history shown, firm rules re-applied
+    through the same `apply_escalation_rules` the agent uses;
+  - close an intake: only from `PENDING_REVIEW` with no unresolved escalation (new domain rule);
+  - mark alerts read.
+- [x] Accept/resolve send the Phase 5 `status_changed` signal to the handoff workflow, after commit
+  and best-effort.
 
-**Required tests / evidence:** API integration tests; Playwright UI tests.
+**Acceptance criteria → evidence**
+- [x] *A simulated coordinator can review the results and complete the next action; the dashboard
+  shows the real handoff state.* `scripts/dashboard_e2e_demo.py` uses the real conversation
+  pipeline (scripted model), real Temporal, the real API and a built dashboard in Chromium:
+  **PASS, 9/9 checks** (`docs/evidence/phase7/dashboard_e2e.json`, 6 screenshots).
+  - The failed handoff (reviewer channel down) is shown as FAILED, with the fallback alert and no
+    Accept button.
+  - The urgent handoff is shown as delivered and running.
+  - The overview counts match the database.
+  - **Accept completed the waiting HandoffWorkflow (result ACCEPTED) in 0.72 s** through the
+    signal; its timer would otherwise run 15 minutes. The dashboard then shows
+    `COMPLETED (ACCEPTED)`.
+  - The booking is shown; a field is verified; both escalations are resolved; the intake is
+    closed.
+  - The timeline holds agent and staff actions in commit order.
+- **API integration tests** (`tests/integration/test_api.py`, 14): login and cookie flags;
+  indistinguishable failures; logout revocation; bearer + expiry; tenant isolation (404);
+  queue/accept/resolve with audit + signal; non-reviewer 403; FAILED not acceptable; verify and
+  correct with rules re-applied; close guarded; lists; UNABLE_TO_COMPLETE shown.
+- **Playwright UI tests** (`tests/integration/test_dashboard_ui.py`, 5, marker `ui`): **5/5 PASS
+  in two runs**. They cover the sign-in error and redirect, accept then resolve (the note is
+  required), verify / close-guard / history, the administrator read-only view, and the
+  failed-handoff view.
 
-**Blockers / decisions:** authentication approach for the local demo. **Next step:** after Phase 5.
+**Validation (2026-10-12):**
+- `pytest` 386 passed (default run) + 5 UI tests passed.
+- Phase 6 system track still 45/45 after the rule-application refactor.
+- ruff + format clean; strict mypy clean (85 files); `alembic check` no drift.
+- `tsc --noEmit` clean; `next build` clean.
+
+**Known limitations**
+- Local-demo authentication:
+  - no rate limiting or lockout on login;
+  - no password reset or staff administration UI;
+  - CSRF protection relies on SameSite=Strict plus JSON bodies;
+  - the cookie is not `Secure` over local HTTP.
+- No pagination (lists are capped at 200 rows). The dashboard does not auto-refresh; reload to see
+  workflow progress.
+- Staff names are not resolved in the audit timeline (it shows actor ids).
+- UI tests need ports 3000/8000 free and a built frontend. `API_ORIGIN` is fixed when the
+  frontend is built.
+- Evaluation runs leave REQUESTED outbox rows for their `eval-*` firms; a regular
+  `temporal_worker.py` would dispatch them. This is harmless to the demo firm but noisy (Phase 8).
+
+**Blockers:** none.
 
 ---
 
@@ -530,10 +597,9 @@ dependency fails; blueprint §18 "definition of done" items 1–11 all verified.
 
 ## Outstanding decisions
 
-1. **REST API timing.** The blueprint lists the FastAPI surface (§12) but assigns it to no phase.
-   Proposed: Phases 1–6 call domain services in-process; the HTTP API is built in Phase 7 together
-   with staff authentication (so no unauthenticated write endpoints exist). Override if you want the
-   API earlier.
+1. **REST API timing.** Resolved in Phase 7: the staff (review-side) API was built together with
+   staff authentication. The agent's operations stay in-process via validated tools, so no
+   unauthenticated write endpoint exists.
 2. **LLM provider and model.** Resolved 2026-10-11: **Gemini primary (`gemini-3.8-flash`), Groq
    fallback (`openai/gpt-oss-120b`)** (your decisions). Models to be confirmed by Phase 2 live runs.
 3. **TTS engine** (Piper vs. Kokoro) and voice licence — decide in Phase 4.

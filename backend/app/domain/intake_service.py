@@ -6,7 +6,7 @@ Services flush but never commit; the caller owns the transaction.
 import uuid
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.domain import policy_engine
@@ -16,8 +16,8 @@ from app.domain.clock import resolve_now
 from app.domain.errors import InvalidTransition, NotFound, PermissionDenied, ValidationFailed
 from app.domain.firm_config_service import get_active_firm, load_config
 from app.domain.transitions import ensure_intake_transition
-from app.models import IntakeRecord, intake_reference_seq
-from app.models.enums import ActorType, FieldStatus, IntakeStatus
+from app.models import Escalation, IntakeRecord, intake_reference_seq
+from app.models.enums import ActorType, EscalationStatus, FieldStatus, IntakeStatus
 from app.schemas.intake import FieldEntry
 
 ENTITY = "intake"
@@ -149,6 +149,20 @@ def transition_intake(
     intake = get_intake(session, firm_id=firm_id, intake_id=intake_id, for_update=True)
     previous = intake.status
     ensure_intake_transition(previous, target)
+    if target is IntakeStatus.CLOSED:
+        unresolved = session.scalar(
+            select(func.count())
+            .select_from(Escalation)
+            .where(
+                Escalation.intake_id == intake.id,
+                Escalation.status != EscalationStatus.RESOLVED,
+            )
+        )
+        if unresolved:
+            # Closing would hide a pending (possibly urgent) handoff from the review queue.
+            raise InvalidTransition(
+                "resolve the intake's open escalations before closing it", open=unresolved
+            )
     intake.status = target
     session.flush()
     record_audit(

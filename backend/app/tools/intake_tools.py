@@ -12,15 +12,10 @@ from app.domain import (
     policy_engine,
 )
 from app.domain.call_session_service import attach_intake
-from app.domain.firm_config_service import firm_today, get_active_firm, load_config
-from app.models.enums import EscalationReason, FieldStatus
+from app.domain.firm_config_service import get_active_firm, load_config
+from app.models.enums import FieldStatus
 from app.tools.context import ToolContext, require_intake
 from app.tools.schemas import FinalizeIntakeSummaryInput, NoArguments, SaveIntakeAnswerInput
-
-
-def rule_escalation_key(intake_id: object, rule_id: str) -> str:
-    """Shared by automatic and model-requested rule escalations, so they never duplicate."""
-    return f"rule:{intake_id}:{rule_id}"
 
 
 def get_intake_questions(session: Session, ctx: ToolContext, _: NoArguments) -> dict[str, Any]:
@@ -73,32 +68,22 @@ def save_intake_answer(
         note=args.note,
         now=now,
     )
-    firm = get_active_firm(session, ctx.firm_id)
-    config = load_config(firm)
+    config = load_config(get_active_firm(session, ctx.firm_id))
     fields = intake_service.intake_fields(intake)
 
     # Escalation rules are applied deterministically here; the model is told the outcome.
-    escalations = []
-    for match in policy_engine.evaluate_rules(config, fields, firm_today(firm, now)):
-        result = escalation_service.create_escalation(
-            session,
-            firm_id=ctx.firm_id,
-            actor=ctx.actor,
-            intake_id=intake_id,
-            reason_code=EscalationReason.CONFIGURED_RULE,
-            rule_id=match.rule_id,
-            idempotency_key=rule_escalation_key(intake_id, match.rule_id),
-            now=now,
+    escalations = [
+        {
+            "rule_id": match.rule_id,
+            "description": match.description,
+            "priority": result.escalation.priority,
+            "status": result.escalation.status,
+            "newly_created": result.created,
+        }
+        for match, result in escalation_service.apply_escalation_rules(
+            session, firm_id=ctx.firm_id, intake_id=intake_id, actor=ctx.actor, now=now
         )
-        escalations.append(
-            {
-                "rule_id": match.rule_id,
-                "description": match.description,
-                "priority": result.escalation.priority,
-                "status": result.escalation.status,
-                "newly_created": result.created,
-            }
-        )
+    ]
     saved = fields[args.field_key]
     return {
         "field_key": args.field_key,

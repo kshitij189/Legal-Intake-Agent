@@ -304,8 +304,17 @@ copy .env.example .env   # then edit values
 #   audio: --audio-tts piper (TTS off the GPU: isolates STT; see Phase 6 GPU-memory finding)
 #          --audio-back-to-back (no readiness gate between calls)
 
+# review dashboard (Phase 7) - staff API + Next.js; needs postgres (+ temporal for live handoffs)
+.\.venv\Scripts\python scripts/seed_demo_data.py               # sets DEMO_STAFF_PASSWORD (from .env) on the demo staff
+.\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 8000   # run from backend/
+cd frontend; npm install; npm run build; npm run start; cd ..  # http://127.0.0.1:3000 (or `npm run dev`)
+#   sign in: firm northstar-legal, e.g. sana.kapoor@northstar-legal.example (coordinator)
+.\.venv\Scripts\python -u scripts/dashboard_e2e_demo.py       # coordinator e2e vs real Temporal + screenshots
+
 # checks (run pytest from backend/ so its pyproject settings apply)
 cd backend; ..\.venv\Scripts\python -m pytest; cd ..
+cd backend; ..\.venv\Scripts\python -m pytest -m ui; cd ..   # Playwright UI tests (built frontend, ports 3000/8000 free)
+cd frontend; npx tsc --noEmit; cd ..
 .\.venv\Scripts\ruff check backend scripts
 .\.venv\Scripts\ruff format --check backend scripts
 .\.venv\Scripts\mypy --config-file backend/pyproject.toml backend/app   # config must be explicit from the repo root
@@ -413,8 +422,8 @@ Notes:
   conversation) runs in threads, never on the event loop.
 - `scripts/voice_smoke_worker.py` uses a deterministic scripted model for automated audio tests
   only; the real worker is `scripts/voice_worker.py`.
-- The web app (`app/main.py`) is local-demo only: an unauthenticated token endpoint bound to
-  127.0.0.1. Staff authentication and the full API arrive in Phase 7.
+- The web app (`app/main.py`) is local-demo only, bound to 127.0.0.1. The voice token endpoint is
+  unauthenticated by design. The staff API (Phase 7) requires a staff session.
 - The blueprint's `agent/claude_client.py` is `agent/llm_client.py` (neutral types + fallback)
   with `agent/llm_gemini.py` and `agent/llm_groq.py` adapters.
 
@@ -438,7 +447,40 @@ Notes:
 - `tests/integration/test_evaluation_harness.py` runs every non-Temporal system scenario plus
   negative controls (disabled guard, disabled rules, wrong expectations) that must FAIL.
 
-Commands for later phases (frontend) are added here when those phases are implemented.
+### Review dashboard and staff API (Phase 7)
+- `app/api/` exposes the staff API under `/api/v1`. Route modules are thin (`routes.py`); the
+  ORM-to-response mapping lives in `views.py`; `deps.py` provides the DB session and the signed-in
+  staff member; `errors.py` maps domain errors to `{"error": {code, message}}`:
+  401 auth, 403 permission, 404 not found, 422 validation, 409 transition/conflict.
+  Read-side queries live in `domain/review_service.py`. **Every query is scoped to the signed-in
+  staff member's firm.** Agent-side operations (calls, bookings, intake creation) stay
+  in-process via tools; they have no HTTP endpoints.
+- Auth (local demo):
+  - `domain/staff_auth_service.py` hashes passwords with scrypt (stdlib) and issues opaque session
+    tokens (`staff_sessions`, SHA-256 of the token stored, 8 h TTL, revoked on logout).
+  - Tokens travel in the cookie `li_session` (HttpOnly, SameSite=Strict, `Secure` via
+    `DASHBOARD_COOKIE_SECURE`) or as `Authorization: Bearer`.
+  - Login failures are indistinguishable.
+  - Demo passwords come only from `DEMO_STAFF_PASSWORD` in `.env`.
+- Staff writes reuse the domain rules:
+  - Accept/resolve are reviewer-only; FAILED can only be resolved.
+  - Field corrections and verification use `save_intake_answer` with a staff actor, then
+    `escalation_service.apply_escalation_rules`, the same function the agent's tool uses.
+  - An intake can be closed only from `PENDING_REVIEW`, and only when none of its escalations is
+    unresolved.
+- After accept/resolve, the API sends the `status_changed` signal to `handoff-<id>`
+  (`workflows/client.py::signal_handoff_status_changed`), after commit and best-effort. A finished
+  workflow logs `handoff_signal_not_delivered`; this is expected and the database stays
+  authoritative.
+- `frontend/` (Next.js 16.3.6, React 19.3, TypeScript 5.9.3, pinned; no UI library) consists of
+  client pages over `lib/api.ts`. `/api/*` is proxied to FastAPI (`next.config.ts`, `API_ORIGIN`,
+  fixed at build time), so the cookie is same-origin. Times are shown in the firm's timezone.
+  Caller statements are labelled unverified; handoff state shows the escalation status, the
+  reviewer/fallback alerts and the workflow record exactly as stored.
+- Tests: `tests/integration/test_api.py` (API on the test DB) and
+  `tests/integration/test_dashboard_ui.py` (Playwright, marker `ui`, excluded by default).
+
+Commands for Phase 8 are added here when that phase is implemented.
 
 ## 13. Testing and evaluation requirements
 

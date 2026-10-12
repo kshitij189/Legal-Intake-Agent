@@ -2,11 +2,14 @@
 a retried delivery returns the existing alert instead of creating a second one."""
 
 import uuid
+from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from app.domain.clock import resolve_now
+from app.domain.errors import NotFound
 from app.models import StaffNotification
 from app.models.enums import NotificationKind, StaffRole
 
@@ -53,3 +56,19 @@ def list_notifications(
     if escalation_id is not None:
         stmt = stmt.where(StaffNotification.escalation_id == escalation_id)
     return list(session.scalars(stmt.order_by(StaffNotification.created_at)))
+
+
+def mark_read(
+    session: Session, *, firm_id: uuid.UUID, notification_id: uuid.UUID, now: datetime | None = None
+) -> StaffNotification:
+    notification = session.scalar(
+        select(StaffNotification).where(
+            StaffNotification.id == notification_id, StaffNotification.firm_id == firm_id
+        )
+    )
+    if notification is None:
+        raise NotFound("notification not found", notification_id=str(notification_id))
+    if notification.read_at is None:
+        notification.read_at = resolve_now(now)
+        session.flush()
+    return notification

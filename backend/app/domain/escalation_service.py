@@ -58,6 +58,42 @@ def evaluate_escalation_rules(
     )
 
 
+def rule_escalation_key(intake_id: object, rule_id: str) -> str:
+    """Shared by automatic and requested rule escalations, so they never duplicate."""
+    return f"rule:{intake_id}:{rule_id}"
+
+
+def apply_escalation_rules(
+    session: Session,
+    *,
+    firm_id: uuid.UUID,
+    intake_id: uuid.UUID,
+    actor: Actor,
+    now: datetime | None = None,
+) -> list[tuple[policy_engine.RuleMatch, "EscalationResult"]]:
+    """Evaluate the firm's rules on the stored intake and create (or return the existing open)
+    escalation for every match. Called after any field change, by the agent or by staff."""
+    now = resolve_now(now)
+    return [
+        (
+            match,
+            create_escalation(
+                session,
+                firm_id=firm_id,
+                actor=actor,
+                intake_id=intake_id,
+                reason_code=EscalationReason.CONFIGURED_RULE,
+                rule_id=match.rule_id,
+                idempotency_key=rule_escalation_key(intake_id, match.rule_id),
+                now=now,
+            ),
+        )
+        for match in evaluate_escalation_rules(
+            session, firm_id=firm_id, intake_id=intake_id, now=now
+        )
+    ]
+
+
 def create_escalation(
     session: Session,
     *,

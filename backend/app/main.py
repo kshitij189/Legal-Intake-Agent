@@ -1,12 +1,15 @@
 """FastAPI application.
 
-Phase 4 scope: the local voice demo only - a page that joins a LiveKit room with the microphone and
-an endpoint issuing a join token for a fresh room per call. It performs no business writes. The
-full REST surface (blueprint §12) and staff authentication arrive in Phase 7. Bind to 127.0.0.1:
-the token endpoint is unauthenticated by design for the local demo.
+- Phase 4: the local voice demo - a page that joins a LiveKit room with the microphone, and an
+  endpoint issuing a join token for a fresh room per call (unauthenticated by design; no writes).
+- Phase 7: the staff API under /api/v1 (app/api/routes.py), session-authenticated, used by the
+  Next.js review dashboard in frontend/.
+
+Local demo only: bind to 127.0.0.1.
 """
 
 import uuid
+from collections.abc import Callable
 from datetime import timedelta
 from pathlib import Path
 
@@ -14,13 +17,41 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse, RedirectResponse
 from livekit import api
 from pydantic import BaseModel
+from sqlalchemy.orm import Session, sessionmaker
 
+from app.api import errors, routes
 from app.config import get_settings
+from app.db.session import make_engine, make_session_factory
+from app.workflows.client import signal_handoff_status_changed
 
 STATIC_DIR = Path(__file__).resolve().parent / "web"
 TOKEN_TTL = timedelta(minutes=30)
 
-app = FastAPI(title="Legal Intake Agent", docs_url=None, redoc_url=None)
+
+def create_app(
+    sessions: sessionmaker[Session] | None = None,
+    handoff_signal: Callable[[uuid.UUID], object] | None = None,
+) -> FastAPI:
+    """`sessions` and `handoff_signal` are injectable for tests."""
+    settings = get_settings()
+    application = FastAPI(title="Legal Intake Agent", docs_url=None, redoc_url=None)
+    application.state.sessions = sessions or make_session_factory(
+        make_engine(settings.database_url)
+    )
+    if handoff_signal is None:
+
+        def handoff_signal(escalation_id: uuid.UUID) -> object:
+            if not settings.handoff_signal_enabled:
+                return False
+            return signal_handoff_status_changed(settings, escalation_id)
+
+    application.state.handoff_signal = handoff_signal
+    errors.install(application)
+    application.include_router(routes.router)
+    application.add_api_route("/", index, include_in_schema=False)
+    application.add_api_route("/voice", voice_page, include_in_schema=False)
+    application.add_api_route("/api/v1/voice/token", voice_token, methods=["POST"])
+    return application
 
 
 class VoiceToken(BaseModel):
@@ -30,17 +61,14 @@ class VoiceToken(BaseModel):
     identity: str
 
 
-@app.get("/", include_in_schema=False)
 def index() -> RedirectResponse:
     return RedirectResponse("/voice")
 
 
-@app.get("/voice", include_in_schema=False)
 def voice_page() -> FileResponse:
     return FileResponse(STATIC_DIR / "voice.html")
 
 
-@app.post("/api/v1/voice/token")
 def voice_token() -> VoiceToken:
     """Token for one caller in a brand-new room; the voice worker is dispatched automatically."""
     settings = get_settings()
@@ -56,3 +84,6 @@ def voice_token() -> VoiceToken:
         .to_jwt()
     )
     return VoiceToken(url=settings.livekit_url, token=token, room=room, identity=identity)
+
+
+app = create_app()

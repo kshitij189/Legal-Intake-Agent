@@ -68,6 +68,13 @@ class Settings(BaseSettings):
     calendar_fault_injection: str | None = None
     notifier_fault_injection: str | None = None
 
+    # Review dashboard (Phase 7). Local demo: HTTP on 127.0.0.1, so the cookie is not `Secure`.
+    dashboard_cookie_secure: bool = False
+    # Nudge the running handoff workflow after accept/resolve (best effort; DB is authoritative).
+    handoff_signal_enabled: bool = True
+    # Password given to the fictional staff by scripts/seed_demo_data.py (unset = no logins).
+    demo_staff_password: SecretStr | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:

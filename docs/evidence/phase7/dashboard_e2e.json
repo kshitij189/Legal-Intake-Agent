@@ -1,0 +1,92 @@
+{
+  "run_id": "20261012T111359Z",
+  "checks": {
+    "urgent_handoff_running_before_accept": true,
+    "overview_counts_match_db": true,
+    "failed_handoff_shown_without_accept": true,
+    "urgent_alert_shown_as_delivered": true,
+    "accept_signal_completed_handoff_workflow": true,
+    "dashboard_shows_completed_workflow": true,
+    "booked_consultation_shown": true,
+    "intake_closed_after_resolution": true,
+    "timeline_has_agent_and_staff_actions": true
+  },
+  "screenshots": [
+    "01_overview.png",
+    "02_queue_before_accept.png",
+    "03_queue_after_accept.png",
+    "04_intake_detail.png",
+    "05_intake_closed_timeline.png",
+    "06_workflows.png"
+  ],
+  "seed": {
+    "H01_reviewer_channel_down": "PASS",
+    "U01_respond_by_tomorrow_booking": "PASS",
+    "F01_llm_outage_mid_call": "PASS",
+    "X01_hangup_mid_intake": "PASS"
+  },
+  "handoff_completed_after_accept_s": 0.72,
+  "db_after": {
+    "escalations": [
+      {
+        "reason": "CONFIGURED_RULE",
+        "rule": "imminent_deadline",
+        "status": "RESOLVED"
+      },
+      {
+        "reason": "UNABLE_TO_COMPLETE",
+        "rule": null,
+        "status": "PENDING"
+      },
+      {
+        "reason": "CONFIGURED_RULE",
+        "rule": "imminent_deadline",
+        "status": "RESOLVED"
+      }
+    ],
+    "workflows": [
+      {
+        "type": "HANDOFF",
+        "status": "STARTED",
+        "result": null
+      },
+      {
+        "type": "POST_CALL",
+        "status": "STARTED",
+        "result": null
+      },
+      {
+        "type": "POST_CALL",
+        "status": "COMPLETED",
+        "result": "NOTHING_TO_DO:PENDING_REVIEW"
+      },
+      {
+        "type": "HANDOFF",
+        "status": "FAILED",
+        "result": "DELIVERY_FAILED"
+      },
+      {
+        "type": "POST_CALL",
+        "status": "STARTED",
+        "result": null
+      },
+      {
+        "type": "HANDOFF",
+        "status": "COMPLETED",
+        "result": "ACCEPTED"
+      },
+      {
+        "type": "POST_CALL",
+        "status": "COMPLETED",
+        "result": "NOTHING_TO_DO:PENDING_REVIEW"
+      }
+    ],
+    "sessions": [
+      "COMPLETED",
+      "DISCONNECTED",
+      "COMPLETED",
+      "FAILED"
+    ]
+  },
+  "result": "PASS"
+}

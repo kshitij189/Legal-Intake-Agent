@@ -579,3 +579,58 @@ dashboard signal yet, dev-server Temporal, direct-booking fallback when Temporal
   drift.
 
 **Next:** Phase 7 — Human-review dashboard (awaiting authorization).
+
+---
+
+## 2026-10-12 — Phase 7: human-review dashboard
+
+**Added**
+- Migration `4b103e7be80c`: `staff_members.password_hash` and `staff_sessions`. The table holds
+  a SHA-256 of each token, has a tenant-composite FK, and records expiry and revocation.
+- Domain modules:
+  - `staff_auth_service.py`: scrypt hashing, login, authenticate, logout; `staff.login` is audited.
+  - `review_service.py`: firm-scoped read queries; queue ordered failed → pending → accepted →
+    resolved, then by priority.
+  - `escalation_service.apply_escalation_rules` and `rule_escalation_key`, moved from the tool
+    layer so the agent and staff share them.
+  - `notification_service.mark_read`.
+  - `intake_service.transition_intake`: refuses CLOSED while an escalation is unresolved.
+- `app/api/` (`deps`, `errors`, `views`, `routes`) plus `schemas/api.py`; `main.create_app()`
+  factory (injectable sessions and handoff signal); `workflows/client.signal_handoff_status_changed`.
+- Settings: `DASHBOARD_COOKIE_SECURE`, `HANDOFF_SIGNAL_ENABLED`, `DEMO_STAFF_PASSWORD`. The seed
+  script sets demo passwords only if `DEMO_STAFF_PASSWORD` is configured. `.env.example` leaves
+  the password commented out, so a copied example never creates a known login.
+- `frontend/`: Next.js 16.3.6, React 19.3.0, TypeScript 5.9.3, exact pins. New npm dependencies
+  (Next.js is the approved stack); no UI library.
+- Tests: `test_api.py` (14) and `test_dashboard_ui.py` (5, Python Playwright, marker `ui`,
+  deselected by default via `addopts`). `scripts/dashboard_e2e_demo.py` produces the evidence.
+
+**Decisions**
+- Local-demo auth uses DB sessions plus an HttpOnly, SameSite=Strict cookie and stdlib scrypt.
+  No new Python dependency; sessions are revocable, unlike stateless tokens.
+- Same-origin proxy (Next rewrites) instead of CORS.
+- UI tests use Python Playwright (already a dev dependency, browser installed) instead of
+  `@playwright/test`, so the tests share the DB fixtures and seeding code.
+- Pinned Next 16.3.6 rather than 16.4.0, which was 6 days old.
+- Closing an intake with unresolved escalations is refused. Otherwise a pending urgent handoff
+  could be hidden from the queue.
+
+**Problems found and fixed**
+- UI tests: navigating right after "Sign in" raced the login request, so tests now wait for the
+  signed-in header. Next.js renders an empty `role=alert` route announcer, so tests target the
+  page's own alert.
+- Next.js inferred the workspace root from a `package-lock.json` in the user's home folder. The
+  root is now pinned (`outputFileTracingRoot`, `turbopack.root`).
+
+**Tests and validations executed (actual)**
+- `dashboard_e2e_demo.py` (real Temporal): PASS, 9/9 checks. Accept → HandoffWorkflow COMPLETED
+  (ACCEPTED) 0.72 s later; 6 screenshots in `docs/evidence/phase7/`.
+- `pytest` 386 passed; `pytest -m ui` 5 passed (two runs).
+- `run_evaluations.py --track system` 45/45 (regression after the refactor).
+- ruff/format clean; strict mypy clean (85 files); `alembic check` no drift.
+- `tsc --noEmit` and `next build` clean.
+
+**Known limitations:** see Phase 7 in `IMPLEMENTATION_PROGRESS.md` (demo-grade auth, no
+pagination or auto-refresh, actor ids in the timeline, eval outbox leftovers).
+
+**Next:** Phase 8 — Hardening and demonstration (awaiting authorization).

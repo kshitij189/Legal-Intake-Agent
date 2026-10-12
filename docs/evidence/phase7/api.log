@@ -1,0 +1,24 @@
+INFO:     Started server process [45608]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58960 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58960 - "GET /api/v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58960 - "GET /api/v1/escalations HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/escalations HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "POST /api/v1/escalations/f5f3718f-2f61-4db0-ab20-390aff9ffed3/accept HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/escalations HTTP/1.1" 200 OK
+handoff_signal_not_delivered
+INFO:     127.0.0.1:58962 - "POST /api/v1/escalations/1f2d1a92-0b9e-4d89-af16-8964ccdd061e/resolve HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/intakes/a5e1cb50-0e01-4c66-8bb3-dcdb59782654 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "PATCH /api/v1/intakes/a5e1cb50-0e01-4c66-8bb3-dcdb59782654/fields/caller_name HTTP/1.1" 200 OK
+handoff_signal_not_delivered
+INFO:     127.0.0.1:58962 - "POST /api/v1/escalations/f5f3718f-2f61-4db0-ab20-390aff9ffed3/resolve HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/intakes/a5e1cb50-0e01-4c66-8bb3-dcdb59782654 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "POST /api/v1/intakes/a5e1cb50-0e01-4c66-8bb3-dcdb59782654/close HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58962 - "GET /api/v1/workflows HTTP/1.1" 200 OK

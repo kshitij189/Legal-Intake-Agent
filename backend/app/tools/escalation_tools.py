@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 from app.domain import escalation_service
 from app.models.enums import EscalationReason, EscalationStatus
 from app.tools.context import ToolContext, require_intake
-from app.tools.intake_tools import rule_escalation_key
 from app.tools.schemas import MarkForHumanReviewInput, NoArguments
 
 _STATUS_MEANING = {
@@ -30,7 +29,7 @@ def mark_for_human_review(
     intake_id = require_intake(ctx)
     reason = EscalationReason(args.reason)
     if reason is EscalationReason.CONFIGURED_RULE:
-        key = rule_escalation_key(intake_id, args.rule_id or "")
+        key = escalation_service.rule_escalation_key(intake_id, args.rule_id or "")
     else:
         key = unable_escalation_key(ctx.call_session_id)
     result = escalation_service.create_escalation(

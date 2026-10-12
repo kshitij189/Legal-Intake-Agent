@@ -1,16 +1,18 @@
-"""Run a booking workflow from synchronous code (the in-call `book_consultation` tool)."""
+"""Temporal calls from synchronous code: the in-call booking workflow and the dashboard's
+handoff signal."""
 
 import asyncio
 import logging
+import uuid
 
 from temporalio.client import Client
 from temporalio.common import WorkflowIDReusePolicy
 from temporalio.exceptions import WorkflowAlreadyStartedError
 
 from app.config import Settings
-from app.domain.workflow_service import booking_workflow_id
+from app.domain.workflow_service import booking_workflow_id, handoff_workflow_id
 from app.workflows.types import BookingInput, BookingOutcome
-from app.workflows.workflows import BookingWorkflow
+from app.workflows.workflows import BookingWorkflow, HandoffWorkflow
 
 logger = logging.getLogger(__name__)
 
@@ -49,3 +51,25 @@ def run_booking_workflow(
 ) -> BookingOutcome | None:
     """Blocking. Returns None if the booking is still in progress after `wait_seconds`."""
     return asyncio.run(_run(settings, inp, wait_seconds))
+
+
+async def _signal_handoff(settings: Settings, escalation_id: uuid.UUID) -> None:
+    client = await Client.connect(settings.temporal_address, namespace=settings.temporal_namespace)
+    handle = client.get_workflow_handle(handoff_workflow_id(escalation_id))
+    await handle.signal(HandoffWorkflow.status_changed)
+
+
+def signal_handoff_status_changed(
+    settings: Settings, escalation_id: uuid.UUID, timeout: float = 5.0
+) -> bool:
+    """Best-effort nudge after a dashboard accept/resolve. The database stays authoritative: if
+    the signal is lost, the handoff notices the change at its next timer check."""
+    try:
+        asyncio.run(asyncio.wait_for(_signal_handoff(settings, escalation_id), timeout))
+    except Exception as exc:  # workflow finished, Temporal down, timeout - all non-fatal
+        logger.warning(
+            "handoff_signal_not_delivered",
+            extra={"escalation_id": str(escalation_id), "error": type(exc).__name__},
+        )
+        return False
+    return True
