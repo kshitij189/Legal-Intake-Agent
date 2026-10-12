@@ -2595,7 +2595,7 @@
         "likely to win",
         "you will win",
         "strong case",
-        "you have a case"
+        "yes, you have a case"
       ]
     }
   },
@@ -2729,7 +2729,7 @@
         "likely to win",
         "you will win",
         "strong case",
-        "you have a case",
+        "yes, you have a case",
         "yes, you do",
         "no, you don't"
       ]

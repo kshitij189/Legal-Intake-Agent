@@ -6,28 +6,36 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/Badges";
 import { api, formatTime, type IntakeListItem, type IntakeStatus } from "@/lib/api";
 
+const PAGE = 50;
 const STATUSES: (IntakeStatus | "ALL")[] = ["ALL", "PENDING_REVIEW", "INCOMPLETE", "IN_PROGRESS", "CLOSED"];
 type Filter = (typeof STATUSES)[number];
 
 export default function IntakesPage() {
   const [status, setStatus] = useState<Filter>("ALL");
+  const [offset, setOffset] = useState(0);
   const [items, setItems] = useState<IntakeListItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setItems(null);
     api
-      .intakes(status === "ALL" ? undefined : status)
+      .intakes(status === "ALL" ? undefined : status, PAGE, offset)
       .then(setItems)
       .catch(() => setError("Could not load intakes."));
-  }, [status]);
+  }, [status, offset]);
 
   return (
     <>
       <h1>Intakes</h1>
       <label className="inline">
         Status{" "}
-        <select value={status} onChange={(e) => setStatus(e.target.value as Filter)}>
+        <select
+          value={status}
+          onChange={(e) => {
+            setStatus(e.target.value as Filter);
+            setOffset(0);
+          }}
+        >
           {STATUSES.map((s) => (
             <option key={s} value={s}>
               {s.replaceAll("_", " ").toLowerCase()}
@@ -72,6 +80,22 @@ export default function IntakesPage() {
           </tbody>
         </table>
       )}
+      <div className="row pager">
+        <button type="button" className="secondary" disabled={offset === 0} onClick={() => setOffset(offset - PAGE)}>
+          Previous
+        </button>
+        <span className="muted">
+          {items && items.length > 0 ? `${offset + 1}-${offset + items.length}` : ""}
+        </span>
+        <button
+          type="button"
+          className="secondary"
+          disabled={!items || items.length < PAGE}
+          onClick={() => setOffset(offset + PAGE)}
+        >
+          Next
+        </button>
+      </div>
     </>
   );
 }

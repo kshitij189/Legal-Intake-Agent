@@ -311,6 +311,11 @@ cd frontend; npm install; npm run build; npm run start; cd ..  # http://127.0.0.
 #   sign in: firm northstar-legal, e.g. sana.kapoor@northstar-legal.example (coordinator)
 .\.venv\Scripts\python -u scripts/dashboard_e2e_demo.py       # coordinator e2e vs real Temporal + screenshots
 
+# hardening and demo (Phase 8)
+.\.venv\Scripts\python -u scripts/record_demo.py               # repeatable demo -> docs/demo/ (DEMO.md + video)
+.\.venv\Scripts\python scripts/purge_transcripts.py            # retention: delete expired transcript turns
+.\.venv\Scripts\python scripts/retire_eval_firms.py [--dry-run]  # deactivate old eval-*/dash-* firms
+
 # checks (run pytest from backend/ so its pyproject settings apply)
 cd backend; ..\.venv\Scripts\python -m pytest; cd ..
 cd backend; ..\.venv\Scripts\python -m pytest -m ui; cd ..   # Playwright UI tests (built frontend, ports 3000/8000 free)
@@ -480,7 +485,24 @@ Notes:
 - Tests: `tests/integration/test_api.py` (API on the test DB) and
   `tests/integration/test_dashboard_ui.py` (Playwright, marker `ui`, excluded by default).
 
-Commands for Phase 8 are added here when that phase is implemented.
+### Hardening (Phase 8)
+- Logging: `app/observability/logging.py` writes JSON lines; `extra={...}` keys become fields.
+  The API, the Temporal worker and the voice worker call `configure_logging()`. API responses
+  carry `X-Request-ID`, and the access log records method/path/status/duration only. Never log
+  transcript text, contact details or secrets.
+- Login throttling: `app/api/throttle.py` allows 5 failures per (firm, email) per 15 min, then
+  returns 429 with `Retry-After`. It is in-process (single instance).
+  `test_every_staff_route_requires_a_session` fails if a new staff route is added without auth.
+- Phone validation: `IntakeQuestion.phone_digit_counts` (demo firm `[10, 11, 12]`). Wrong-length
+  numbers (typical speech-to-text digit drops) are rejected, so the agent asks again.
+- `TTS_ENGINE=auto` picks Kokoro only if the GPU has at least `KOKORO_MIN_GPU_MIB` (6144). Below
+  that, Piper: Kokoro + Whisper per process saturated a 4 GB GPU under consecutive calls.
+- Retention: `privacy.transcript_retention_days` (default 90) is applied by
+  `scripts/purge_transcripts.py` (audited `transcripts.purged`, counts only).
+- Evaluation/demo firms are deactivated at the end of each run (`retire_eval_firm`), and the
+  outbox dispatcher only starts requests of active firms.
+- Security review and remaining gaps: `docs/SECURITY.md`. Demo: `docs/demo/DEMO.md`. Overview:
+  `README.md`.
 
 ## 13. Testing and evaluation requirements
 

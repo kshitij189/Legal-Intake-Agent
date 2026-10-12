@@ -634,3 +634,75 @@ dashboard signal yet, dev-server Temporal, direct-booking fallback when Temporal
 pagination or auto-refresh, actor ids in the timeline, eval outbox leftovers).
 
 **Next:** Phase 8 — Hardening and demonstration (awaiting authorization).
+
+---
+
+## 2026-10-12 — Phase 8: hardening and demonstration
+
+**Added / changed**
+- Phone digit counts per question (`phone_digit_counts`; demo firm `[10, 11, 12]`). The rejection
+  message tells the agent to read the number back and ask again.
+- VRAM-aware TTS selection: `KOKORO_MIN_GPU_MIB` (6144) and `gpu.gpu_total_memory_mib()` via
+  `nvidia-smi`. An explicit `TTS_ENGINE` still wins.
+- `app/api/throttle.py` (login throttling, 429 + `Retry-After`).
+- Paging on list endpoints; `actor_name` in the timeline.
+- `/openapi.json` disabled.
+- Dashboard: auto-refresh (15 s, visible tab only), intakes pager, staff names in the action
+  history, throttle message on the login page.
+- `app/observability/logging.py` (JSON lines + `request_id` contextvar) and `app/api/middleware.py`
+  (`X-Request-ID` + access log). Logging is configured in the API lifespan and in the
+  Temporal/voice worker entry points.
+- Retention: `privacy.transcript_retention_days`, `transcript_service.purge_expired_turns`,
+  `scripts/purge_transcripts.py`.
+- Evaluation hygiene: `retire_eval_firm` and `scripts/retire_eval_firms.py`. The dispatcher only
+  claims requests of active firms. `EvalTemporal.call` was added for Temporal client calls.
+- `scripts/record_demo.py`, `docs/demo/` (DEMO.md, video, screenshots), `README.md`,
+  `docs/SECURITY.md`.
+- Tests:
+  - `test_login_throttle.py`, `test_structured_logging.py`, `test_workflow_outbox.py`;
+  - phone-digit tests (the misheard numbers from Phase 6); VRAM selection tests;
+  - API tests: throttling, request id, paging, actor names, tenant sweep, route-auth guard,
+    no OpenAPI;
+  - a retention purge test.
+
+**Decisions**
+- The throttle key is (firm, email), not IP: behind the proxy every client is 127.0.0.1, and
+  forwarded-for headers are spoofable. The accepted trade-off is a 15-minute lockout risk per
+  account.
+- Kokoro is kept for GPUs ≥ 6 GB rather than removed. It is more intelligible, and the defect is
+  memory, not quality.
+- The demo uses the scripted model: free, exactly repeatable and honest about it. Live-model
+  quality is reported by the live track.
+- Langfuse not added (optional in the blueprint); structured logs + audit trail instead.
+
+**Problems found and fixed**
+- **Import side effect broke the audio harness.**
+  - Symptom: calling `configure_logging()` at module import of `app.main` reconfigured every
+    importing process. The audio runner imports `voice_token` from it, and a full audio run
+    ended **9/9 ERROR** (no greeting heard, readiness gates timing out).
+  - Fix: logging now happens in the server lifespan. A 2-scenario rerun then passed, and the full
+    rerun scored 5/9 PASS, 0 ERROR.
+  - The exact mechanism inside the runner was not isolated beyond that before/after.
+  - Regression test: `test_importing_the_app_does_not_reconfigure_logging`.
+- Leftover outbox rows: 74 undispatched requests belonging to 13 evaluation/demo firms would have
+  been started by a regular worker. These firms were retired and the dispatcher scoped to active
+  firms.
+- `/openapi.json` was still published even though docs were disabled.
+- **Dataset change after seeing results (disclosed):** the forbidden phrase `"you have a case"` (L01,
+  L02) matched the model's correct refusal *"can't tell you whether you have a case"*. It is now
+  `"yes, you have a case"`. L02 still FAILs on its other expectation, and no other expectation was
+  changed.
+
+**Tests and validations executed (actual)**
+- `pytest` 411 passed; `pytest -m ui` 5 passed; ruff/format, strict mypy (89 files),
+  `alembic check`, `tsc` clean.
+- System track 45/45. Live track 26/3/0 (field accuracy 0.972, critical recall 1.0). Audio
+  (production config) 5/9, 0 errors, no consecutive-call degradation; latency p50 2.42 s.
+- `record_demo.py` PASS 7/7 (run twice; the second run's recording is committed).
+- Phone check against this run's misheard numbers: 2 of 3 rejected; `9800110099` (10 digits)
+  would be accepted.
+
+**Known limitations:** see Phase 8 in `IMPLEMENTATION_PROGRESS.md` and `docs/SECURITY.md`.
+
+**Next:** all eight phases are implemented. Pending with the user: the real-microphone test
+(DoD 2), a live-LLM voice call, and the limitations listed above.

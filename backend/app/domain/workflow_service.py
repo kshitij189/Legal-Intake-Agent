@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.domain.clock import resolve_now
 from app.domain.errors import NotFound
-from app.models import WorkflowExecution
+from app.models import Firm, WorkflowExecution
 from app.models.enums import WorkflowStatus, WorkflowType
 
 MAX_ERROR_LENGTH = 1000
@@ -63,10 +63,13 @@ def request_workflow(
 def claim_requested(
     session: Session, *, limit: int = 20, firm_ids: Collection[uuid.UUID] | None = None
 ) -> list[WorkflowExecution]:
-    """System dispatcher only (all tenants, unless `firm_ids` narrows it, e.g. for
-    evaluations). Rows stay locked until the caller's commit, and concurrent dispatchers
-    skip them."""
-    stmt = select(WorkflowExecution).where(WorkflowExecution.status == WorkflowStatus.REQUESTED)
+    """System dispatcher only (all active tenants, unless `firm_ids` narrows it, e.g. for
+    evaluations). Rows of deactivated firms (e.g. finished evaluation runs) are never started.
+    Rows stay locked until the caller's commit, and concurrent dispatchers skip them."""
+    stmt = select(WorkflowExecution).where(
+        WorkflowExecution.status == WorkflowStatus.REQUESTED,
+        WorkflowExecution.firm_id.in_(select(Firm.id).where(Firm.is_active.is_(True))),
+    )
     if firm_ids is not None:
         stmt = stmt.where(WorkflowExecution.firm_id.in_(list(firm_ids)))
     return list(

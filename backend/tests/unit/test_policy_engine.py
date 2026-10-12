@@ -22,7 +22,7 @@ def q(key: str) -> IntakeQuestion:
     ("key", "raw", "expected"),
     [
         ("phone", " +91 98765-43210 ", "+919876543210"),
-        ("phone", "(020) 555.1234", "0205551234"),
+        ("phone", "(020) 5555.1234", "02055551234"),
         ("phone", "98,765 43,210", "9876543210"),  # how speech-to-text writes spoken numbers
         ("email", "Priya@Example.COM", "priya@example.com"),
         ("reported_deadline", "2026-10-13", "2026-10-13"),
@@ -51,6 +51,35 @@ def test_normalize_value_accepts_and_canonicalizes(key: str, raw: str, expected:
 def test_normalize_value_rejects_invalid(key: str, raw: str) -> None:
     with pytest.raises(ValidationFailed):
         policy_engine.normalize_value(q(key), raw)
+
+
+@pytest.mark.parametrize(
+    "heard",
+    [
+        "94,475,667",  # Phase 6 audio: "94470 55667" with digits dropped (8 digits)
+        "98,111,0099",  # "98111 00999" with a digit dropped (9 digits)
+        "900007060",  # "90080 70060" misheard (9 digits)
+        "+1 555 0100 2",  # 9 digits
+    ],
+)
+def test_phone_with_implausible_digit_count_is_rejected(heard: str) -> None:
+    """Speech-to-text that drops or merges digits must not be saved as the callback number."""
+    with pytest.raises(ValidationFailed, match="repeat the number"):
+        policy_engine.normalize_value(q("phone"), heard)
+
+
+@pytest.mark.parametrize("raw", ["98765 43210", "+91 99887 76655", "011 2345 6789"])
+def test_phone_with_configured_digit_count_is_accepted(raw: str) -> None:
+    policy_engine.normalize_value(q("phone"), raw)
+
+
+def test_phone_digit_counts_only_for_phone_questions() -> None:
+    with pytest.raises(ValueError, match="only PHONE"):
+        IntakeQuestion(key="x", prompt="x", type="TEXT", phone_digit_counts=(10,))
+    with pytest.raises(ValueError, match="between 7 and 15"):
+        IntakeQuestion(key="x", prompt="x", type="PHONE", phone_digit_counts=(3,))
+    unrestricted = IntakeQuestion(key="x", prompt="x", type="PHONE")
+    assert policy_engine.normalize_value(unrestricted, "5551234") == "5551234"
 
 
 def build(

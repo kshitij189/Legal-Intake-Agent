@@ -9,7 +9,8 @@ Local demo only: bind to 127.0.0.1.
 """
 
 import uuid
-from collections.abc import Callable
+from collections.abc import AsyncIterator, Callable
+from contextlib import asynccontextmanager
 from datetime import timedelta
 from pathlib import Path
 
@@ -19,13 +20,23 @@ from livekit import api
 from pydantic import BaseModel
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.api import errors, routes
+from app.api import errors, middleware, routes
+from app.api.throttle import LoginThrottle
 from app.config import get_settings
 from app.db.session import make_engine, make_session_factory
+from app.observability.logging import configure_logging
 from app.workflows.client import signal_handoff_status_changed
 
 STATIC_DIR = Path(__file__).resolve().parent / "web"
 TOKEN_TTL = timedelta(minutes=30)
+
+
+@asynccontextmanager
+async def _lifespan(_: FastAPI) -> AsyncIterator[None]:
+    # Only when the server runs: importing this module (e.g. for voice_token) must not
+    # reconfigure the importer's logging.
+    configure_logging()
+    yield
 
 
 def create_app(
@@ -34,7 +45,13 @@ def create_app(
 ) -> FastAPI:
     """`sessions` and `handoff_signal` are injectable for tests."""
     settings = get_settings()
-    application = FastAPI(title="Legal Intake Agent", docs_url=None, redoc_url=None)
+    application = FastAPI(
+        title="Legal Intake Agent",
+        docs_url=None,
+        redoc_url=None,
+        openapi_url=None,
+        lifespan=_lifespan,
+    )
     application.state.sessions = sessions or make_session_factory(
         make_engine(settings.database_url)
     )
@@ -46,7 +63,9 @@ def create_app(
             return signal_handoff_status_changed(settings, escalation_id)
 
     application.state.handoff_signal = handoff_signal
+    application.state.login_throttle = LoginThrottle()
     errors.install(application)
+    middleware.install(application)
     application.include_router(routes.router)
     application.add_api_route("/", index, include_in_schema=False)
     application.add_api_route("/voice", voice_page, include_in_schema=False)

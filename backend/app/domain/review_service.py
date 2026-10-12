@@ -38,7 +38,8 @@ def list_intakes(
     *,
     firm_id: uuid.UUID,
     statuses: list[IntakeStatus] | None = None,
-    limit: int = 200,
+    limit: int = 100,
+    offset: int = 0,
 ) -> list[IntakeListItem]:
     open_count = (
         select(func.count())
@@ -57,7 +58,9 @@ def list_intakes(
     stmt = select(IntakeRecord, open_count, booked).where(IntakeRecord.firm_id == firm_id)
     if statuses:
         stmt = stmt.where(IntakeRecord.status.in_(statuses))
-    rows = session.execute(stmt.order_by(IntakeRecord.created_at.desc()).limit(limit)).all()
+    rows = session.execute(
+        stmt.order_by(IntakeRecord.created_at.desc()).limit(limit).offset(offset)
+    ).all()
     items = []
     for intake, escalations, starts_at in rows:
         fields = intake_service.intake_fields(intake)
@@ -140,7 +143,8 @@ def list_escalation_queue(
     *,
     firm_id: uuid.UUID,
     statuses: list[EscalationStatus] | None = None,
-    limit: int = 200,
+    limit: int = 100,
+    offset: int = 0,
 ) -> list[EscalationListItem]:
     """Open work first (FAILED and URGENT at the top), then newest."""
     status_rank = case(
@@ -163,7 +167,11 @@ def list_escalation_queue(
     )
     if statuses:
         stmt = stmt.where(Escalation.status.in_(statuses))
-    stmt = stmt.order_by(status_rank, priority_rank, Escalation.created_at.desc()).limit(limit)
+    stmt = (
+        stmt.order_by(status_rank, priority_rank, Escalation.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
     return [EscalationListItem(e, ref, name) for e, ref, name in session.execute(stmt).all()]
 
 
@@ -175,7 +183,12 @@ class AppointmentListItem:
 
 
 def list_appointments(
-    session: Session, *, firm_id: uuid.UUID, from_time: datetime | None = None, limit: int = 200
+    session: Session,
+    *,
+    firm_id: uuid.UUID,
+    from_time: datetime | None = None,
+    limit: int = 100,
+    offset: int = 0,
 ) -> list[AppointmentListItem]:
     stmt = (
         select(Appointment, IntakeRecord.reference, StaffMember.full_name)
@@ -185,7 +198,7 @@ def list_appointments(
     )
     if from_time is not None:
         stmt = stmt.where(Appointment.starts_at >= from_time)
-    rows = session.execute(stmt.order_by(Appointment.starts_at).limit(limit)).all()
+    rows = session.execute(stmt.order_by(Appointment.starts_at).limit(limit).offset(offset)).all()
     return [AppointmentListItem(a, ref, lawyer) for a, ref, lawyer in rows]
 
 
@@ -204,7 +217,7 @@ def get_appointment_item(
 
 
 def list_workflows(
-    session: Session, *, firm_id: uuid.UUID, limit: int = 200
+    session: Session, *, firm_id: uuid.UUID, limit: int = 100, offset: int = 0
 ) -> list[WorkflowExecution]:
     return list(
         session.scalars(
@@ -212,6 +225,7 @@ def list_workflows(
             .where(WorkflowExecution.firm_id == firm_id)
             .order_by(WorkflowExecution.created_at.desc())
             .limit(limit)
+            .offset(offset)
         )
     )
 
@@ -224,3 +238,21 @@ def escalation_references(session: Session, *, firm_id: uuid.UUID) -> dict[uuid.
         .where(Escalation.firm_id == firm_id)
     ).tuples()
     return dict(rows.all())
+
+
+def actor_names(session: Session, *, firm_id: uuid.UUID, staff_ids: set[str]) -> dict[str, str]:
+    """Staff actor id -> full name, for timelines (agent/system actors keep their component id)."""
+    ids = []
+    for value in staff_ids:
+        try:
+            ids.append(uuid.UUID(value))
+        except ValueError:
+            continue
+    if not ids:
+        return {}
+    rows = session.execute(
+        select(StaffMember.id, StaffMember.full_name).where(
+            StaffMember.firm_id == firm_id, StaffMember.id.in_(ids)
+        )
+    ).tuples()
+    return {str(staff_id): name for staff_id, name in rows}

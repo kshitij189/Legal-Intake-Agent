@@ -96,3 +96,35 @@ def test_transcripts_are_tenant_scoped(committed_demo: Demo) -> None:
             )
             == []
         )
+
+
+def test_retention_purges_only_expired_turns_of_that_firm(committed_demo: Demo) -> None:
+    from datetime import timedelta
+
+    from app.domain.actors import Actor
+    from app.models import AuditEvent, IntakeRecord
+
+    sessions, firm = committed_demo
+    convo = start(committed_demo, "Thank you.")
+    convo.respond("Hello")
+    with sessions() as s, s.begin():
+        stored = s.scalars(select(TranscriptTurn)).all()
+        assert len(stored) == 3
+        stored[0].created_at = NOW - timedelta(days=91)  # older than the 90-day default
+    with sessions() as s, s.begin():
+        deleted = transcript_service.purge_expired_turns(
+            s, firm_id=firm.firm_id, actor=Actor.system("retention"), now=NOW
+        )
+    assert deleted == 1
+    assert len(turns(committed_demo)) == 2
+    with sessions() as s:
+        event = s.scalars(select(AuditEvent).where(AuditEvent.action == "transcripts.purged")).one()
+        assert event.details["deleted_turns"] == 1  # counts only, never transcript text
+        assert s.scalars(select(IntakeRecord)).all() == []  # nothing else touched
+    with sessions() as s, s.begin():  # idempotent
+        assert (
+            transcript_service.purge_expired_turns(
+                s, firm_id=firm.firm_id, actor=Actor.system("retention"), now=NOW
+            )
+            == 0
+        )

@@ -126,6 +126,7 @@ export type AuditEvent = {
   occurred_at: string;
   actor_type: "AGENT" | "STAFF" | "SYSTEM";
   actor_id: string;
+  actor_name: string | null;
   action: string;
   entity_type: string;
   entity_id: string;
@@ -186,8 +187,11 @@ export const api = {
     request<Staff>("POST", "/auth/login", { firm, email, password }),
   logout: () => request<void>("POST", "/auth/logout"),
   me: () => request<Staff>("GET", "/auth/me"),
-  intakes: (status?: IntakeStatus) =>
-    request<IntakeListItem[]>("GET", "/intakes" + (status ? `?status=${status}` : "")),
+  intakes: (status: IntakeStatus | undefined, limit: number, offset: number) =>
+    request<IntakeListItem[]>(
+      "GET",
+      `/intakes?limit=${limit}&offset=${offset}` + (status ? `&status=${status}` : ""),
+    ),
   intake: (id: string) => request<IntakeDetail>("GET", `/intakes/${id}`),
   updateField: (id: string, key: string, body: { status: FieldStatus; value?: string | null; note?: string | null }) =>
     request<IntakeDetail>("PATCH", `/intakes/${id}/fields/${key}`, body),
@@ -228,3 +232,11 @@ export const FIELD_STATUS_LABEL: Record<FieldStatus, string> = {
   PENDING_HUMAN_REVIEW: "Needs human review",
   VERIFIED_BY_SYSTEM: "Verified by staff",
 };
+
+/** Re-run `load` every `ms` while the tab is visible (reviewers keep the queue open). */
+export function startPolling(load: () => void, ms = 15_000): () => void {
+  const timer = window.setInterval(() => {
+    if (document.visibilityState === "visible") load();
+  }, ms);
+  return () => window.clearInterval(timer);
+}

@@ -51,7 +51,7 @@ def load_voice_models(settings: Settings) -> dict[str, Any]:
         download_root=settings.models_dir / "whisper",
     )
     stt.load()
-    engine = resolve_tts_engine(settings.tts_engine)
+    engine = resolve_tts_engine(settings.tts_engine, settings.kokoro_min_gpu_mib)
     tts: PiperTTS | KokoroTTS
     if engine == "kokoro":
         kokoro = load_kokoro(

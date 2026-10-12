@@ -289,7 +289,8 @@ export default function IntakeDetailPage() {
                 <td>{e.seq}</td>
                 <td>{formatTime(e.occurred_at)}</td>
                 <td>
-                  {e.actor_type.toLowerCase()} <span className="muted small">{e.actor_id.slice(0, 13)}</span>
+                  {e.actor_type.toLowerCase()}{" "}
+                  <span className="muted small">{e.actor_name ?? e.actor_id.slice(0, 13)}</span>
                 </td>
                 <td>{e.action}</td>
                 <td>

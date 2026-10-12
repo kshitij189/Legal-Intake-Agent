@@ -348,6 +348,10 @@ ul.plain {
   margin-bottom: 0.75rem;
 }
 
+.pager {
+  margin-top: 0.75rem;
+}
+
 .editor {
   display: flex;
   flex-wrap: wrap;

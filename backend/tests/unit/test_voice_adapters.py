@@ -191,3 +191,19 @@ def test_tts_engine_resolution(
 
     monkeypatch.setattr(gpu, "onnx_cuda_available", lambda: cuda)
     assert gpu.resolve_tts_engine(engine) == expected
+
+
+@pytest.mark.parametrize(
+    ("gpu_mib", "expected"),
+    [(4096, "piper"), (6144, "kokoro"), (8192, "kokoro"), (None, "piper")],
+)
+def test_auto_tts_uses_kokoro_only_on_large_enough_gpus(
+    monkeypatch: pytest.MonkeyPatch, gpu_mib: int | None, expected: str
+) -> None:
+    """Phase 6 finding: Kokoro + Whisper per process saturated a 4 GB GPU (consecutive calls)."""
+    from app.voice import gpu
+
+    monkeypatch.setattr(gpu, "onnx_cuda_available", lambda: True)
+    monkeypatch.setattr(gpu, "gpu_total_memory_mib", lambda: gpu_mib)
+    assert gpu.resolve_tts_engine("auto", kokoro_min_gpu_mib=6144) == expected
+    assert gpu.resolve_tts_engine("kokoro", kokoro_min_gpu_mib=6144) == "kokoro"  # explicit wins

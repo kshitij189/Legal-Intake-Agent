@@ -39,6 +39,18 @@ class IntakeQuestion(StrictModel):
     type: QuestionType
     required: bool = True
     choices: tuple[ChoiceOption, ...] = ()
+    # PHONE only: accepted digit counts (country code included, "+" and separators ignored).
+    # Empty = any 7-15 digits. Rejecting implausible lengths catches speech-to-text that drops or
+    # merges digits (Phase 6: 3 of 9 voice calls), so the agent asks again instead of saving it.
+    phone_digit_counts: tuple[int, ...] = ()
+
+    @model_validator(mode="after")
+    def _check_phone_digits(self) -> Self:
+        if self.phone_digit_counts and self.type is not QuestionType.PHONE:
+            raise ValueError(f"only PHONE questions may set phone_digit_counts ('{self.key}')")
+        if any(not 7 <= n <= 15 for n in self.phone_digit_counts):
+            raise ValueError("phone_digit_counts must be between 7 and 15")
+        return self
 
     @model_validator(mode="after")
     def _check_choices(self) -> Self:
@@ -99,6 +111,8 @@ class PrivacyPolicy(StrictModel):
         min_length=1,
         max_length=300,
     )
+    # Transcript turns older than this are deleted by scripts/purge_transcripts.py.
+    transcript_retention_days: int = Field(default=90, ge=1, le=3650)
 
 
 class HandoffPolicy(StrictModel):

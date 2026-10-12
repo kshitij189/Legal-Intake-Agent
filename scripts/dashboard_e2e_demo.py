@@ -31,7 +31,13 @@ from sqlalchemy import select
 from app.config import REPO_ROOT, get_settings
 from app.db.session import make_engine, make_session_factory
 from app.domain import staff_auth_service, workflow_service
-from app.evaluation.runner import EvalContext, EvalTemporal, create_eval_firm, run_scenario
+from app.evaluation.runner import (
+    EvalContext,
+    EvalTemporal,
+    create_eval_firm,
+    retire_eval_firm,
+    run_scenario,
+)
 from app.evaluation.scenario import Scenario, load_scenarios
 from app.models import (
     CallSession,
@@ -303,6 +309,7 @@ def main() -> int:
             ).all()
         worker.terminate_open_workflows(list(open_wf))  # e.g. post-call timers of the hang-up
         worker.close()
+        retire_eval_firm(sessions, firm_id)
 
     passed = bool(checks) and all(checks.values())
     report["result"] = "PASS" if passed else "FAIL"

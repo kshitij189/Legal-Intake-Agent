@@ -174,6 +174,7 @@ class AuditOut(Out):
     occurred_at: datetime
     actor_type: ActorType
     actor_id: str
+    actor_name: str | None = None  # staff member's name
     action: str
     entity_type: str
     entity_id: uuid.UUID

@@ -10,6 +10,7 @@ from fastapi import APIRouter, Query, Request, Response
 
 from app.api import views
 from app.api.deps import REVIEWER_ROLES, SESSION_COOKIE, Db, Staff
+from app.api.throttle import LoginThrottle
 from app.config import get_settings
 from app.domain import (
     escalation_service,
@@ -37,6 +38,9 @@ from app.schemas.api import (
 
 router = APIRouter(prefix="/api/v1")
 
+Limit = Annotated[int, Query(ge=1, le=500)]
+Offset = Annotated[int, Query(ge=0)]
+
 
 def _staff_out(staff: Staff) -> StaffOut:
     s = staff.staff
@@ -56,10 +60,20 @@ def _staff_out(staff: Staff) -> StaffOut:
 
 
 @router.post("/auth/login")
-def login(body: LoginIn, db: Db, response: Response) -> StaffOut:
-    token, member = staff_auth_service.login(
-        db, firm_slug=body.firm, email=body.email, password=body.password
-    )
+def login(body: LoginIn, db: Db, response: Response, request: Request) -> StaffOut:
+    # Keyed by account, not client IP: behind the dashboard proxy every request comes from
+    # 127.0.0.1, and a forwarded-for header could be spoofed to dodge the limit.
+    throttle: LoginThrottle = request.app.state.login_throttle
+    key = (body.firm.strip().lower(), body.email.strip().lower())
+    throttle.check(key)
+    try:
+        token, member = staff_auth_service.login(
+            db, firm_slug=body.firm, email=body.email, password=body.password
+        )
+    except staff_auth_service.AuthenticationFailed:
+        throttle.failed(key)
+        raise
+    throttle.succeeded(key)
     db.commit()
     response.set_cookie(
         SESSION_COOKIE,
@@ -100,7 +114,11 @@ def me(staff: Staff) -> StaffOut:
 
 @router.get("/intakes")
 def list_intakes(
-    staff: Staff, db: Db, status: Annotated[list[IntakeStatus] | None, Query()] = None
+    staff: Staff,
+    db: Db,
+    status: Annotated[list[IntakeStatus] | None, Query()] = None,
+    limit: Limit = 100,
+    offset: Offset = 0,
 ) -> list[IntakeListOut]:
     return [
         IntakeListOut(
@@ -114,7 +132,9 @@ def list_intakes(
             created_at=item.intake.created_at,
             updated_at=item.intake.updated_at,
         )
-        for item in review_service.list_intakes(db, firm_id=staff.firm_id, statuses=status)
+        for item in review_service.list_intakes(
+            db, firm_id=staff.firm_id, statuses=status, limit=limit, offset=offset
+        )
     ]
 
 
@@ -166,11 +186,17 @@ def close_intake(intake_id: uuid.UUID, staff: Staff, db: Db) -> IntakeDetailOut:
 
 @router.get("/escalations")
 def escalation_queue(
-    staff: Staff, db: Db, status: Annotated[list[EscalationStatus] | None, Query()] = None
+    staff: Staff,
+    db: Db,
+    status: Annotated[list[EscalationStatus] | None, Query()] = None,
+    limit: Limit = 100,
+    offset: Offset = 0,
 ) -> list[EscalationOut]:
     return [
         views.escalation_out(db, item.escalation, item.intake_reference, item.assigned_to)
-        for item in review_service.list_escalation_queue(db, firm_id=staff.firm_id, statuses=status)
+        for item in review_service.list_escalation_queue(
+            db, firm_id=staff.firm_id, statuses=status, limit=limit, offset=offset
+        )
     ]
 
 
@@ -216,11 +242,15 @@ def resolve_escalation(
 
 
 @router.get("/appointments")
-def list_appointments(staff: Staff, db: Db, upcoming: bool = False) -> list[AppointmentOut]:
+def list_appointments(
+    staff: Staff, db: Db, upcoming: bool = False, limit: Limit = 100, offset: Offset = 0
+) -> list[AppointmentOut]:
     since = datetime.now(UTC) if upcoming else None
     return [
         views.appointment_out(item)
-        for item in review_service.list_appointments(db, firm_id=staff.firm_id, from_time=since)
+        for item in review_service.list_appointments(
+            db, firm_id=staff.firm_id, from_time=since, limit=limit, offset=offset
+        )
     ]
 
 
@@ -234,8 +264,15 @@ def get_appointment(appointment_id: uuid.UUID, staff: Staff, db: Db) -> Appointm
 
 
 @router.get("/workflows")
-def list_workflows(staff: Staff, db: Db) -> list[WorkflowOut]:
-    return [views.workflow_out(w) for w in review_service.list_workflows(db, firm_id=staff.firm_id)]
+def list_workflows(
+    staff: Staff, db: Db, limit: Limit = 100, offset: Offset = 0
+) -> list[WorkflowOut]:
+    return [
+        views.workflow_out(w)
+        for w in review_service.list_workflows(
+            db, firm_id=staff.firm_id, limit=limit, offset=offset
+        )
+    ]
 
 
 @router.get("/notifications")

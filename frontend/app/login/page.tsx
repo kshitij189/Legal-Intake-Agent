@@ -24,7 +24,11 @@ function LoginForm() {
       router.replace(next && next.startsWith("/") && !next.startsWith("//") ? next : "/");
     } catch (err) {
       setError(
-        err instanceof ApiError && err.status === 401 ? "Invalid email or password." : "Sign-in failed.",
+        err instanceof ApiError && err.status === 401
+          ? "Invalid email or password."
+          : err instanceof ApiError && err.status === 429
+            ? "Too many failed attempts for this account. Try again in 15 minutes."
+            : "Sign-in failed.",
       );
     } finally {
       setBusy(false);

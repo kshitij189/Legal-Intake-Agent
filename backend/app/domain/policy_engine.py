@@ -46,6 +46,14 @@ def normalize_value(question: IntakeQuestion, raw: str) -> str:
             phone = _PHONE_SEPARATORS.sub("", value)
             if not _PHONE.match(phone):
                 raise ValidationFailed("not a valid phone number", field_key=question.key)
+            digits = len(phone.lstrip("+"))
+            if question.phone_digit_counts and digits not in question.phone_digit_counts:
+                raise ValidationFailed(
+                    f"the number has {digits} digits; numbers here have"
+                    f" {' or '.join(map(str, question.phone_digit_counts))} digits. Do not save"
+                    " it: read the digits back and ask the caller to repeat the number",
+                    field_key=question.key,
+                )
             return phone
         case QuestionType.EMAIL:
             if len(value) > 320 or not _EMAIL.match(value):

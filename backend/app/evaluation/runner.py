@@ -9,10 +9,10 @@ import logging
 import threading
 import time
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, TypeVar
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import OperationalError
@@ -37,6 +37,7 @@ from app.models import (
     AuditEvent,
     CallSession,
     Escalation,
+    Firm,
     IntakeRecord,
     StaffNotification,
     TranscriptTurn,
@@ -48,6 +49,7 @@ from app.workflows.activities import IntakeActivities
 from app.workflows.worker import build_worker, dispatch_pending
 
 logger = logging.getLogger(__name__)
+T = TypeVar("T")
 HANDOFF_WAIT_SECONDS = 60
 
 
@@ -55,6 +57,13 @@ def create_eval_firm(sessions: sessionmaker[Session], run_id: str) -> uuid.UUID:
     """A fresh firm per evaluation run: isolated data and a full calendar."""
     with sessions() as s, s.begin():
         return seed_demo_data(s, slug=f"eval-{run_id}", now=datetime.now(UTC)).firm_id
+
+
+def retire_eval_firm(sessions: sessionmaker[Session], firm_id: uuid.UUID) -> None:
+    """Deactivate a finished run's firm: its data stays for inspection, but the regular outbox
+    dispatcher never starts its leftover workflow requests (e.g. post-call follow-ups)."""
+    with sessions() as s, s.begin():
+        s.get_one(Firm, firm_id).is_active = False
 
 
 class EvalTemporal:
@@ -109,6 +118,10 @@ class EvalTemporal:
                     await self.client.get_workflow_handle(workflow_id).terminate("evaluation end")
 
         asyncio.run_coroutine_threadsafe(terminate(), self._loop).result(timeout=30)
+
+    def call(self, coro: Coroutine[Any, Any, T], timeout: float = 30) -> T:
+        """Run a coroutine (e.g. a Temporal client call) on the worker's event loop."""
+        return asyncio.run_coroutine_threadsafe(coro, self._loop).result(timeout=timeout)
 
     def close(self) -> None:
         if self._stop is not None:

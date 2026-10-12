@@ -5,11 +5,16 @@ firm (tenant-scoped queries).
 """
 
 import uuid
+from datetime import datetime, timedelta
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
+from app.domain.actors import Actor
+from app.domain.audit import record_audit
 from app.domain.call_session_service import get_call_session
+from app.domain.clock import resolve_now
+from app.domain.firm_config_service import get_active_firm, load_config
 from app.models import TranscriptTurn
 from app.models.enums import Speaker
 
@@ -87,3 +92,32 @@ def list_turns(
             .order_by(TranscriptTurn.seq)
         )
     )
+
+
+def purge_expired_turns(
+    session: Session, *, firm_id: uuid.UUID, actor: Actor, now: datetime | None = None
+) -> int:
+    """Delete this firm's transcript turns older than its `privacy.transcript_retention_days`.
+    Intake records, escalations and audit history are kept; only conversation text is removed."""
+    now = resolve_now(now)
+    firm = get_active_firm(session, firm_id)
+    cutoff = now - timedelta(days=load_config(firm).privacy.transcript_retention_days)
+    deleted = len(
+        session.scalars(
+            delete(TranscriptTurn)
+            .where(TranscriptTurn.firm_id == firm_id, TranscriptTurn.created_at < cutoff)
+            .returning(TranscriptTurn.id)
+        ).all()
+    )
+    if deleted:
+        record_audit(
+            session,
+            firm_id=firm_id,
+            actor=actor,
+            action="transcripts.purged",
+            entity_type="firm",
+            entity_id=firm_id,
+            details={"deleted_turns": deleted, "older_than": cutoff.isoformat()},
+        )
+    session.flush()
+    return deleted

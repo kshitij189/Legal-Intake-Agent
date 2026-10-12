@@ -6,13 +6,13 @@ A phase is `COMPLETED` only when every acceptance criterion has recorded evidenc
 **Repository state at documentation setup (2026-10-11):** empty directory, no source code, no git
 repository. No prior implementation work existed, so every phase started `NOT_STARTED`.
 
-**Last updated:** 2026-10-12 — Phases 1–7 completed.
+**Last updated:** 2026-10-12 — Phases 1–8 completed (DoD item 2 awaits the user's microphone test).
 
 > Correction (Phase 4): the "mypy strict" results recorded for Phases 1–3 were produced without the
 > strict config loaded (see CHANGE_LOG, Phase 4). Strict mode now runs via
 > `mypy --config-file backend/pyproject.toml backend/app` and is clean.
 
-**Next phase to implement:** Phase 8 — Hardening and demonstration (awaiting authorization).
+**Next phase to implement:** none. All phases are implemented; the user's own tests are pending (see Phase 8).
 
 ## Summary
 
@@ -25,7 +25,7 @@ repository. No prior implementation work existed, so every phase started `NOT_ST
 | 5 | Durable workflows | COMPLETED (2026-10-12) | 1, 2 (3 recommended) |
 | 6 | Evaluation harness | COMPLETED (2026-10-12) | 3 (audio mode: 4; recovery/fault cases: 5) |
 | 7 | Human-review dashboard | COMPLETED (2026-10-12) | 1, 5 |
-| 8 | Hardening and demonstration | NOT_STARTED | 1–7 |
+| 8 | Hardening and demonstration | COMPLETED (2026-10-12), DoD 2 BLOCKED on user | 1–7 |
 
 ---
 
@@ -572,7 +572,9 @@ timeline for a simulated coordinator.
 
 ## Phase 8 — Hardening and demonstration
 
-**Status:** NOT_STARTED
+**Status:** COMPLETED (2026-10-12), except definition-of-done item 2, which is **BLOCKED on the
+user**: it needs someone speaking into a real microphone (deferred by the user). Every other
+deliverable and DoD item is verified below.
 
 **Objective:** Access controls, tenant isolation, secret management, bounded retries, idempotency,
 structured logging, failure recovery; repeatable demo.
@@ -580,18 +582,87 @@ structured logging, failure recovery; repeatable demo.
 **Dependencies:** Phases 1–7.
 
 **Tasks / deliverables**
-- [ ] Security and tenant-isolation review; retention/deletion policy.
-- [ ] Optional Langfuse tracing.
-- [ ] README: architecture diagram, setup, schema, sample conversations, scenario dataset, evaluation
-      results, known limitations, walkthrough.
-- [ ] Recorded demo: normal intake, urgent escalation, calendar failure, successful recovery.
+- [x] **Fixes for the Phase 6 findings**
+  - Phone numbers: `IntakeQuestion.phone_digit_counts` (demo firm: 10/11/12 digits). Numbers of
+    the wrong length are rejected with an "ask again" message instead of being saved.
+  - GPU memory: `TTS_ENGINE=auto` uses Kokoro only on GPUs with ≥ `KOKORO_MIN_GPU_MIB` (6144);
+    on this 4 GB laptop it now picks Piper automatically.
+- [x] **Access controls, from the Phase 7 gaps**
+  - Login throttling: 5 failures per account per 15 min → 429 with `Retry-After`.
+  - A guard test fails if any new staff route lacks authentication; `/openapi.json` is disabled.
+  - Staff names in the audit timeline.
+  - Paging (`limit`/`offset`) on all lists; the overview and queue auto-refresh every 15 s.
+- [x] **Security and tenant-isolation review:** `docs/SECURITY.md` covers the data inventory,
+  the controls with their tests, and the gaps before real use. API sweep: other-firm records are
+  404 on all 8 id routes, absent from all 5 lists, and unchanged.
+- [x] **Retention/deletion policy:** `privacy.transcript_retention_days` (default 90),
+  `purge_expired_turns` (audited, counts only), and `scripts/purge_transcripts.py`.
+- [x] **Structured logging:** JSON lines that keep `extra` fields, `X-Request-ID` correlation,
+  and an access log without bodies or values. Used by the API (at server start), the Temporal
+  worker and the voice worker.
+- [x] **Evaluation hygiene:** runs deactivate their firm, and the dispatcher ignores inactive
+  firms. 13 older eval/demo firms with **74 undispatched workflow requests** were retired
+  (`scripts/retire_eval_firms.py`).
+- [x] **README:** architecture and ER diagrams, setup, schema, sample conversations, dataset,
+  results, walkthrough, limitations.
+- [x] **Recorded demo:** `scripts/record_demo.py` → `docs/demo/DEMO.md` plus
+  `dashboard_walkthrough.webm`. It covers a normal intake, an urgent escalation, a calendar
+  failure with recovery, and the coordinator review.
+- [ ] Optional Langfuse tracing: not added (documented in `docs/SECURITY.md`).
 
-**Acceptance criteria:** the system demonstrates both the happy path and predictable behavior when a
-dependency fails; blueprint §18 "definition of done" items 1–11 all verified.
+**Acceptance criteria → evidence** (`docs/evidence/phase8/`, `docs/demo/`)
+- [x] *Happy path and predictable behaviour when a dependency fails.* `record_demo.py`:
+  **PASS 7/7**. Temporal's own history shows `book_slot` FAILED after commit, then
+  `find_booking`, then exactly one appointment. Accept completed the waiting handoff workflow.
+  The Phase 6 fault scenarios (calendar, reviewer channel, LLM, DB, disconnects) still pass.
 
-**Required tests / evidence:** full test + evaluation run; demo recording.
+Definition of done (blueprint §18):
 
-**Blockers / decisions:** none known. **Next step:** after Phase 7.
+| # | Item | Evidence |
+|---|---|---|
+| 1 | Start the app, open the voice interface | Phase 4 `voice_browser_smoke.py` (real Chromium on `/voice`); README setup |
+| 2 | Speak through **your** microphone | **BLOCKED: needs the user.** Automated equivalent: Chromium fake-mic WebRTC (Phase 4) and the audio track (9 calls) |
+| 3 | Describe a fictional enquiry | Audio track (synthesized callers), live track (29 enquiries) |
+| 4 | Agent captures structured information | DEMO.md tool calls + DB state; dashboard fields |
+| 5 | Statuses on reported facts | DEMO.md fields (`REPORTED_BY_CALLER`), dashboard provenance labels, UI tests |
+| 6 | Configured escalation in the review queue | Demo scene 2 + dashboard video/screenshots |
+| 7 | Consultation booked, verified in PostgreSQL | Demo scene 1 DB state (1 BOOKED appointment, re-read before confirming) |
+| 8 | Incomplete answer / disconnect without corruption | X01/X02 (system + live PASS), P02, Phase 4 hang-up test |
+| 9 | Calendar timeout and safe recovery | Demo scene 3 (Temporal history) + C01/C02 |
+| 10 | Run the evaluation suite and inspect it | `run_evaluations.py`, reports below |
+| 11 | Complete action history in the dashboard | Intake detail timeline (demo screenshots, UI tests) |
+
+**Full evaluation run (final code, 2026-10-12)**
+- **System:** 45/45 PASS. False booking confirmations 0; duplicates 0.0; critical recall 1.0
+  (9/9); recovery 1.0; handoff integrity 1.0.
+- **Live** (Gemini → Groq, quotas reset): **26 PASS / 3 FAIL / 0 SKIPPED** of 29. Field accuracy
+  0.972; critical recall 1.0 (6/6); 0 false booking confirmations; 0 duplicates; 10 omission
+  nudges. Turn p50 6.3 s is inflated by rate-limit backoff. The FAILs:
+  - N02: the city was not saved.
+  - R03: the refused matter description was saved as REPORTED text instead of
+    DECLINED_BY_CALLER.
+  - L02: the legal question was saved as PENDING_HUMAN_REVIEW with no value. The model correctly
+    refused to advise; its phrase "can't tell you whether you have a case" also tripped a
+    forbidden-phrase substring, a harness false positive since fixed in the dataset (disclosed in
+    CHANGE_LOG).
+- **Audio, production config** (auto → Piper on 4 GB): **5/9 PASS**, no GPU errors, no
+  degradation across 9 consecutive calls. Before, it was 3/9, with failures from call 4 or 5.
+  Caller WER 0.084; agent-speech WER 0.033; keyword recall 0.839; latency p50 2.42 s / p95
+  2.88 s; barge-in 1/1. The 4 FAILs are speech-recognition misses on names and digits. Of the 3
+  misheard phone numbers, the new length check rejects 2; the third (`9800110099`) has a valid
+  length.
+- Tests: `pytest` 411 passed + 5 Playwright UI passed; ruff/format, strict mypy (89 files),
+  `alembic check`, `tsc` clean.
+
+**Known limitations** (full list: `docs/SECURITY.md` "Gaps", README)
+- DoD 2 (real microphone) and a live-model voice call still need the user.
+- Whisper `base.en` can mishear a phone number with a plausible length. Staff verify contact
+  details; a read-back confirmation by the agent would need live-model testing.
+- Local-demo security: unauthenticated voice token endpoint, no TLS, dev-mode Temporal/LiveKit,
+  in-process login throttle, app connects as DB owner.
+- No Langfuse tracing; English only.
+
+**Blockers:** DoD item 2 needs the user's microphone (deferred by the user).
 
 ---
 

@@ -16,7 +16,7 @@ from app.domain import (
 )
 from app.domain.errors import NotFound
 from app.domain.firm_config_service import get_active_firm, load_config
-from app.models import Escalation, IntakeRecord, StaffMember, WorkflowExecution
+from app.models import AuditEvent, Escalation, IntakeRecord, StaffMember, WorkflowExecution
 from app.schemas.api import (
     AppointmentOut,
     AuditOut,
@@ -180,11 +180,24 @@ def intake_detail(session: Session, firm_id: uuid.UUID, intake_id: uuid.UUID) ->
             WorkflowOut.model_validate(w)
             for w in review_service.intake_workflows(session, firm_id=firm_id, intake_id=intake.id)
         ],
-        timeline=[
-            AuditOut.model_validate(e)
-            for e in review_service.intake_timeline(session, firm_id=firm_id, intake_id=intake.id)
-        ],
+        timeline=timeline_out(
+            session,
+            firm_id,
+            review_service.intake_timeline(session, firm_id=firm_id, intake_id=intake.id),
+        ),
     )
+
+
+def timeline_out(session: Session, firm_id: uuid.UUID, events: list[AuditEvent]) -> list[AuditOut]:
+    names = review_service.actor_names(
+        session, firm_id=firm_id, staff_ids={e.actor_id for e in events if e.actor_type == "STAFF"}
+    )
+    out = []
+    for event in events:
+        item = AuditOut.model_validate(event)
+        item.actor_name = names.get(event.actor_id)
+        out.append(item)
+    return out
 
 
 def workflow_out(execution: WorkflowExecution) -> WorkflowOut:

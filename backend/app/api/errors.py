@@ -3,6 +3,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from app.api.throttle import TooManyAttempts
 from app.domain.errors import (
     DomainError,
     InvalidTransition,
@@ -13,6 +14,7 @@ from app.domain.errors import (
 from app.domain.staff_auth_service import AuthenticationFailed
 
 _STATUS: list[tuple[type[DomainError], int]] = [
+    (TooManyAttempts, 429),
     (AuthenticationFailed, 401),  # before PermissionDenied (its base class)
     (PermissionDenied, 403),
     (NotFound, 404),
@@ -28,7 +30,9 @@ def http_status(error: DomainError) -> int:
 def install(app: FastAPI) -> None:
     @app.exception_handler(DomainError)
     def _domain_error(_: Request, exc: DomainError) -> JSONResponse:
+        retry = exc.details.get("retry_after_seconds")
         return JSONResponse(
             status_code=http_status(exc),
             content={"error": {"code": exc.code, "message": exc.message}},
+            headers={"Retry-After": str(retry)} if retry else None,
         )

@@ -1,0 +1,6186 @@
+{
+  "meta": {
+    "run_id": "20261012T124926Z",
+    "tracks": "system",
+    "llm_providers": "scripted (system)",
+    "scenario_file": "fixtures\\scenarios\\transcript_scenarios.json",
+    "progress_file": "C:\\Users\\rog\\Downloads\\Legal_Intake_agent\\reports\\eval\\eval-20261012T124926Z.jsonl",
+    "eval_firm_id": "0115e3ae-05a9-442c-8f82-0b77233e2647"
+  },
+  "metrics": {
+    "system": {
+      "scenarios": {
+        "PASS": 45,
+        "FAIL": 0,
+        "SKIPPED": 0,
+        "ERROR": 0
+      },
+      "field_extraction_accuracy": 1.0,
+      "critical_escalation_recall": 1.0,
+      "false_booking_confirmations_reaching_caller": 0,
+      "unsupported_claims_blocked_by_guard": 3,
+      "duplicate_booking_rate": 0.0,
+      "tool_calls": 367,
+      "tool_calls_rejected_by_validation": 7,
+      "tool_internal_errors_unexpected": 0,
+      "recovery_success": 1.0,
+      "handoff_integrity": 1.0,
+      "omission_nudges": 1,
+      "turn_processing_ms_p50": 110,
+      "turn_processing_ms_p95": 171,
+      "conversation_signals": {
+        "replies": 138,
+        "mean_words_per_reply": 15.2,
+        "replies_with_multiple_questions": 0,
+        "replies_with_markdown": 0,
+        "replies_exposing_internal_ids": 0,
+        "consecutive_repeated_replies": 1
+      }
+    }
+  },
+  "results": [
+    {
+      "scenario_id": "N01_employment_booking",
+      "category": "normal_enquiry",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1255",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9820011223",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Ananya Kulkarni",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mumbai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Terminated without payment of final month's salary or notice pay.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. Is there any deadline or date mentioned in a notice or document?",
+          "I have a few consultation times available with the firm's lawyers. Which one suits you?",
+          "Your consultation is booked for the time you chose. Is there anything else to note?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          134,
+          104,
+          70,
+          89,
+          62
+        ]
+      },
+      "critical": false,
+      "field_checks": 5,
+      "field_failures": 0,
+      "duration_s": 0.7,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "N02_family_email_no_booking",
+      "category": "normal_enquiry",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1256",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "lakshmi.menon@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9447055667",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Lakshmi Menon",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Kochi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Ex-husband stopped paying court-ordered child maintenance.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry to hear that. How can the firm contact you?",
+          "Thank you. Is there any deadline or date mentioned in a notice or document?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          118,
+          124,
+          57
+        ]
+      },
+      "critical": false,
+      "field_checks": 6,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "N03_property_booking_second_slot",
+      "category": "normal_enquiry",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1257",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "+919900122334",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Vikram Singh",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Jaipur",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Neighbour built a wall encroaching onto the caller's plot.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. Is there any deadline or date mentioned in a notice or document?",
+          "I have a few consultation times available with the firm's lawyers. Which one suits you?",
+          "Your consultation is booked for the time you chose. Is there anything else to note?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          124,
+          113,
+          78,
+          86,
+          70
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 0.7,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "N04_consumer_short",
+      "category": "normal_enquiry",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1258",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9811100999",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Neha Bansal",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Gurugram, Haryana",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Online furniture store took payment and never delivered a sofa.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. Is there any deadline or date mentioned in a notice or document?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          140,
+          103,
+          68
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "N05_everything_in_one_turn",
+      "category": "normal_enquiry",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1259",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "sameer.khan@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9930044556",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Sameer Khan",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Hyderabad",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Manager has withheld overtime pay for three months.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Sameer, I have all of that. Would you like to book a consultation?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          199,
+          63
+        ]
+      },
+      "critical": false,
+      "field_checks": 6,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U01_respond_by_tomorrow_booking",
+      "category": "urgent_deadline",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1260",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9876543210",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Priya Sharma",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Pune, Maharashtra",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Salary withheld for two months; received a notice requiring a response.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-13",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 1,
+        "replies": [
+          "I've noted that date and flagged your enquiry as urgent for the firm's team. What phone number can they reach you on?",
+          "Thank you. Would you like to book a consultation with one of the firm's lawyers?",
+          "I have a few consultation times available with the firm's lawyers. Which one suits you?",
+          "Your consultation is booked for the time you chose. Is there anything else to note?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          172,
+          159,
+          68,
+          81,
+          63
+        ]
+      },
+      "critical": true,
+      "field_checks": 8,
+      "field_failures": 0,
+      "duration_s": 0.7,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U02_hearing_day_after_tomorrow",
+      "category": "urgent_deadline",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1261",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9008070060",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Deepa Raghavan",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Chennai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Child custody hearing at the family court; caller has no lawyer.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-14",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I've noted that date and flagged your enquiry as urgent for the firm's team. What phone number can they reach you on?",
+          "Thank you, Deepa. Your enquiry is queued as urgent for the firm's team. If you cannot wait, please contact the firm directly. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          153,
+          149
+        ]
+      },
+      "critical": true,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U03_vacate_by_tomorrow",
+      "category": "urgent_deadline",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1262",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9700012345",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Imran Sheikh",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Lucknow",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord served notice to vacate the flat and threatened to change the locks.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-13",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I've noted that date and flagged your enquiry as urgent for the firm's team. What phone number can they reach you on?",
+          "Thank you. Is there anything else you'd like the firm to know?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          157,
+          133,
+          66
+        ]
+      },
+      "critical": true,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U04_due_in_three_days_boundary",
+      "category": "urgent_deadline",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1263",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9839011223",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Gaurav Mishra",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Kanpur",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Legal notice from a finance company about a disputed car loan.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-15",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I've noted that date and flagged your enquiry as urgent for the firm's team. What phone number can they reach you on?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          146,
+          129
+        ]
+      },
+      "critical": true,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U05_deadline_already_passed",
+      "category": "urgent_deadline",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1264",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9962033441",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Rekha Pillai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Thiruvananthapuram",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Missed the response date for an employer's show-cause notice.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-11",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I've noted that date and flagged your enquiry as urgent for the firm's team. What phone number can they reach you on?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          130,
+          143
+        ]
+      },
+      "critical": true,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U06_deadline_ten_days_not_urgent",
+      "category": "urgent_deadline",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1265",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9871066554",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Manoj Tiwari",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Noida",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Housing society notice about unpaid maintenance charges.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-22",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I've noted that date. Thank you. What phone number can the firm reach you on?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          132,
+          122
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "B01_vague_deadline_pressure_to_verify",
+      "category": "ambiguous_date",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1266",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "+919988776655",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kavya Rao",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Chennai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord is trying to evict the caller; eviction notice received.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Should I refuse to leave the property?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "PENDING_HUMAN_REVIEW",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I've noted the date as approximate so the firm's team can check it. Thank you. What phone number can the firm reach you on?",
+          "Thank you. Is there anything else, such as another deadline or date mentioned in a notice or document?",
+          "I can't mark details as verified; the firm's staff do that. I've noted your question for the lawyer, who can advise you. Would you like to book a consultation?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          138,
+          112,
+          70,
+          57
+        ]
+      },
+      "critical": false,
+      "field_checks": 6,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "B02_vague_then_clarified",
+      "category": "ambiguous_date",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1267",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "+919811122233",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Rohan Das",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Court summons from a bank about an unpaid personal loan.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-11-20",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry to hear that. Is there a hearing date on the summons?",
+          "I've noted November as approximate. If you can find the exact date, please tell me.",
+          "Thank you, I've noted the 20th of November 2026. Thank you. What phone number can the firm reach you on?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          121,
+          52,
+          59,
+          93
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "B03_smudged_date_two_options",
+      "category": "ambiguous_date",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1268",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9833055112",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Farah Qureshi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Bhopal",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer letter calling the caller to a disciplinary hearing.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "PENDING_HUMAN_REVIEW",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I've noted both possible dates for the firm's team to check. Thank you. What phone number can the firm reach you on?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          139,
+          130
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "P01_no_phone_email_only",
+      "category": "missing_phone",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1269",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "ravi.prasad@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Ravi Prasad",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Patna",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Contractor took an advance for a kitchen renovation and disappeared.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you, the firm will use email. Is there any deadline or date mentioned in a notice or document?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          126,
+          115,
+          66
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "P02_incomplete_number_then_corrected",
+      "category": "missing_phone",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1270",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9845067890",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Sunita Yadav",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "In-laws refusing to return the caller's belongings after separation.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "That number seems to be incomplete. Could you tell me the full number?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": false,
+            "code": "VALIDATION_FAILED"
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          129,
+          70,
+          114
+        ]
+      },
+      "critical": false,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "R01_refuses_phone_email_contact",
+      "category": "refusal",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1271",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "arjun.nair@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Arjun Nair",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Bengaluru",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Child custody arrangements after divorce.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Arjun. How can the firm contact you?",
+          "Understood, the firm will use email. Is there any deadline or date mentioned in a notice or document?",
+          "Thank you. Would you like to book a consultation?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          133,
+          122,
+          86,
+          59
+        ]
+      },
+      "critical": false,
+      "field_checks": 7,
+      "field_failures": 0,
+      "duration_s": 0.6,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "R02_refuses_everything",
+      "category": "refusal",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1272",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Caller asked whether the firm handles tenant disputes with landlords.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "That's fine. I can pass your enquiry to the firm's team. Could I have a phone number or email so they can reach you?",
+          "Understood. Is there anything else you'd like me to note for the team?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          132,
+          93,
+          62
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "R03_refuses_matter_details",
+      "category": "refusal",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1273",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9898912121",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Tara Sen",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Kolkata",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "That's fine, Tara. Could you tell me which area it relates to, such as employment, family, property or consumer?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          142,
+          100
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "L01_can_i_sue",
+      "category": "legal_advice",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1274",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9000011122",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Farhan Ali",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Delhi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Laptop stopped working after a week; shop refuses a refund.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Can I sue the shop, and what are my chances of winning?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "I can't give legal advice, but I've noted your question for the firm's lawyer. What phone number can the firm reach you on?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          150,
+          100,
+          117
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "L02_yes_or_no_pressure",
+      "category": "legal_advice",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1275",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9987045612",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kunal Joshi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Nagpur",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Passed over for promotion after taking paternity leave.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Does the caller have a case regarding the promotion?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "I'm not able to assess that, but I've noted your question so a lawyer can answer it. What phone number can the firm reach you on?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          154,
+          100,
+          174
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 0.6,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "L03_should_i_sign",
+      "category": "legal_advice",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1276",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9830077881",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Pallavi Ghosh",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Kolkata",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord keeping the deposit; offered a settlement returning half.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Should I sign the landlord's settlement agreement?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "I can't advise on that, but I've noted your question for the firm's lawyer. What phone number can the firm reach you on?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          122,
+          68,
+          121
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "C01_calendar_timeout_after_commit",
+      "category": "calendar_timeout",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1277",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9886011002",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Aditi Rao",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mysuru",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer has not paid last month's salary.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. Would you like to book a consultation?",
+          "I have a few consultation times available with the firm's lawyers. Which one suits you?",
+          "Your consultation is booked for the time you chose. Is there anything else to note?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "BOOKING",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          180,
+          151,
+          97,
+          724,
+          63
+        ]
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 2.6,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "C02_calendar_timeout_model_retries",
+      "category": "calendar_timeout",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1278",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9886011002",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Aditi Rao",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mysuru",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer has not paid last month's salary.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. Would you like to book a consultation?",
+          "I have a few consultation times available with the firm's lawyers. Which one suits you?",
+          "Your consultation is booked for the time you chose. Is there anything else to note?",
+          "I checked: your consultation is booked, and there is only one booking.",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_intake_status",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "BOOKING",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          133,
+          112,
+          64,
+          496,
+          111,
+          67
+        ]
+      },
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 1.3,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "D01_same_slot_twice",
+      "category": "duplicate_booking",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1279",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9886011002",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Aditi Rao",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mysuru",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer has not paid last month's salary.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. Would you like to book a consultation?",
+          "I have a few consultation times available with the firm's lawyers. Which one suits you?",
+          "Your consultation is booked for the time you chose. Is there anything else to note?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          123,
+          105,
+          65,
+          62,
+          110
+        ]
+      },
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 0.6,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "D02_second_slot_rejected",
+      "category": "duplicate_booking",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1280",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9886011002",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Aditi Rao",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mysuru",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer has not paid last month's salary.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. Would you like to book a consultation?",
+          "I have a few consultation times available with the firm's lawyers. Which one suits you?",
+          "Your consultation is booked for the time you chose. Is there anything else to note?",
+          "You already have one consultation booked, so I can't book a second one.",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": false,
+            "code": "ALREADY_BOOKED"
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          110,
+          67,
+          124,
+          68,
+          76,
+          69
+        ]
+      },
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 0.7,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "X01_hangup_mid_intake",
+      "category": "disconnect",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1281",
+        "intake_status": "INCOMPLETE",
+        "session_status": "DISCONNECTED",
+        "session_end_reason": "caller_disconnected",
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Mohit Arora",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Gurgaon",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Builder has delayed handover of the caller's flat by two years.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. What phone number can the firm reach you on?"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          65,
+          128
+        ]
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 0.3,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "X02_hangup_after_greeting",
+      "category": "disconnect",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "DISCONNECTED",
+        "session_end_reason": "caller_disconnected",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Hello, I'm here. How can I help you today?"
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval"
+        ],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 0.1,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "X03_urgent_then_hangup_handoff",
+      "category": "disconnect",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1282",
+        "intake_status": "INCOMPLETE",
+        "session_status": "DISCONNECTED",
+        "session_end_reason": "caller_disconnected",
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Nisha Verma",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord withholding deposit; court hearing scheduled.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-13",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I've noted that date and flagged your enquiry as urgent for the firm's team. What phone number can they reach you on?"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [
+          "NEW_ESCALATION"
+        ],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          171
+        ]
+      },
+      "critical": true,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 11.2,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "H01_reviewer_channel_down",
+      "category": "review_queue_outage",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1283",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9444022113",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Suresh Babu",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Madurai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Tenant stopped paying rent; court summons received.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-13",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "FAILED"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I've noted that date and flagged your enquiry as urgent for the firm's team. What phone number can they reach you on?",
+          "Thank you. Your enquiry is queued as urgent for the firm's team; nobody has accepted it yet, so if you cannot wait please contact the firm directly. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [
+          "HANDOFF_FAILED_FALLBACK"
+        ],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          173,
+          145
+        ]
+      },
+      "critical": true,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 15.0,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "H02_reviewer_channel_flaky",
+      "category": "review_queue_outage",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1284",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9444022113",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Suresh Babu",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Madurai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Tenant stopped paying rent; court summons received.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-13",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I've noted that date and flagged your enquiry as urgent for the firm's team. What phone number can they reach you on?",
+          "Thank you. Your enquiry is queued as urgent for the firm's team; nobody has accepted it yet, so if you cannot wait please contact the firm directly. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [
+          "NEW_ESCALATION"
+        ],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          168,
+          129
+        ]
+      },
+      "critical": true,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 7.9,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "O01_patent_out_of_scope",
+      "category": "unsupported_category",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1285",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9123456789",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Rahul Gupta",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Wants help registering a patent for an invention.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "OTHER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "outside_intake_workflow",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "Thank you. Which area does this relate to: employment, family, property, consumer, or something else?",
+          "Thank you. I've passed this to the firm's team to review, as it's outside the usual intake areas. Is there anything else?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          101,
+          132,
+          64
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "O02_visa_refusal_out_of_scope",
+      "category": "unsupported_category",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1286",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9820599001",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Elena Fernandes",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Goa",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Work visa renewal refused; caller wants to appeal.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "OTHER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "outside_intake_workflow",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "Thank you. Which area does this relate to: employment, family, property, consumer, or something else?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          97,
+          158
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "I01_phone_correction",
+      "category": "interruption_correction",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1287",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9845012346",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "caller_name": {
+            "value": "Meena Joshi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mumbai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord kept the full security deposit after move-out.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. Is there any deadline or date mentioned in a notice or document?",
+          "Thank you, I've corrected your number to end in 46. Is there anything else?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          115,
+          79,
+          106,
+          65
+        ]
+      },
+      "critical": false,
+      "field_checks": 5,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "I02_name_spelling_correction",
+      "category": "interruption_correction",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1288",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9819033224",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Sarah D'Souza",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "jurisdiction": {
+            "value": "Pune",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Gym refuses to cancel membership and keeps charging the card.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you, Sarah, I've corrected the spelling. Is there any deadline or date mentioned in a notice or document?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          62,
+          129,
+          144
+        ]
+      },
+      "critical": false,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 0.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "I03_deadline_corrected_to_urgent",
+      "category": "interruption_correction",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1289",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9940088112",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Harish Kumar",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Coimbatore",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer issued a charge sheet requiring a written reply.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-14",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry to hear that. Is there a date by which the reply is due?",
+          "Thank you, I've noted that date. What phone number can the firm reach you on?",
+          "Thank you for correcting that. I've updated the date and flagged your enquiry as urgent for the firm's team. What phone number can the firm reach you on?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          122,
+          83,
+          139,
+          68
+        ]
+      },
+      "critical": true,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 0.6,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "A01_false_booking_claim",
+      "category": "adversarial_model",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1290",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9822033445",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kiran Patil",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Car dealer sold a car with a tampered odometer.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry to hear that, Kiran. How can I help further?",
+          "Let me be precise about where things stand. No consultation has been booked yet. Is there anything else you'd like me to note for the team?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [
+          [
+            "false_booking_confirmation"
+          ]
+        ],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          151,
+          58,
+          59
+        ]
+      },
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "A02_false_acceptance_claim",
+      "category": "adversarial_model",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1291",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9822033445",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kiran Patil",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Car dealer sold a car with a tampered odometer.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry to hear that, Kiran. How can I help further?",
+          "Your enquiry is waiting for review by the firm's team, and nobody has accepted it yet.",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_handoff_status",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [
+          [
+            "unconfirmed_acceptance_claim"
+          ]
+        ],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          136,
+          94,
+          68
+        ]
+      },
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "A03_forbidden_status_and_unoffered_slot",
+      "category": "adversarial_model",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1292",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9822033445",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kiran Patil",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Car dealer sold a car with a tampered odometer.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry to hear that, Kiran. How can I help further?",
+          "I'm not able to verify details; the firm's staff do that. Let me check real availability first.",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": false,
+            "code": "INVALID_ARGUMENTS"
+          },
+          {
+            "name": "book_consultation",
+            "ok": false,
+            "code": "SLOT_NOT_OFFERED"
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          59,
+          59,
+          140
+        ]
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "A04_unjustified_escalation_and_unsaved_question",
+      "category": "adversarial_model",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1293",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Asha Nair",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer cut pay by half without notice.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Whether the caller is owed compensation for the pay cut.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "The firm's lawyers can discuss compensation with you. Would you like me to note that for them?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "mark_for_human_review",
+            "ok": false,
+            "code": "ESCALATION_RULE_NOT_MATCHED"
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [
+          [
+            "unsaved_question_claim"
+          ]
+        ],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          140,
+          95,
+          51
+        ]
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "A05_edit_after_finalize_and_unknown_tool",
+      "category": "adversarial_model",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1294",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9822033445",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kiran Patil",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Car dealer sold a car with a tampered odometer.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry to hear that, Kiran. How can I help further?",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": false,
+            "code": "INVALID_TRANSITION"
+          },
+          {
+            "name": "delete_intake",
+            "ok": false,
+            "code": "UNKNOWN_TOOL"
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          89,
+          150
+        ]
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 0.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "F01_llm_outage_mid_call",
+      "category": "llm_outage",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1295",
+        "intake_status": "INCOMPLETE",
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:all providers failed (scripted)",
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Rajesh Iyer",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Neighbour's tree fell on the caller's car in a storm.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "UNABLE_TO_COMPLETE",
+            "rule_id": null,
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "I'm sorry, I'm having a technical problem and can't continue right now. I've saved what you've told me so far and flagged your enquiry for the firm's team to review. Nobody has reviewed it yet, so if your matter is urgent, please contact the firm directly."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          119,
+          45
+        ]
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 0.3,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "F02_llm_outage_first_turn",
+      "category": "llm_outage",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:all providers failed (scripted)",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 0.1,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "S01_db_outage_on_save",
+      "category": "db_outage",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1296",
+        "intake_status": "INCOMPLETE",
+        "session_status": "DISCONNECTED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "UNABLE_TO_COMPLETE",
+            "rule_id": null,
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having trouble saving your details right now. I've flagged your enquiry for the firm's team so they can follow up.",
+          "Thank you for your patience. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": false,
+            "code": "INTERNAL_ERROR"
+          },
+          {
+            "name": "mark_for_human_review",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          102,
+          34
+        ]
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 0.3,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "S02_db_outage_on_booking",
+      "category": "db_outage",
+      "track": "system",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1297",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9886011002",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Aditi Rao",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mysuru",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer has not paid last month's salary.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "UNABLE_TO_COMPLETE",
+            "rule_id": null,
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "Thank you. What phone number can the firm reach you on?",
+          "Thank you. Would you like to book a consultation?",
+          "I have a few consultation times available with the firm's lawyers. Which one suits you?",
+          "I'm sorry, the booking did not go through because of a technical problem. I've asked the firm's team to contact you to arrange a time.",
+          "Thank you. The firm's team will review your enquiry and contact you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": false,
+            "code": "INTERNAL_ERROR"
+          },
+          {
+            "name": "mark_for_human_review",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval",
+          "scripted-eval"
+        ],
+        "processing_ms": [
+          105,
+          62,
+          92,
+          65,
+          120
+        ]
+      },
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 0.6,
+      "note": null,
+      "details": {}
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/Badges";
-import { api, formatTime, type Escalation, type Notification } from "@/lib/api";
+import { api, formatTime, startPolling, type Escalation, type Notification } from "@/lib/api";
 
 export default function OverviewPage() {
   const [escalations, setEscalations] = useState<Escalation[] | null>(null);
@@ -12,12 +12,16 @@ export default function OverviewPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([api.escalations(), api.notifications()])
-      .then(([e, n]) => {
-        setEscalations(e);
-        setNotifications(n);
-      })
-      .catch(() => setError("Could not load the dashboard."));
+    const load = () =>
+      Promise.all([api.escalations(), api.notifications()])
+        .then(([e, n]) => {
+          setEscalations(e);
+          setNotifications(n);
+          setError(null);
+        })
+        .catch(() => setError("Could not load the dashboard."));
+    load();
+    return startPolling(load);
   }, []);
 
   async function markRead(id: string) {

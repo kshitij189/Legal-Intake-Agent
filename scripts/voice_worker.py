@@ -7,11 +7,10 @@ Usage (LiveKit + Postgres running via docker compose):
 Uses the real LLM chain (Gemini, fallback Groq), local Whisper STT and local Piper TTS.
 """
 
-import logging
-
 from livekit.agents import AgentServer, JobContext, cli
 
 from app.config import get_settings
+from app.observability.logging import configure_logging
 from app.voice.session_manager import prewarm, run_voice_session
 
 settings = get_settings()
@@ -31,5 +30,5 @@ async def entrypoint(ctx: JobContext) -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    configure_logging()
     cli.run_app(server)

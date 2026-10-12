@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
 import { EscalationCard } from "@/components/EscalationCard";
-import { api, type Escalation, type EscalationStatus } from "@/lib/api";
+import { api, startPolling, type Escalation, type EscalationStatus } from "@/lib/api";
 
 const FILTERS: (EscalationStatus | "OPEN" | "ALL")[] = ["OPEN", "FAILED", "PENDING", "ACCEPTED", "RESOLVED", "ALL"];
 type Filter = (typeof FILTERS)[number];
@@ -18,10 +18,16 @@ function Queue() {
 
   useEffect(() => {
     setItems(null);
-    api
-      .escalations(filter === "OPEN" || filter === "ALL" ? undefined : filter)
-      .then((all) => setItems(filter === "OPEN" ? all.filter((e) => e.status !== "RESOLVED") : all))
-      .catch(() => setError("Could not load the queue."));
+    const load = () =>
+      api
+        .escalations(filter === "OPEN" || filter === "ALL" ? undefined : filter)
+        .then((all) => {
+          setItems(filter === "OPEN" ? all.filter((e) => e.status !== "RESOLVED") : all);
+          setError(null);
+        })
+        .catch(() => setError("Could not load the queue."));
+    load();
+    return startPolling(load); // cards keep their typed notes: they are keyed by escalation id
   }, [filter]);
 
   return (

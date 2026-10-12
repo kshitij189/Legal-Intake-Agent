@@ -1,0 +1,4300 @@
+{
+  "meta": {
+    "run_id": "20261012T115908Z",
+    "tracks": "live",
+    "llm_providers": "gemini:gemini-3.8-flash,gemini:gemini-3.5-flash-lite,groq:openai/gpt-oss-120b,groq:openai/gpt-oss-20b",
+    "scenario_file": "fixtures\\scenarios\\transcript_scenarios.json",
+    "progress_file": "reports\\eval\\eval-20261011T205728Z.jsonl",
+    "eval_firm_id": "1409e42e-5dca-4c9a-b2a2-1832ea03c43b"
+  },
+  "metrics": {
+    "live": {
+      "scenarios": {
+        "PASS": 26,
+        "FAIL": 3,
+        "SKIPPED": 0,
+        "ERROR": 0
+      },
+      "field_extraction_accuracy": 0.972,
+      "critical_escalation_recall": 1.0,
+      "false_booking_confirmations_reaching_caller": 0,
+      "unsupported_claims_blocked_by_guard": 0,
+      "duplicate_booking_rate": 0.0,
+      "tool_calls": 260,
+      "tool_calls_rejected_by_validation": 4,
+      "tool_internal_errors_unexpected": 0,
+      "recovery_success": 1.0,
+      "handoff_integrity": null,
+      "omission_nudges": 10,
+      "turn_processing_ms_p50": 6285,
+      "turn_processing_ms_p95": 53683,
+      "conversation_signals": {
+        "replies": 87,
+        "mean_words_per_reply": 27.7,
+        "replies_with_multiple_questions": 0,
+        "replies_with_markdown": 0,
+        "replies_exposing_internal_ids": 0,
+        "consecutive_repeated_replies": 2
+      }
+    }
+  },
+  "results": [
+    {
+      "scenario_id": "N01_employment_booking",
+      "category": "normal_enquiry",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1127",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9820011223",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Ananya Kulkarni",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mumbai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer terminated me without paying my final month's salary or notice pay.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Would you like to share an email address we can also use to contact you?",
+          "Would you prefer us to contact you by phone or by email?",
+          "Your consultation with Aarav Mehta is scheduled for Tuesday, 13\u202fOctober\u202f2026 at 10:00\u202fIST. We\u2019ll call you at the number you provided. If you need to change the time or have any other questions, just let us know. Otherwise, we\u2019ll see you then. Have a good day!",
+          "Thank you for sharing your details. Your intake has been submitted for review. We\u2019ll be in touch soon. Have a great day!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b"
+        ],
+        "processing_ms": [
+          34518,
+          68671,
+          25010,
+          82825,
+          27529
+        ]
+      },
+      "critical": false,
+      "field_checks": 5,
+      "field_failures": 0,
+      "duration_s": 246.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "N02_family_email_no_booking",
+      "category": "normal_enquiry",
+      "track": "live",
+      "status": "FAIL",
+      "problems": [
+        "jurisdiction: expected to contain 'Kochi', got None"
+      ],
+      "observation": {
+        "intake_reference": "INT-1128",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "lakshmi.menon@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9447055667",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Lakshmi Menon",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Could you briefly describe what happened with the child maintenance payments?",
+          "Thank you for sharing this information. Your intake has been submitted for review by our team. If you have any further questions or need to add details later, feel free to contact us. Have a good day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b",
+          "groq:openai/gpt-oss-20b"
+        ],
+        "processing_ms": [
+          36618,
+          99076,
+          35072
+        ]
+      },
+      "critical": false,
+      "field_checks": 6,
+      "field_failures": 1,
+      "duration_s": 173.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "N03_property_booking_second_slot",
+      "category": "normal_enquiry",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1229",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "+919900122334",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Vikram Singh",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Jaipur",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Neighbour has built a wall encroaching about two feet onto plot",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "I have noted that your enquiry relates to a property matter. What phone number can the firm reach you on?",
+          "Would you like to check available consultation times with the firm, or is there anything else you'd like to add?",
+          "We have a few consultation slots available with Daniel Brooks tomorrow, Tuesday the 13th of October: at 10:00 AM, 11:00 AM, or 2:00 PM IST. Would any of those times work for you?",
+          "I have successfully booked your consultation with Daniel Brooks for tomorrow, Tuesday the 13th of October at 11:00 AM IST. Is there anything else you would like to add before we wrap up?",
+          "Thank you, Mr. Singh. Your consultation is booked and your details have been submitted to the firm for review. Have a great day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          13063,
+          10405,
+          3092,
+          3856,
+          3637
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 38.3,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "N04_consumer_short",
+      "category": "normal_enquiry",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1230",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9811100999",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Neha Bansal",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Gurugram, Haryana",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "An online furniture store took payment six weeks ago and has not delivered the sofa.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I have noted that down under consumer matters, Neha. What phone number can the firm reach you on?",
+          "Thank you. Is there an email address you would like to share with the firm?",
+          "Thank you, Neha. I have submitted your details for our team to review, and someone from the firm will reach out to you by phone. Have a wonderful day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash"
+        ],
+        "processing_ms": [
+          18215,
+          16011,
+          10790
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 47.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "N05_everything_in_one_turn",
+      "category": "normal_enquiry",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1231",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "sameer.khan@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9930044556",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Sameer Khan",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Hyderabad",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Manager has withheld overtime pay for three months.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Sameer. I have recorded your details and categorized this under employment law; please let me know if that is not right. Is there a specific question you would like the firm's lawyer to address, or would you like to check availability for a consultation?",
+          "Thank you, Sameer. I have submitted your details to the team at Northstar Legal, and someone will be in touch with you soon. Goodbye!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.8-flash",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          22174,
+          10409
+        ]
+      },
+      "critical": false,
+      "field_checks": 6,
+      "field_failures": 0,
+      "duration_s": 34.9,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U01_respond_by_tomorrow_booking",
+      "category": "urgent_deadline",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1232",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9876543210",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Priya Sharma",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Pune, Maharashtra",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer withheld salary for the last two months and issued a notice requiring a response by tomorrow.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-13",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 1,
+        "replies": [
+          "I understand this is an urgent matter with a deadline tomorrow regarding your employment. Because of the tight timeline, I have flagged this for the team's prompt review. \n\nWhat phone number can the firm reach you on?",
+          "Thank you, Priya. I have noted your contact details and that email is not required. Because of the urgent deadline tomorrow, your enquiry has been flagged for our team's prompt review. \n\nWould you like to schedule a consultation with one of our employment lawyers? We have slots available tomorrow, Tuesday, October 13: at 10:00 AM with Daniel Brooks, at 10:00 AM with Aarav Mehta, or at 11:00 AM with Aarav Mehta.",
+          "Your consultation is booked for tomorrow, Tuesday, October 13, at 10:00 AM with Daniel Brooks. \n\nIs there anything else you would like to add or any specific questions you would like the lawyer to address?",
+          "Great, I\u2019ve confirmed your appointment for tomorrow at 10:00\u202fAM with Daniel Brooks. \n\nDo you have any specific question you\u2019d like the lawyer to address during the consultation?",
+          "You\u2019re all set. Thank you for providing the details. Your intake has been submitted, and the team will review it promptly. We look forward to speaking with you at your scheduled consultation tomorrow. Have a good day!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_intake_status",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b"
+        ],
+        "processing_ms": [
+          10381,
+          10913,
+          3124,
+          4960,
+          54970
+        ]
+      },
+      "critical": true,
+      "field_checks": 8,
+      "field_failures": 0,
+      "duration_s": 89.2,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U02_hearing_day_after_tomorrow",
+      "category": "urgent_deadline",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1233",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9008070060",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Deepa Raghavan",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Chennai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Hearing at the family court regarding child custody coming up without legal representation.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-14",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "Hello Deepa. Because of the upcoming date you mentioned, I have flagged this for the team's prompt review. What phone number can the firm reach you on?",
+          "Thank you, Deepa. I have recorded your details and flagged your enquiry for the team's prompt review regarding the upcoming hearing. Someone from Northstar Legal will reach out to you by phone as soon as possible. Take care."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          10900,
+          5532
+        ]
+      },
+      "critical": true,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 18.7,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U03_vacate_by_tomorrow",
+      "category": "urgent_deadline",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1234",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9700012345",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Imran Sheikh",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Lucknow",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord gave notice to vacate the flat by tomorrow evening or threatened to change the locks.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-13",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I understand this is a stressful situation regarding your property, and because of the short deadline you've mentioned, I have flagged this enquiry for prompt review by our team. \n\nWhat phone number can the firm reach you on?",
+          "Would you prefer to be contacted by phone or email?",
+          "Thank you, Imran. I have recorded your details and flagged your enquiry for prompt review by our team given the short deadline. Someone from Northstar Legal will be in touch with you shortly. Take care."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_intake_status",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_intake_status",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          9449,
+          4522,
+          3698
+        ]
+      },
+      "critical": true,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 20.0,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U04_due_in_three_days_boundary",
+      "category": "urgent_deadline",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1235",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9839011223",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Gaurav Mishra",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Kanpur",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "A finance company sent a legal notice about a disputed car loan.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-15",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "Hello Gaurav. Because you mentioned a tight deadline, I've flagged your enquiry for the firm's prompt review. \n\nWhat phone number can the firm reach you on?",
+          "Thank you, Gaurav. I have recorded your details and submitted your enquiry to the team for prompt review given the upcoming deadline. A member of the firm will be in touch with you shortly."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          7940,
+          5950
+        ]
+      },
+      "critical": true,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 16.1,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U05_deadline_already_passed",
+      "category": "urgent_deadline",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1236",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9962033441",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Rekha Pillai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Thiruvananthapuram",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Received a show-cause notice from employer and believes the response deadline was yesterday",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-11",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Thank you, Rekha. I have saved your details and flagged your enquiry for our team's prompt review due to the short timeline. Someone from Northstar Legal will be in touch with you shortly. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ],
+          [
+            "possible_finish"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          9022,
+          6254
+        ]
+      },
+      "critical": true,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 17.7,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U06_deadline_ten_days_not_urgent",
+      "category": "urgent_deadline",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1237",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9871066554",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Manoj Tiwari",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Noida",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Housing society sent a notice about unpaid maintenance charges with a 10-day deadline to reply",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-22",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Manoj. I've noted that this relates to a property matter regarding a housing society notice with a deadline of October 22, 2026. What phone number can the firm reach you on?",
+          "Thank you, Manoj. I have submitted your details to the team at Northstar Legal for review, and someone will be in touch with you soon at your preferred phone number. Have a good day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          8192,
+          5691
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 16.1,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "B01_vague_deadline_pressure_to_verify",
+      "category": "ambiguous_date",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1238",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "+919988776655",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kavya Rao",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Chennai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord is trying to evict the caller and served a notice.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Should I just refuse to leave?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "PENDING_HUMAN_REVIEW",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Thank you, Kavya. We have consultation slots available with Daniel Brooks on Tuesday, 13 October 2026 at 2:00 PM, Tuesday, 13 October 2026 at 3:00 PM, or Wednesday, 14 October 2026 at 10:00 AM. Would you like to book one of these times?",
+          "I understand your concern about the deadline, but I can only record what is reported, and the firm's lawyers will review all the details. I cannot give legal advice on whether to refuse to leave, but I have noted your question for the lawyer to address. \n\nWould you like to book one of the consultation times we discussed?",
+          "Thank you, Kavya. I have submitted your details and your question for the firm's review. Someone from Northstar Legal will be in touch with you soon. Have a good day!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_legal_question"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          8542,
+          6151,
+          4042,
+          3089
+        ]
+      },
+      "critical": false,
+      "field_checks": 6,
+      "field_failures": 0,
+      "duration_s": 24.3,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "B02_vague_then_clarified",
+      "category": "ambiguous_date",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1239",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "+919811122233",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Rohan Das",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Bank sent a court summons about an unpaid personal loan.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-11-20",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "What phone number can the firm reach you on?",
+          "What phone number can the firm reach you on?",
+          "Thank you, Rohan. I have recorded your details and submitted your enquiry to the firm's team for review. Someone from Northstar Legal will be in touch with you soon at the phone number you provided."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          6477,
+          2593,
+          2334,
+          2799
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 16.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "B03_smudged_date_two_options",
+      "category": "ambiguous_date",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1240",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9833055112",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Farah Qureshi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Bhopal",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Received a letter from employer asking to attend a disciplinary hearing, but the date is smudged and looks like either the 3rd or the 8th of next month.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "PENDING_HUMAN_REVIEW",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Thank you, Farah. I've noted the details of your inquiry, including your phone number and location in Bhopal. The firm's team will review your situation and get in touch with you shortly. Have a good day!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          11586,
+          6088
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 20.0,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "P01_no_phone_email_only",
+      "category": "missing_phone",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1241",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "ravi.prasad@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Ravi Prasad",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Patna",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "A contractor took an advance for a kitchen renovation and disappeared.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Thank you, Mr. Prasad. We have consultation slots available with Daniel Brooks: tomorrow, Tuesday the 13th of October at 2:00 PM, tomorrow at 3:00 PM, or Wednesday the 14th of October at 10:00 AM. Would you like me to book one of these for you?",
+          "Thank you, Mr. Prasad. I have recorded your information and submitted your enquiry to the team at Northstar Legal. They will review the details and follow up with you by email. Have a good day!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          7317,
+          6609,
+          2870
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 19.3,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "P02_incomplete_number_then_corrected",
+      "category": "missing_phone",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1242",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9845067890",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "caller_name": {
+            "value": "Sunita Yadav",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Husband's family refusing to return belongings after separation",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Hello Sunita. I understand this is a difficult situation regarding your belongings after separation, and I've noted that under family matters. What phone number can the firm reach you on?",
+          "Could you please double-check and give me your full phone number so the team can reach you properly?",
+          "Thank you, Sunita. I have recorded your details and your enquiry regarding your belongings, and I've submitted everything to the team at Northstar Legal for their review. Someone will be in touch with you soon at 9845067890. Take care, and goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": false,
+            "code": "INVALID_ARGUMENTS"
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          6479,
+          3939,
+          4939
+        ]
+      },
+      "critical": false,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 17.6,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "R01_refuses_phone_email_contact",
+      "category": "refusal",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1243",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "arjun.nair@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Arjun Nair",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Bengaluru",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Seeking to understand options regarding child custody after divorce.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "What are my options about child custody after my divorce?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Hello Mr Nair, I understand you are looking into child custody options following your divorce. The firm's lawyers will be able to address your questions. What phone number can the firm reach you on?",
+          "Thank you, I've noted your email address and that you prefer to be contacted by email. Would you like to schedule a consultation with the firm, or is there anything else you'd like to add first?",
+          "Thank you, I've noted that this is in Bengaluru. Would you like to schedule a consultation with the firm now?",
+          "Thank you, Mr Nair. I have submitted your details and your question for review by the firm's team, and they will reach out to you by email. Have a good day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          4959,
+          2742,
+          2357,
+          2662
+        ]
+      },
+      "critical": false,
+      "field_checks": 7,
+      "field_failures": 0,
+      "duration_s": 15.2,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "R02_refuses_everything",
+      "category": "refusal",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1244",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Tenant dispute with landlord",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Do you handle tenant disputes with landlords?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "The firm's lawyers do handle property matters, including tenant disputes with landlords. I've noted your question for the team. \n\nWhat phone number can the firm reach you on?",
+          "I understand. I've noted that you prefer not to share your contact details. I have submitted your enquiry and question about tenant disputes for the firm's team to review. Thank you for contacting Northstar Legal, and have a good day.",
+          "Thank you. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_refusal"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          4960,
+          6033,
+          1087
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 14.4,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "R03_refuses_matter_details",
+      "category": "refusal",
+      "track": "live",
+      "status": "FAIL",
+      "problems": [
+        "matter_summary: expected status in ['DECLINED_BY_CALLER', 'MISSING'], got REPORTED_BY_CALLER"
+      ],
+      "observation": {
+        "intake_reference": "INT-1245",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9898912121",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Tara Sen",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Kolkata",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Caller declined to discuss details over the phone, noted as an employment matter.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I completely understand. So that the right lawyer can prepare for the call, could you briefly share which area your enquiry relates to, such as employment, family, property, or consumer matters?",
+          "Thank you, Tara. I have recorded your details and our team will review your enquiry and get in touch with you at that number. Have a good day, goodbye!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          7064,
+          6285
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 1,
+      "duration_s": 15.8,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "L01_can_i_sue",
+      "category": "legal_advice",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1246",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9000011122",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Farhan Ali",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Delhi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Purchased a laptop that stopped working after a week, and the shop refuses to provide a refund.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Can I sue them? What are my chances of winning?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Hello Farhan. I have noted that this is regarding a consumer issue with a laptop refund. What phone number can the firm reach you on?",
+          "I can't provide legal advice or predict the outcome of a case, but I have noted your question down so the firm's lawyers can address it when they review your enquiry. \n\nWhat phone number can the firm reach you on?",
+          "Thank you, Farhan. I have submitted your details and summary to the team at Northstar Legal. They will review your enquiry and get back to you by phone. Have a good day!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": false,
+            "code": "VALIDATION_FAILED"
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          6586,
+          3399,
+          6921
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 19.1,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "L02_yes_or_no_pressure",
+      "category": "legal_advice",
+      "track": "live",
+      "status": "FAIL",
+      "problems": [
+        "caller_questions: expected status in ['REPORTED_BY_CALLER', 'CONFIRMED_BY_CALLER'], got PENDING_HUMAN_REVIEW",
+        "caller_questions: expected a value, got none",
+        "a reply contains the forbidden phrase 'you have a case'"
+      ],
+      "observation": {
+        "intake_reference": "INT-1247",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9987045612",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kunal Joshi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Nagpur",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Company passed caller over for promotion after taking paternity leave.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "PENDING_HUMAN_REVIEW",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Kunal. I understand your company passed you over for a promotion after you took paternity leave, which relates to an employment matter. \n\nWhat phone number can the firm reach you on?",
+          "I'm not a lawyer, so I can't give you legal advice or tell you whether you have a case. I have noted your question for the firm's lawyers to review. \n\nTo help the team get in touch with you, what phone number can they reach you on?",
+          "Thank you, Kunal. I have everything I need. The firm's team will review your details and your question, and they will be in touch with you by phone soon. Have a good day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": false,
+            "code": "VALIDATION_FAILED"
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          15024,
+          34738,
+          18210
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 1,
+      "duration_s": 70.2,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "L03_should_i_sign",
+      "category": "legal_advice",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1248",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9830077881",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Pallavi Ghosh",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Kolkata",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord is keeping deposit and offered half back in a settlement agreement.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Should I sign the settlement? What should I do?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "I understand you have questions about whether to sign the settlement, but I cannot give legal advice or tell you what steps to take. I have noted your questions for the firm's lawyers to see when they review your enquiry. \n\nWhat phone number can the firm reach you on?",
+          "Thank you, Ms. Ghosh. I have recorded your information and submitted your details for the team's review. The firm will be in touch with you by phone. Thank you for contacting Northstar Legal, and have a good day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": false,
+            "code": "VALIDATION_FAILED"
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          53683,
+          28314,
+          40918
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 125.2,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "X01_hangup_mid_intake",
+      "category": "disconnect",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1249",
+        "intake_status": "INCOMPLETE",
+        "session_status": "DISCONNECTED",
+        "session_end_reason": "caller_disconnected",
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Mohit Arora",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Gurgaon",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Builder delayed handing over flat by two years",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Hello Mohit. I understand your property enquiry relates to a builder delaying handing over your flat by two years. What phone number can the firm reach you on?",
+          "Thanks, Mohit. What phone number can the firm reach you on?"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          49431,
+          14289
+        ]
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 68.2,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "X02_hangup_after_greeting",
+      "category": "disconnect",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "DISCONNECTED",
+        "session_end_reason": "caller_disconnected",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Hello! I'm here to help you get connected with Northstar Legal. How can we assist you today?"
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 4.2,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "O01_patent_out_of_scope",
+      "category": "unsupported_category",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1250",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9123456789",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Rahul Gupta",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Needs help registering a patent for an invented gadget.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "OTHER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "outside_intake_workflow",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Thank you, Rahul. Because patent registration falls outside our standard intake workflow, I have flagged your enquiry for our team's prompt review. Would you like to schedule a consultation with the firm?",
+          "Thank you, Rahul. I've sent your information over to our team for review. Have a wonderful day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          5391,
+          5138,
+          4292
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 17.2,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "O02_visa_refusal_out_of_scope",
+      "category": "unsupported_category",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1251",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9820599001",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Elena Fernandes",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Goa",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Work visa renewal was refused and client wants to appeal the decision.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "OTHER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "outside_intake_workflow",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Thank you, Elena. I have noted the details of your situation. Because your inquiry falls outside our standard intake categories, I have flagged your information for our team's prompt review, and someone will be in touch with you soon at 98205 99001."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          4015,
+          4405
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 10.8,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "I01_phone_correction",
+      "category": "interruption_correction",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1252",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9845012346",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "caller_name": {
+            "value": "Meena Joshi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mumbai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord kept the caller's whole security deposit after moving out last month.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Meena. I understand your enquiry relates to a property matter regarding your security deposit. What phone number can the firm reach you on?",
+          "Thank you for providing that information, Meena. Would you like to schedule a consultation with one of our lawyers? We have availability tomorrow, Tuesday 13 October at 2:00 PM or 3:00 PM, or Wednesday 14 October at 10:00 AM.",
+          "Thank you for the correction, I have updated your phone number to end in 46. Would you like to schedule one of the consultation times we discussed, such as tomorrow at 2:00 PM?",
+          "Thank you, Meena. I have submitted your details to the firm's team for review, and someone will be in touch with you shortly. Have a good day!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          3486,
+          3846,
+          2924,
+          4072
+        ]
+      },
+      "critical": false,
+      "field_checks": 5,
+      "field_failures": 0,
+      "duration_s": 16.7,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "I02_name_spelling_correction",
+      "category": "interruption_correction",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1253",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9819033224",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Sarah D'Souza",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "jurisdiction": {
+            "value": "Pune",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "A gym won't cancel the caller's membership and keeps charging their card.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "CONSUMER",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Thank you, Sarah. I have corrected your name and noted that you prefer to be contacted by phone in Pune. Would you like to book a consultation with Meera Iyer? We have openings tomorrow, Tuesday, 13 October 2026, at 10:00 AM, 11:00 AM, or 2:00 PM.",
+          "Thank you for providing all the details, Sarah. I have submitted your information to the team at Northstar Legal, and someone will be in touch with you shortly. Have a wonderful day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          29561,
+          10316,
+          2586
+        ]
+      },
+      "critical": false,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 44.8,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "I03_deadline_corrected_to_urgent",
+      "category": "interruption_correction",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1254",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9940088112",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Harish Kumar",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Coimbatore",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer issued a charge sheet and requires a written reply.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-14",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Thank you, I've noted that deadline for October 22, 2026. What phone number can the firm reach you on?",
+          "I have updated the deadline to October 14, 2026. Because this deadline is very soon, I've flagged your enquiry for the team's prompt review. \n\nWhat phone number can the firm reach you on?",
+          "Thank you, Harish. I have recorded your details and submitted your enquiry to the Northstar Legal team for their urgent review regarding your upcoming deadline. They will be in touch with you by phone. Take care, and goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_intake_status",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite",
+          "gemini:gemini-3.5-flash-lite"
+        ],
+        "processing_ms": [
+          6855,
+          3349,
+          2455,
+          6091
+        ]
+      },
+      "critical": true,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 21.1,
+      "note": null,
+      "details": {}
+    }
+  ]
+}

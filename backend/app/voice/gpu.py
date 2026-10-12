@@ -10,6 +10,7 @@ On Windows those DLL folders must be registered before the libraries load.
 import logging
 import os
 import site
+import subprocess
 import sys
 from functools import lru_cache
 from pathlib import Path
@@ -61,8 +62,38 @@ def resolve_stt(device: str, compute_type: str) -> tuple[str, str]:
     return device, compute_type
 
 
-def resolve_tts_engine(engine: str) -> str:
-    """`auto` -> Kokoro when its GPU path works (Kokoro on CPU is ~11x slower), else Piper."""
-    if engine == "auto":
-        return "kokoro" if onnx_cuda_available() else "piper"
-    return engine
+def gpu_total_memory_mib() -> int | None:
+    """Total memory of the first NVIDIA GPU, or None if it cannot be read."""
+    try:
+        out = subprocess.run(
+            ["nvidia-smi", "--query-gpu=memory.total", "--format=csv,noheader,nounits"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        ).stdout
+        return int(out.splitlines()[0].strip())
+    except (OSError, subprocess.SubprocessError, ValueError, IndexError):
+        return None
+
+
+def resolve_tts_engine(engine: str, kokoro_min_gpu_mib: int = 0) -> str:
+    """`auto` -> Kokoro when its GPU path works and the GPU is large enough, else Piper.
+
+    Kokoro on CPU is ~11x slower. On the GPU, each voice process holds ~2 GB (Whisper + Kokoro)
+    and LiveKit keeps the active process plus a spare, so a 4 GB card saturates by the 3rd-4th
+    consecutive call and calls degrade (Phase 6 finding). Below `kokoro_min_gpu_mib`, use Piper.
+    """
+    if engine != "auto":
+        return engine
+    if not onnx_cuda_available():
+        return "piper"
+    if kokoro_min_gpu_mib <= 0:
+        return "kokoro"
+    total = gpu_total_memory_mib()
+    if total is None or total < kokoro_min_gpu_mib:
+        logger.warning(
+            "tts_auto_selected_piper gpu_mib=%s kokoro_min_gpu_mib=%s", total, kokoro_min_gpu_mib
+        )
+        return "piper"
+    return "kokoro"

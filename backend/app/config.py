@@ -51,6 +51,9 @@ class Settings(BaseSettings):
     kokoro_model_path: Path = REPO_ROOT / "models" / "kokoro" / "kokoro-v1.0.onnx"
     kokoro_voices_path: Path = REPO_ROOT / "models" / "kokoro" / "voices-v1.0.bin"
     kokoro_voice: str = "af_heart"
+    # `auto` uses Kokoro only on GPUs with at least this much memory. Measured 2026-10-12: ~2 GB
+    # per voice process, active + one spare; a 4 GB card saturated and calls degraded.
+    kokoro_min_gpu_mib: int = 6144
     models_dir: Path = REPO_ROOT / "models"
     voice_web_port: int = 8000
     # Pre-spawned job processes; each loads its own STT/TTS models. One keeps a 4 GB GPU from

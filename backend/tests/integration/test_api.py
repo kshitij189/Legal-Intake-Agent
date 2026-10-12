@@ -110,6 +110,20 @@ def test_login_failures_are_indistinguishable(api: Api) -> None:
     assert len({r.text for r in responses}) == 1
 
 
+def test_repeated_failed_logins_are_throttled(api: Api) -> None:
+    wrong = {"firm": "northstar-legal", "email": COORDINATOR, "password": "wrong password"}
+    for _ in range(5):
+        assert api.client.post("/api/v1/auth/login", json=wrong).status_code == 401
+    blocked = api.client.post("/api/v1/auth/login", json=wrong)
+    assert blocked.status_code == 429
+    assert blocked.json()["error"]["code"] == "TOO_MANY_ATTEMPTS"
+    assert int(blocked.headers["Retry-After"]) > 0
+    right = {**wrong, "password": PASSWORD}
+    assert api.client.post("/api/v1/auth/login", json=right).status_code == 429  # even correct
+    other = {**right, "email": ADMIN}
+    assert api.client.post("/api/v1/auth/login", json=other).status_code == 200
+
+
 def test_login_sets_an_httponly_cookie_and_logout_revokes_it(api: Api) -> None:
     response = api.client.post(
         "/api/v1/auth/login",
@@ -201,6 +215,10 @@ def test_queue_detail_accept_and_resolve(api: Api) -> None:
     assert actions[0] == ("AGENT", "intake.created")
     assert ("AGENT", "escalation.created") in actions and ("AGENT", "intake.finalized") in actions
     assert actions[-2:] == [("STAFF", "escalation.accepted"), ("STAFF", "escalation.resolved")]
+    assert {e["actor_name"] for e in detail["timeline"] if e["actor_type"] == "STAFF"} == {
+        "Sana Kapoor"
+    }
+    assert all(e["actor_name"] is None for e in detail["timeline"] if e["actor_type"] == "AGENT")
     assert [e["seq"] for e in detail["timeline"]] == sorted(e["seq"] for e in detail["timeline"])
 
 
@@ -348,3 +366,120 @@ def test_unable_to_complete_escalation_shows_reason(api: Api) -> None:
     [queued] = api.client.get("/api/v1/escalations").json()
     assert (queued["reason_code"], queued["priority"]) == ("UNABLE_TO_COMPLETE", "HIGH")
     assert "Language model unavailable" in queued["reason_text"]
+
+
+def test_lists_are_paged(api: Api) -> None:
+    first, _ = urgent_intake(api)
+    second, _ = urgent_intake(api)
+    api.login()
+    newest_first = [i["id"] for i in api.client.get("/api/v1/intakes").json()]
+    assert newest_first == [str(second), str(first)]
+    page_two = api.client.get("/api/v1/intakes", params={"limit": 1, "offset": 1}).json()
+    assert [i["id"] for i in page_two] == [str(first)]
+    assert len(api.client.get("/api/v1/escalations", params={"limit": 1}).json()) == 1
+    assert api.client.get("/api/v1/intakes", params={"limit": 0}).status_code == 422
+    assert api.client.get("/api/v1/workflows", params={"limit": 501}).status_code == 422
+
+
+def test_responses_carry_a_request_id(api: Api) -> None:
+    generated = api.client.get("/api/v1/auth/me")
+    assert len(generated.headers["X-Request-ID"]) == 32
+    echoed = api.client.get("/api/v1/auth/me", headers={"X-Request-ID": "client-supplied-1"})
+    assert echoed.headers["X-Request-ID"] == "client-supplied-1"
+    junk = api.client.get("/api/v1/auth/me", headers={"X-Request-ID": "x"})
+    assert junk.headers["X-Request-ID"] != "x"
+
+
+def test_every_id_route_is_tenant_scoped(api: Api) -> None:
+    """Security sweep (Phase 8): records of another firm are 'not found' on every route, and
+    nothing about them changes."""
+    from app.db.seed import seed_demo_data
+    from app.domain import notification_service
+    from app.models import Appointment
+    from app.models.enums import NotificationKind, StaffRole
+
+    with api.sessions() as s, s.begin():
+        other = seed_demo_data(s, slug="other-firm", now=datetime.now(UTC)).firm_id
+        today = firm_today(get_active_firm(s, other), datetime.now(UTC))
+        intake = intake_service.create_draft_intake(s, firm_id=other, actor=AGENT)
+        intake_service.save_intake_answer(
+            s,
+            firm_id=other,
+            intake_id=intake.id,
+            actor=AGENT,
+            field_key="reported_deadline",
+            status=FieldStatus.REPORTED_BY_CALLER,
+            value=(today + timedelta(days=1)).isoformat(),
+        )
+        [(_, result)] = escalation_service.apply_escalation_rules(
+            s, firm_id=other, intake_id=intake.id, actor=AGENT
+        )
+        notification, _ = notification_service.notify(
+            s,
+            firm_id=other,
+            escalation_id=result.escalation.id,
+            recipient_role=StaffRole.INTAKE_COORDINATOR,
+            kind=NotificationKind.NEW_ESCALATION,
+            dedupe_key="other:new",
+            message="Other firm alert",
+        )
+        from app.domain import appointment_service
+
+        slot = appointment_service.check_availability(
+            s, firm_id=other, matter_category=None, limit=1, now=datetime.now(UTC)
+        )[0]
+        appointment = appointment_service.book_consultation(
+            s,
+            firm_id=other,
+            actor=AGENT,
+            intake_id=intake.id,
+            slot_id=slot.id,
+            idempotency_key="other:book",
+        ).appointment
+    esc, apt, note = result.escalation.id, appointment.id, notification.id
+    api.login()  # a reviewer of Northstar Legal
+    calls = [
+        ("get", f"/api/v1/intakes/{intake.id}", None),
+        ("patch", f"/api/v1/intakes/{intake.id}/fields/caller_name",
+         {"status": "VERIFIED_BY_SYSTEM", "value": "x"}),
+        ("post", f"/api/v1/intakes/{intake.id}/close", None),
+        ("get", f"/api/v1/escalations/{esc}", None),
+        ("post", f"/api/v1/escalations/{esc}/accept", None),
+        ("post", f"/api/v1/escalations/{esc}/resolve", {"note": "x"}),
+        ("get", f"/api/v1/appointments/{apt}", None),
+        ("post", f"/api/v1/notifications/{note}/read", None),
+    ]  # fmt: skip
+    for method, path, body in calls:
+        response = api.client.request(method, path, json=body)
+        assert response.status_code == 404, (path, response.status_code, response.text)
+    for path in ("/api/v1/intakes", "/api/v1/escalations", "/api/v1/appointments",
+                 "/api/v1/workflows", "/api/v1/notifications"):  # fmt: skip
+        listed = api.client.get(path).text
+        assert str(intake.id) not in listed and str(esc) not in listed and str(apt) not in listed
+    with api.sessions() as s:
+        assert s.get_one(Escalation, esc).status == "PENDING"
+        assert s.get_one(IntakeRecord, intake.id).status == IntakeStatus.IN_PROGRESS
+        assert s.get_one(Appointment, apt).status == "BOOKED"
+    assert api.signals == []
+
+
+def test_every_staff_route_requires_a_session() -> None:
+    """Guard for new routes: only login may be called without a staff session."""
+    from fastapi.dependencies.models import Dependant
+
+    from app.api import routes
+    from app.api.deps import current_staff
+
+    def calls(dependant: Dependant) -> list[object]:
+        return [dependant.call, *[c for d in dependant.dependencies for c in calls(d)]]
+
+    open_routes = {
+        route.path
+        for route in routes.router.routes
+        if current_staff not in calls(route.dependant)  # type: ignore[attr-defined]
+    }
+    assert open_routes == {"/api/v1/auth/login"}
+
+
+def test_api_schema_is_not_published(api: Api) -> None:
+    assert api.client.get("/openapi.json").status_code == 404

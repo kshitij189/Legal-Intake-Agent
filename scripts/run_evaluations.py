@@ -36,7 +36,7 @@ from app.evaluation.metrics import (
     result_from_dict,
 )
 from app.evaluation.report import write_reports
-from app.evaluation.runner import EvalContext, create_eval_firm, run_scenario
+from app.evaluation.runner import EvalContext, create_eval_firm, retire_eval_firm, run_scenario
 from app.evaluation.scenario import Scenario, load_scenarios
 
 SCENARIOS = REPO_ROOT / "fixtures" / "scenarios" / "transcript_scenarios.json"
@@ -157,6 +157,7 @@ def main() -> int:
     if "audio" in tracks:
         meta["audio_worker_tts"] = args.audio_tts or f"configured ({settings.tts_engine})"
         meta["audio_back_to_back"] = args.audio_back_to_back
+    retire_eval_firm(sessions, firm_id)  # leftovers must not reach the regular worker
     json_path, md_path = write_reports(
         args.report_dir, f"eval-{run_id}-{args.track}", meta, results, metrics
     )

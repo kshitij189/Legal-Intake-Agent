@@ -23,7 +23,13 @@ DEMO_FIRM_TIMEZONE = "Asia/Kolkata"
 DEMO_FIRM_CONFIG: dict[str, Any] = {
     "intake_questions": [
         {"key": "caller_name", "prompt": "What is your full name?", "type": "TEXT"},
-        {"key": "phone", "prompt": "What phone number can the firm reach you on?", "type": "PHONE"},
+        {
+            "key": "phone",
+            "prompt": "What phone number can the firm reach you on?",
+            "type": "PHONE",
+            # Indian numbers: 10-digit mobile, 11 with a leading 0/STD code, 12 with +91.
+            "phone_digit_counts": [10, 11, 12],
+        },
         {
             "key": "email",
             "prompt": "Is there an email address you'd like to share?",
