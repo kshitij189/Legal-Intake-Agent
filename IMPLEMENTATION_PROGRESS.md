@@ -6,13 +6,13 @@ A phase is `COMPLETED` only when every acceptance criterion has recorded evidenc
 **Repository state at documentation setup (2026-10-11):** empty directory, no source code, no git
 repository. No prior implementation work existed, so every phase started `NOT_STARTED`.
 
-**Last updated:** 2026-10-12 — Phases 1–5 completed.
+**Last updated:** 2026-10-12 — Phases 1–6 completed.
 
 > Correction (Phase 4): the "mypy strict" results recorded for Phases 1–3 were produced without the
 > strict config loaded (see CHANGE_LOG, Phase 4). Strict mode now runs via
 > `mypy --config-file backend/pyproject.toml backend/app` and is clean.
 
-**Next phase to implement:** Phase 6 — Evaluation harness (awaiting authorization).
+**Next phase to implement:** Phase 7 — Human-review dashboard (awaiting authorization).
 
 ## Summary
 
@@ -23,7 +23,7 @@ repository. No prior implementation work existed, so every phase started `NOT_ST
 | 3 | Conversational state and safety | COMPLETED (2026-10-11) | 2 |
 | 4 | Voice loop | COMPLETED (2026-10-11) | 3 |
 | 5 | Durable workflows | COMPLETED (2026-10-12) | 1, 2 (3 recommended) |
-| 6 | Evaluation harness | NOT_STARTED | 3 (audio mode: 4; recovery/fault cases: 5) |
+| 6 | Evaluation harness | COMPLETED (2026-10-12) | 3 (audio mode: 4; recovery/fault cases: 5) |
 | 7 | Human-review dashboard | NOT_STARTED | 1, 5 |
 | 8 | Hardening and demonstration | NOT_STARTED | 1–7 |
 
@@ -381,7 +381,10 @@ files); `alembic check` no drift. Voice regression after Phase 5: 2/2 PASS (late
 ---
 ## Phase 6 — Evaluation harness
 
-**Status:** NOT_STARTED
+**Status:** COMPLETED (2026-10-12). The harness, dataset and reports are done and the
+acceptance criterion is met. The live-model track is only partly measured (provider quota, see
+below). The audio track found two real defects; they are reported, not fixed (see Known
+limitations).
 
 **Objective:** Labelled scenario dataset, transcript runner, DB assertions, audio fixtures, fault
 injection and regression reports.
@@ -389,18 +392,91 @@ injection and regression reports.
 **Dependencies:** Phase 3 (audio mode needs Phase 4; recovery and fault scenarios need Phase 5).
 
 **Tasks / deliverables**
-- [ ] 30–50 labelled scenarios in `fixtures/scenarios/` covering blueprint §13.
-- [ ] Transcript-mode runner (Mode A) and audio-mode runner (Mode B) with a simulated caller.
-- [ ] Fault injection: calendar timeout, review-queue outage, disconnects, LLM (Groq)/DB failures.
-- [ ] Metrics report (all blueprint §13 metrics) via `scripts/run_evaluations.py`.
+- [x] **45 labelled transcript scenarios** (`fixtures/scenarios/transcript_scenarios.json`)
+  covering every blueprint §13 case:
+  - normal 5, urgent deadline 6 (one negative case), ambiguous date 3, missing phone 2;
+  - refusal 3, legal advice 3, calendar timeout 2, duplicate booking 2, disconnect 3;
+  - review-queue outage 2, unsupported category 2, interruption/correction 3;
+  - adversarial model 5, LLM outage 2, DB outage 2.
 
-**Acceptance criteria:** a single command runs the suite and reports the exact passing and failing
-scenarios.
+  9 are labelled critical. **9 audio scenarios** (`audio_scenarios.json`).
+- [x] Mode A runner (`app/evaluation/runner.py`) with two tracks:
+  - **system:** a scripted model (`ScenarioLLM`) plus the real tools, DB and Temporal, with faults
+    injected per scenario.
+  - **live:** the real model chain.
 
-**Required tests / evidence:** the generated report with actual numbers (targets: zero false booking
-confirmations, zero duplicate appointments, all critical escalations handled).
+  Mode B runner (`app/evaluation/audio_runner.py` and `scripts/voice_eval_worker.py`): synthesized
+  callers over LiveKit WebRTC (Piper and 6 Kokoro voices, 1.35× speed, 15 dB noise, mid-turn
+  pauses, barge-in). It measures WER (caller and agent speech), keyword recall and latency.
+- [x] Fault injection: calendar timeout after commit, reviewer channel down or flaky, caller
+  disconnects, LLM outage (mid-call / first turn), DB outage (on save / on booking), and an
+  adversarial model (false booking/acceptance claims, forbidden status, unoffered slot,
+  unjustified escalation, edit after finalize, unknown tool).
+- [x] One command: `scripts/run_evaluations.py --track system|live|audio|all`, with
+  `--only/--category/--limit/--resume`. It writes a JSON + Markdown report and a resumable progress
+  file, and exits non-zero on any FAIL/ERROR.
 
-**Blockers / decisions:** live Groq runs are subject to API rate limits and usage. **Next step:** after Phases 3–5.
+**Acceptance criteria → evidence** (`docs/evidence/phase6/`)
+- [x] *A single command runs the suite and reports the exact passing and failing scenarios*. See the
+  per-scenario PASS/FAIL/SKIPPED/ERROR tables in each report.
+- **System track** (`system_track.md`): **45/45 PASS** (two runs, the same scenario results in both; timings vary).
+  - false booking confirmations reaching the caller **0**; duplicate booking rate **0.0**; critical
+    escalation recall **1.0** (9/9);
+  - recovery success **1.0**; handoff integrity **1.0**; unexpected internal errors **0**;
+  - guard blocks 3; validation rejections 7; turn processing p50 133 ms / p95 285 ms.
+  - Field accuracy 1.0 here reflects the scripted model. It is **not** a model-quality number.
+- **Negative controls** (`tests/integration/test_evaluation_harness.py`): with the reply guard
+  disabled, A01 FAILs on the "unsupported claim reached the caller" invariant. With escalation
+  rules disabled, U03 FAILs and critical recall drops to 0.0. Wrong expectations FAIL, and a script
+  mismatch is ERROR. A green run therefore detects regressions.
+- **Live track** (Gemini → Groq chain): **1 PASS, 1 FAIL, 27 SKIPPED**. N01 passed. N02 FAILed
+  because the model never saved the caller's city (a genuine omission; there is no deterministic
+  check for jurisdiction). Every provider in the chain was then rate-limited; a resume with
+  90-second pauses also stayed rate-limited, so the free-tier daily quotas were exhausted. The
+  SKIPPED scenarios remain to be run (`--resume`); live model-quality metrics are not established
+  yet. On the 2 completed scenarios (`live_track.md`):
+  - field accuracy 0.909 (10/11); 0 false booking confirmations; 0 duplicates;
+  - turn time p50 36.6 s, inflated by provider rate-limit backoff, so not a latency measure.
+- **Audio track, speech recognition isolated** (`--audio-tts piper`,
+  `audio_stt_isolated_piper_tts.md`): 5/9 PASS.
+  - caller WER mean **0.079** (0.00–0.29); agent-speech WER **0.016**; keyword recall **0.839**;
+  - response latency p50 **1.35 s** / p95 **2.92 s**; barge-in **1/1**; 15 dB noise passed (WER 0.05).
+  - The 4 FAILs are genuine recognition errors (see limitations).
+- **Audio track, production voice config** (Kokoro TTS on the GPU): **3/9 PASS** in both
+  readiness-gated runs. The early calls match the isolated run. From call 5 (run 1) or call 4
+  (run 2) every scenario fails, including voices that pass in isolation.
+  - The VRAM trace (`vram_trace_kokoro_gpu_5_calls.txt`) shows 2.0 → 3.3 → **3.95 GB of 4 GB**
+    with a constant process count.
+  - Per-call timings (`audio_production_config_timings.txt`): Kokoro takes 0.33–0.75 s per sentence
+    in calls 1–3 and 1.9–7.1 s from call 4. Only one caller utterance per call reaches STT instead
+    of two.
+  - In one earlier run, CUDA out-of-memory errors appeared in both STT and TTS. That worker log
+    was overwritten before per-run logs were added, so only the report remains
+    (`audio_production_config_kokoro_gpu_run1.json`, AU09 timeout).
+
+**Validation (2026-10-12):** `pytest` 372 passed (81 new); ruff + format clean; strict mypy clean
+(77 files); `alembic check` no drift.
+
+**Known limitations / findings for later phases**
+- **GPU memory (defect, Phase 4 runtime):** each voice process holds about 2 GB (Whisper on
+  CUDA 12 plus Kokoro on CUDA 13). LiveKit keeps the active process plus one prewarmed spare, which
+  saturates a 4 GB GPU by the 3rd–4th consecutive call. Effects:
+  - Kokoro then slows 5–10×, so the agent's replies contain multi-second silences.
+  - Callers talk into those silences, and turns are lost or merged.
+  - In one run, CUDA ran out of memory.
+
+  With TTS off the GPU (`--audio-tts piper`), the same 9 calls show no such degradation. Options
+  for Phase 8: share one model set across jobs (thread executor), cap the onnxruntime arena, or
+  use Piper on ≤4 GB GPUs. The single-call Phase 4 tests could not reveal this.
+- **Phone numbers by voice (risk):** Whisper base.en dropped or merged digits in 3/9 calls (e.g.
+  "90080 70060" → "90,000 AD7060"). A wrong callback number could be saved. Options for Phase 8:
+  read-back confirmation of digits, a larger STT model, and digit-aware decoding.
+- A mid-turn pause stores the first fragment twice (LiveKit re-commits the user turn after an
+  interrupted reply). Names are sometimes misspelled (Rohen Dass, Ned Bansal).
+- The live track needs provider quota; quota exhaustion is SKIPPED, never PASS.
+- Kokoro's Hindi-trained voice speaking English is an accent proxy, not real accented speech.
+
+**Blockers:** none for the phase. Live-track coverage is pending provider quota.
 
 ---
 

@@ -1,0 +1,101 @@
+[
+  {
+    "id": "AU01_piper_clean",
+    "description": "Baseline: Piper (US English) caller, clean audio, normal pace.",
+    "voice": "piper",
+    "turns": [
+      "Hello, my name is Priya Sharma. My employer has withheld my salary for two months.",
+      "My phone number is 98765 43210, and I received a notice that I must respond by tomorrow."
+    ],
+    "keywords": ["Priya Sharma", "9876543210", "salary", "tomorrow"]
+  },
+  {
+    "id": "AU02_kokoro_us_female",
+    "description": "Kokoro US English female voice (af_bella), clean.",
+    "voice": "kokoro:af_bella",
+    "turns": [
+      "Hi, I'm Lakshmi Menon. My ex-husband has stopped paying the child maintenance.",
+      "My phone number is 94470 55667, and I live in Kochi."
+    ],
+    "keywords": ["Lakshmi", "maintenance", "9447055667", "Kochi"]
+  },
+  {
+    "id": "AU03_kokoro_us_male",
+    "description": "Kokoro US English male voice (am_michael), clean.",
+    "voice": "kokoro:am_michael",
+    "turns": [
+      "Hello, this is Vikram Singh. My neighbour has built a wall on my land.",
+      "My number is 99001 22334, and I would like to book a consultation."
+    ],
+    "keywords": ["Vikram Singh", "9900122334", "consultation"]
+  },
+  {
+    "id": "AU04_kokoro_british_male",
+    "description": "Kokoro British English male voice (bm_george), clean.",
+    "voice": "kokoro:bm_george",
+    "turns": [
+      "Good afternoon. My name is Daniel Brooks. My landlord has kept my deposit.",
+      "The court hearing is on the twentieth of November. My number is 98450 12346."
+    ],
+    "keywords": ["deposit", "November", "9845012346"]
+  },
+  {
+    "id": "AU05_hindi_voice_english_speech",
+    "description": "Accent stress test: Kokoro's Hindi-trained female voice (hf_alpha) speaking English. A proxy for accent variation, not a real accented speaker.",
+    "voice": "kokoro:hf_alpha",
+    "turns": [
+      "Hello, my name is Deepa Raghavan. I have a family court hearing about custody.",
+      "Please call me on 90080 70060. I am in Chennai."
+    ],
+    "keywords": ["Deepa", "custody", "9008070060", "Chennai"],
+    "max_caller_wer": 0.35
+  },
+  {
+    "id": "AU06_fast_speech",
+    "description": "Fast talker: Kokoro af_heart at 1.35x speed.",
+    "voice": "kokoro:af_heart",
+    "speed": 1.35,
+    "turns": [
+      "Hi, I'm Neha Bansal. An online store took my money and never delivered the sofa.",
+      "My phone is 98111 00999 and I am in Gurugram."
+    ],
+    "keywords": ["Neha", "sofa", "9811100999"],
+    "max_caller_wer": 0.3
+  },
+  {
+    "id": "AU07_noisy_line",
+    "description": "Noisy line: Kokoro am_adam with white noise at 15 dB SNR.",
+    "voice": "kokoro:am_adam",
+    "snr_db": 15,
+    "turns": [
+      "Hello, my name is Imran Sheikh. My landlord told me to leave the flat by tomorrow.",
+      "My number is 97000 12345."
+    ],
+    "keywords": ["Imran", "landlord", "tomorrow", "9700012345"],
+    "max_caller_wer": 0.35
+  },
+  {
+    "id": "AU08_mid_sentence_pause",
+    "description": "Long pause (1.4 s) in the middle of each turn, as callers do when reading a document: the turn may be split, but nothing may be lost.",
+    "voice": "kokoro:bf_emma",
+    "pause_s": 1.4,
+    "turns": [
+      "My name is Rohan Das. | The bank has sent me a court summons.",
+      "Let me check the paper. | It says the hearing is on the twentieth of November."
+    ],
+    "keywords": ["Rohan Das", "summons", "November"],
+    "max_caller_wer": 0.3
+  },
+  {
+    "id": "AU09_barge_in",
+    "description": "Barge-in: the caller talks over the agent's first reply with a phone number; the reply must be marked interrupted and the interruption transcribed and answered.",
+    "voice": "kokoro:am_michael",
+    "turns": [
+      "Hello, my name is Farhan Ali. A shop refuses to refund a faulty laptop."
+    ],
+    "barge_in": true,
+    "interruption": "Sorry to interrupt. My phone number is 90000 11122.",
+    "keywords": ["Farhan", "laptop", "9000011122"],
+    "max_caller_wer": 0.3
+  }
+]

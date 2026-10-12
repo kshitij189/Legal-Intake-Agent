@@ -6,6 +6,7 @@ starts requested workflows using their deterministic `workflow_id`; starting one
 """
 
 import uuid
+from collections.abc import Collection
 from datetime import datetime
 
 from sqlalchemy import select
@@ -59,14 +60,18 @@ def request_workflow(
     )
 
 
-def claim_requested(session: Session, *, limit: int = 20) -> list[WorkflowExecution]:
-    """System dispatcher only (all tenants). Rows stay locked until the caller's commit, and
-    concurrent dispatchers skip them."""
+def claim_requested(
+    session: Session, *, limit: int = 20, firm_ids: Collection[uuid.UUID] | None = None
+) -> list[WorkflowExecution]:
+    """System dispatcher only (all tenants, unless `firm_ids` narrows it, e.g. for
+    evaluations). Rows stay locked until the caller's commit, and concurrent dispatchers
+    skip them."""
+    stmt = select(WorkflowExecution).where(WorkflowExecution.status == WorkflowStatus.REQUESTED)
+    if firm_ids is not None:
+        stmt = stmt.where(WorkflowExecution.firm_id.in_(list(firm_ids)))
     return list(
         session.scalars(
-            select(WorkflowExecution)
-            .where(WorkflowExecution.status == WorkflowStatus.REQUESTED)
-            .order_by(WorkflowExecution.created_at)
+            stmt.order_by(WorkflowExecution.created_at)
             .limit(limit)
             .with_for_update(skip_locked=True)
         )

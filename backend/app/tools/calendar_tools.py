@@ -118,6 +118,8 @@ def _book_via_workflow(
     """Durable booking (Temporal). Returns None only if Temporal itself is unreachable, in which
     case the caller books directly - same idempotency key, same verification."""
     settings = get_settings()
+    if ctx.booking_task_queue:
+        settings = settings.model_copy(update={"temporal_task_queue": ctx.booking_task_queue})
     request = BookingInput(
         firm_id=str(ctx.firm_id),
         intake_id=str(intake_id),

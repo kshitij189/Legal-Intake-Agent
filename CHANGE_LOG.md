@@ -492,3 +492,90 @@ a turn 13.8 s, and the browser run failed to transcribe. `VOICE_IDLE_PROCESSES=1
 dashboard signal yet, dev-server Temporal, direct-booking fallback when Temporal is unreachable).
 
 **Next:** Phase 6 — Evaluation harness (awaiting authorization).
+
+---
+
+## 2026-10-12 — Phase 6: evaluation harness
+
+**Added**
+- `app/evaluation/` modules:
+  - `scenario.py`: strict scenario schema; the system track requires a script, workflow faults
+    are system-only, ids are unique.
+  - `scripted_llm.py`: `ScenarioLLM` with `{{today±N}}` / `{{offered_slot:N}}` placeholders;
+    outage steps; running out of script steps raises `ScriptExhausted`.
+  - `checks.py`: observation plus expectations, and three invariants checked on every scenario.
+  - `metrics.py`: blueprint §13 metrics and `--resume` round trip.
+  - `report.py`: JSON + Markdown.
+  - `runner.py`: Mode A, with a fresh `eval-<run_id>` firm, an `EvalTemporal` worker on its own
+    task queue with per-scenario faults, a DB-outage registry and DB read-back.
+  - `audio.py`: audio schema, WER with digit-run normalization, noise and pauses.
+  - `audio_runner.py`: Mode B over LiveKit WebRTC.
+- `scripts/run_evaluations.py` (one command, all tracks) and `scripts/voice_eval_worker.py`
+  (fixed acknowledgement model, or `VOICE_EVAL_LLM=live`).
+- `fixtures/scenarios/transcript_scenarios.json` (45) and `audio_scenarios.json` (9).
+- Small hooks for evaluation, with no behaviour change by default:
+  - `ToolContext.booking_task_queue`;
+  - `IntakeConversation.registry` / `booking_task_queue`;
+  - `claim_requested` / `dispatch_pending(firm_ids=...)`.
+- Tests: `test_evaluation.py` (unit), `test_evaluation_audio.py` (unit) and
+  `test_evaluation_harness.py` (integration: every non-Temporal system scenario plus 4 negative
+  controls). `reports/` is git-ignored; curated evidence is in `docs/evidence/phase6/`.
+
+**Decisions**
+- Three tracks:
+  - **system:** a scripted model with real tools, DB and Temporal. It proves guarantees, is free and
+    deterministic.
+  - **live:** the real model chain. It measures model quality; a provider outage is `SKIPPED`,
+    never `PASS`.
+  - **audio:** real WebRTC speech.
+
+  Model-quality metrics are only meaningful on the live track; the reports say so.
+- Unsupported claims are re-checked against the **final** DB state after the call, independently
+  of the in-call guard. A disabled guard therefore still fails the scenario (negative control).
+- The harness dispatches only its own firm's outbox rows to its own task queue. The regular Temporal
+  worker must not run during evaluations.
+
+**Problems found and fixed (harness)**
+- `wait_for_handoff` waited on every handoff of the firm. It now waits only on the escalations of
+  the scenario's own intake. `observe` also looks up BOOKING executions by intake id.
+- B02 needed one more scripted step: "summons" triggers the omission nudge. Scripts must account
+  for every nudge and guard call.
+- Audio: agent-speech WER compared interrupted replies with their full text. It now uses the spoken
+  prefix.
+- Audio: the worker log path was shared across runs, and one run's out-of-memory log was
+  overwritten. Logs are now per run.
+
+**Findings (reported, not fixed)**
+- **GPU memory on 4 GB (Phase 4 runtime):** the voice process uses about 2 GB, and LiveKit keeps
+  the active process plus one spare.
+  - VRAM went 2.0 → 3.3 → 3.95 GB of 4 GB over consecutive calls.
+  - In the timed run, from call 4, Kokoro took 1.9–7.1 s per sentence (it took 0.33–0.75 s in calls
+    1–3) and one caller utterance per call was lost. The production config scored 3/9 PASS in both
+    readiness-gated runs; failures started at call 4 or 5.
+  - One run also hit CUDA out-of-memory in STT and TTS.
+  - With TTS on CPU (Piper), the same 9 calls do not degrade.
+  - First hypothesis (prewarm overlapping the call) was tested with a readiness gate: it did not
+    change the outcome, so it was rejected as the main cause. The gate is kept to isolate
+    variables.
+- **Phone numbers by voice:** Whisper base.en dropped or merged digits in 3/9 calls.
+- **Pause duplication:** after a mid-turn pause the first fragment is stored twice.
+- **Live model:** N02 did not save the caller's city.
+
+**Tests and validations executed (actual)**
+- System track: 45/45 PASS in two runs, the same scenario results. Metrics:
+  - false booking confirmations 0; duplicate booking rate 0.0; critical recall 1.0;
+  - recovery 1.0; handoff integrity 1.0; guard blocks 3; validation rejections 7;
+  - turn p50 133 ms / p95 285 ms.
+
+  The calendar fault was confirmed firing in C01 (attempt 1 committed → simulated timeout →
+  state check → 1 appointment).
+- Live track (Gemini → Groq): 1 PASS (N01), 1 FAIL (N02), 27 SKIPPED. Every provider was
+  rate-limited after N02, and a resume with 90 s pauses stayed rate-limited (daily quotas).
+- Audio, speech recognition isolated (`--audio-tts piper`): 5/9 PASS.
+  - caller WER 0.079; agent-speech WER 0.016; keyword recall 0.839;
+  - latency p50 1.35 s / p95 2.92 s; barge-in 1/1.
+- Audio, production config: 3/9 PASS (two gated runs). A back-to-back run (no gate): 3/9 PASS.
+- `pytest` 372 passed; ruff check + format clean; strict mypy clean (77 files); `alembic check` no
+  drift.
+
+**Next:** Phase 7 — Human-review dashboard (awaiting authorization).

@@ -1,0 +1,526 @@
+{
+  "meta": {
+    "run_id": "20261011T213616Z",
+    "tracks": "audio",
+    "llm_providers": "scripted (system)",
+    "scenario_file": "fixtures\\scenarios\\transcript_scenarios.json",
+    "progress_file": "C:\\Users\\rog\\Downloads\\Legal_Intake_agent\\reports\\eval\\eval-20261011T213616Z.jsonl",
+    "eval_firm_id": "a05d9d56-1972-4b3f-8304-df5efc57c739",
+    "audio_worker_tts": "configured (auto)",
+    "audio_back_to_back": false
+  },
+  "metrics": {
+    "audio": {
+      "scenarios": {
+        "PASS": 3,
+        "FAIL": 6,
+        "ERROR": 0
+      },
+      "caller_wer_mean": 0.41,
+      "caller_wer_by_scenario": {
+        "AU01_piper_clean": 0.0,
+        "AU02_kokoro_us_female": 0.043,
+        "AU03_kokoro_us_male": 0.038,
+        "AU04_kokoro_british_male": 0.538,
+        "AU05_hindi_voice_english_speech": 0.652,
+        "AU06_fast_speech": 0.708,
+        "AU07_noisy_line": 0.8,
+        "AU08_mid_sentence_pause": 0.5,
+        "AU09_barge_in": 0.409
+      },
+      "agent_speech_wer_mean": 0.34,
+      "keyword_recall": 0.581,
+      "response_latency_s_p50": 1.77,
+      "response_latency_s_p95": 5.32,
+      "barge_in_handled": "1/1"
+    }
+  },
+  "results": [
+    {
+      "scenario_id": "AU01_piper_clean",
+      "category": "audio",
+      "track": "audio",
+      "status": "PASS",
+      "problems": [],
+      "observation": null,
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 66.9,
+      "note": null,
+      "details": {
+        "voice": "piper",
+        "speed": 1.0,
+        "snr_db": null,
+        "pause_s": 0.0,
+        "reference": "Hello, my name is Priya Sharma. My employer has withheld my salary for two months. My phone number is 98765 43210, and I received a notice that I must respond by tomorrow.",
+        "caller_transcript": "Hello, my name is Priya Sharma. My employer has withheld my salary for two months. My phone number is 98,765,43,210, and I received a notice that I must respond by tomorrow.",
+        "caller_wer": 0.0,
+        "keywords_total": 4,
+        "keywords_heard": 4,
+        "response_latency_s": [
+          1.85,
+          1.64
+        ],
+        "stored_turns": [
+          [
+            "AGENT",
+            "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+            false
+          ],
+          [
+            "CALLER",
+            "Hello, my name is Priya Sharma. My employer has withheld my salary for two months.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ],
+          [
+            "CALLER",
+            "My phone number is 98,765,43,210, and I received a notice that I must respond by tomorrow.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ]
+        ],
+        "agent_wer": 0.02
+      }
+    },
+    {
+      "scenario_id": "AU02_kokoro_us_female",
+      "category": "audio",
+      "track": "audio",
+      "status": "PASS",
+      "problems": [],
+      "observation": null,
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 63.5,
+      "note": null,
+      "details": {
+        "voice": "kokoro:af_bella",
+        "speed": 1.0,
+        "snr_db": null,
+        "pause_s": 0.0,
+        "reference": "Hi, I'm Lakshmi Menon. My ex-husband has stopped paying the child maintenance. My phone number is 94470 55667, and I live in Kochi.",
+        "caller_transcript": "Hi, I'm Lakshmi Manon. My ex-husband has stopped paying the child maintenance. My phone number is 94,470,55,667. And I live in Kochi.",
+        "caller_wer": 0.043,
+        "keywords_total": 4,
+        "keywords_heard": 4,
+        "response_latency_s": [
+          1.56,
+          1.65
+        ],
+        "stored_turns": [
+          [
+            "AGENT",
+            "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+            false
+          ],
+          [
+            "CALLER",
+            "Hi, I'm Lakshmi Manon. My ex-husband has stopped paying the child maintenance.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ],
+          [
+            "CALLER",
+            "My phone number is 94,470,55,667. And I live in Kochi.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ]
+        ],
+        "agent_wer": 0.02
+      }
+    },
+    {
+      "scenario_id": "AU03_kokoro_us_male",
+      "category": "audio",
+      "track": "audio",
+      "status": "PASS",
+      "problems": [],
+      "observation": null,
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 63.4,
+      "note": null,
+      "details": {
+        "voice": "kokoro:am_michael",
+        "speed": 1.0,
+        "snr_db": null,
+        "pause_s": 0.0,
+        "reference": "Hello, this is Vikram Singh. My neighbour has built a wall on my land. My number is 99001 22334, and I would like to book a consultation.",
+        "caller_transcript": "Hello, this is Vikram Singh. My neighbor has built a wall on my land. My number is 99,001, 22,334. And I would like to book a consultation.",
+        "caller_wer": 0.038,
+        "keywords_total": 3,
+        "keywords_heard": 3,
+        "response_latency_s": [
+          1.77,
+          1.88
+        ],
+        "stored_turns": [
+          [
+            "AGENT",
+            "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+            false
+          ],
+          [
+            "CALLER",
+            "Hello, this is Vikram Singh. My neighbor has built a wall on my land.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ],
+          [
+            "CALLER",
+            "My number is 99,001, 22,334. And I would like to book a consultation.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ]
+        ],
+        "agent_wer": 0.02
+      }
+    },
+    {
+      "scenario_id": "AU04_kokoro_british_male",
+      "category": "audio",
+      "track": "audio",
+      "status": "FAIL",
+      "problems": [
+        "caller WER 0.538 > 0.2",
+        "keywords not recognized: ['deposit']",
+        "response latency above 5.0s: [5.19892609998351]"
+      ],
+      "observation": null,
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 56.6,
+      "note": null,
+      "details": {
+        "voice": "kokoro:bm_george",
+        "speed": 1.0,
+        "snr_db": null,
+        "pause_s": 0.0,
+        "reference": "Good afternoon. My name is Daniel Brooks. My landlord has kept my deposit. The court hearing is on the twentieth of November. My number is 98450 12346.",
+        "caller_transcript": "The court hearing is on the 20th of November. My number is 98,450 12,346.",
+        "caller_wer": 0.538,
+        "keywords_total": 3,
+        "keywords_heard": 2,
+        "response_latency_s": [
+          0.0,
+          5.2
+        ],
+        "stored_turns": [
+          [
+            "AGENT",
+            "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+            false
+          ],
+          [
+            "CALLER",
+            "The court hearing is on the 20th of November. My number is 98,450 12,346.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ]
+        ],
+        "agent_wer": 0.575
+      }
+    },
+    {
+      "scenario_id": "AU05_hindi_voice_english_speech",
+      "category": "audio",
+      "track": "audio",
+      "status": "FAIL",
+      "problems": [
+        "caller WER 0.652 > 0.35",
+        "keywords not recognized: ['Deepa', 'custody', '9008070060']"
+      ],
+      "observation": null,
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 52.1,
+      "note": null,
+      "details": {
+        "voice": "kokoro:hf_alpha",
+        "speed": 1.0,
+        "snr_db": null,
+        "pause_s": 0.0,
+        "reference": "Hello, my name is Deepa Raghavan. I have a family court hearing about custody. Please call me on 90080 70060. I am in Chennai.",
+        "caller_transcript": "Please call me on 90,080,7060. I am in Chennai.",
+        "caller_wer": 0.652,
+        "keywords_total": 4,
+        "keywords_heard": 1,
+        "response_latency_s": [
+          0.04,
+          4.34
+        ],
+        "stored_turns": [
+          [
+            "AGENT",
+            "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+            false
+          ],
+          [
+            "CALLER",
+            "Please call me on 90,080,7060. I am in Chennai.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ]
+        ],
+        "agent_wer": 0.549
+      }
+    },
+    {
+      "scenario_id": "AU06_fast_speech",
+      "category": "audio",
+      "track": "audio",
+      "status": "FAIL",
+      "problems": [
+        "caller WER 0.708 > 0.3",
+        "keywords not recognized: ['Neha', 'sofa', '9811100999']"
+      ],
+      "observation": null,
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 53.0,
+      "note": null,
+      "details": {
+        "voice": "kokoro:af_heart",
+        "speed": 1.35,
+        "snr_db": null,
+        "pause_s": 0.0,
+        "reference": "Hi, I'm Neha Bansal. An online store took my money and never delivered the sofa. My phone is 98111 00999 and I am in Gurugram.",
+        "caller_transcript": "My phone is 98111 0099 and I am in Georogram.",
+        "caller_wer": 0.708,
+        "keywords_total": 3,
+        "keywords_heard": 0,
+        "response_latency_s": [
+          0.0,
+          4.24
+        ],
+        "stored_turns": [
+          [
+            "AGENT",
+            "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+            false
+          ],
+          [
+            "CALLER",
+            "My phone is 98111 0099 and I am in Georogram.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ]
+        ],
+        "agent_wer": 0.464
+      }
+    },
+    {
+      "scenario_id": "AU07_noisy_line",
+      "category": "audio",
+      "track": "audio",
+      "status": "FAIL",
+      "problems": [
+        "caller WER 0.8 > 0.35",
+        "keywords not recognized: ['Imran', 'landlord', 'tomorrow']",
+        "response latency above 5.0s: [5.322797000000719]"
+      ],
+      "observation": null,
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 52.8,
+      "note": null,
+      "details": {
+        "voice": "kokoro:am_adam",
+        "speed": 1.0,
+        "snr_db": 15.0,
+        "pause_s": 0.0,
+        "reference": "Hello, my name is Imran Sheikh. My landlord told me to leave the flat by tomorrow. My number is 97000 12345.",
+        "caller_transcript": "My number is 97,000, 12,345.",
+        "caller_wer": 0.8,
+        "keywords_total": 4,
+        "keywords_heard": 1,
+        "response_latency_s": [
+          0.04,
+          5.32
+        ],
+        "stored_turns": [
+          [
+            "AGENT",
+            "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+            false
+          ],
+          [
+            "CALLER",
+            "My number is 97,000, 12,345.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ]
+        ],
+        "agent_wer": 0.484
+      }
+    },
+    {
+      "scenario_id": "AU08_mid_sentence_pause",
+      "category": "audio",
+      "track": "audio",
+      "status": "FAIL",
+      "problems": [
+        "caller WER 0.5 > 0.3",
+        "keywords not recognized: ['Rohan Das', 'summons']",
+        "response latency above 5.0s: [10.903075800044462]"
+      ],
+      "observation": null,
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 69.6,
+      "note": null,
+      "details": {
+        "voice": "kokoro:bf_emma",
+        "speed": 1.0,
+        "snr_db": null,
+        "pause_s": 1.4,
+        "reference": "My name is Rohan Das. The bank has sent me a court summons. Let me check the paper. It says the hearing is on the twentieth of November.",
+        "caller_transcript": "Let me check the paper. It says the hearing is on the 20th of November.",
+        "caller_wer": 0.5,
+        "keywords_total": 3,
+        "keywords_heard": 1,
+        "response_latency_s": [
+          0.0,
+          10.9
+        ],
+        "stored_turns": [
+          [
+            "AGENT",
+            "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+            false
+          ],
+          [
+            "CALLER",
+            "Let me check the paper.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ],
+          [
+            "CALLER",
+            "It says the hearing is on the 20th of November.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ]
+        ],
+        "agent_wer": 0.555
+      }
+    },
+    {
+      "scenario_id": "AU09_barge_in",
+      "category": "audio",
+      "track": "audio",
+      "status": "FAIL",
+      "problems": [
+        "caller WER 0.409 > 0.3",
+        "keywords not recognized: ['Farhan']"
+      ],
+      "observation": null,
+      "critical": false,
+      "field_checks": 0,
+      "field_failures": 0,
+      "duration_s": 60.6,
+      "note": null,
+      "details": {
+        "voice": "kokoro:am_michael",
+        "speed": 1.0,
+        "snr_db": null,
+        "pause_s": 0.0,
+        "reference": "Hello, my name is Farhan Ali. A shop refuses to refund a faulty laptop. Sorry to interrupt. My phone number is 90000 11122.",
+        "caller_transcript": "It uses to refund a faulty laptop. Sorry to interrupt. My phone number is 90,000 11,122.",
+        "caller_wer": 0.409,
+        "keywords_total": 3,
+        "keywords_heard": 2,
+        "response_latency_s": [
+          4.49,
+          4.45
+        ],
+        "stored_turns": [
+          [
+            "AGENT",
+            "Hello, thank you for contacting Northstar Legal. I'm the firm's virtual intake assistant. I can collect some initial information and help arrange a callback or consultation, but I can't give legal advice. This conversation is transcribed so the firm's team can review your enquiry. May I ask you a few questions?",
+            false
+          ],
+          [
+            "CALLER",
+            "It uses to refund a faulty laptop.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            true
+          ],
+          [
+            "CALLER",
+            "Sorry to interrupt. My phone number is 90,000 11,122.",
+            false
+          ],
+          [
+            "AGENT",
+            "Thank you, I have noted that for the firm's team. They will review everything you have told me before anyone contacts you. Please go on whenever you are ready.",
+            false
+          ]
+        ],
+        "barge_in_handled": true,
+        "agent_wer": 0.372
+      }
+    }
+  ]
+}

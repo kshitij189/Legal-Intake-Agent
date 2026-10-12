@@ -7,7 +7,7 @@ import json
 import logging
 import time
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -38,7 +38,7 @@ from app.models.enums import (
 )
 from app.tools.context import ToolContext
 from app.tools.escalation_tools import unable_escalation_key
-from app.tools.executor import ToolExecutor
+from app.tools.executor import ToolExecutor, ToolSpec
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +89,9 @@ class IntakeConversation:
     max_tool_rounds: int = MAX_TOOL_ROUNDS
     # None = follow settings.booking_via_workflow (tests pass False for the direct path).
     durable_booking: bool | None = None
+    # Overrides for evaluations: the tool set (e.g. one tool made to fail) and the booking queue.
+    registry: Mapping[str, ToolSpec] | None = None
+    booking_task_queue: str | None = None
 
     call_session_id: uuid.UUID | None = field(default=None, init=False)
     ended: bool = field(default=False, init=False)
@@ -128,13 +131,14 @@ class IntakeConversation:
             call_session_id=call.id,
             actor=self.actor,
             clock=self.clock,
+            booking_task_queue=self.booking_task_queue,
             durable_booking=(
                 get_settings().booking_via_workflow
                 if self.durable_booking is None
                 else self.durable_booking
             ),
         )
-        self._executor = ToolExecutor(self.sessions, ctx, REGISTRY)
+        self._executor = ToolExecutor(self.sessions, ctx, self.registry or REGISTRY)
         self._tools = tool_definitions(config)
         self._messages = [
             {"role": "system", "content": system},

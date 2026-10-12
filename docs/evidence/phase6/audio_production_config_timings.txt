@@ -1,0 +1,132 @@
+# Production voice config (Kokoro TTS on GPU), 9 consecutive calls - per-call STT/TTS timings
+# source: reports/eval/voice_eval_worker-20261011T213706Z.log (run 20261011T213616Z)
+   15:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+--- call 1
+   39:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=439
+   49:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=482
+   57:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=681
+   62:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=456
+   73:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=366
+   77:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+   183:INFO:app.voice.stt:stt_transcribed stt_ms=521 audio_ms=6516
+   193:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=449
+   201:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=410
+   205:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=346
+   287:INFO:app.voice.stt:stt_transcribed stt_ms=413 audio_ms=10772
+   297:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=335
+   305:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=387
+   309:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=360
+--- call 2
+   365:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=634
+   373:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=464
+   381:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=682
+   386:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=609
+   397:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=435
+   401:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+   507:INFO:app.voice.stt:stt_transcribed stt_ms=322 audio_ms=5972
+   517:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=327
+   525:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=395
+   529:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=324
+   603:INFO:app.voice.stt:stt_transcribed stt_ms=403 audio_ms=8820
+   617:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=334
+   621:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=388
+   629:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=333
+--- call 3
+   681:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=578
+   689:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=525
+   698:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=670
+   702:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=679
+   713:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=750
+   721:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+   829:INFO:app.voice.stt:stt_transcribed stt_ms=700 audio_ms=5332
+   839:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=343
+   847:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=542
+   851:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=383
+   925:INFO:app.voice.stt:stt_transcribed stt_ms=688 audio_ms=8756
+   939:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=373
+   943:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=393
+   951:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=368
+--- call 4
+   1013:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2888
+   1030:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2328
+   1054:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=5722
+   1085:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+   1093:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=5295
+   1105:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=1901
+   1179:INFO:app.voice.stt:stt_transcribed stt_ms=830 audio_ms=10132
+   1201:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2361
+   1221:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3285
+   1233:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=1997
+--- call 5
+   1277:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2728
+   1294:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2442
+   1318:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=5781
+   1345:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+   1357:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=5021
+   1369:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=1958
+   1431:INFO:app.voice.stt:stt_transcribed stt_ms=1149 audio_ms=6324
+   1449:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2339
+   1465:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3276
+   1477:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2048
+--- call 6
+   1525:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2851
+   1542:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2335
+   1581:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=7126
+   1589:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+   1605:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=4604
+   1617:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=1910
+   1675:INFO:app.voice.stt:stt_transcribed stt_ms=941 audio_ms=5044
+   1697:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2355
+   1713:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3340
+   1727:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2157
+--- call 7
+   1779:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2738
+   1796:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2350
+   1831:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=6568
+   1839:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+   1859:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=4773
+   1871:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=1940
+   1929:INFO:app.voice.stt:stt_transcribed stt_ms=1115 audio_ms=5108
+   1951:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2550
+   1971:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3476
+   1983:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2086
+--- call 8
+   2037:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3213
+   2047:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2049:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2057:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2521
+   2067:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2069:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2106:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2108:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2118:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2122:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2124:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=13523
+   2126:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2128:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2189:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+   2195:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=5338
+   2215:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2261
+   2235:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2243:WARNING:livekit.plugins.silero:VAD inference is slower than realtime
+   2275:INFO:app.voice.stt:stt_transcribed stt_ms=1233 audio_ms=2420
+   2311:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3363
+   2313:INFO:app.voice.stt:stt_transcribed stt_ms=3436 audio_ms=3540
+   2349:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=5235
+   2369:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3360
+   2381:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2071
+--- call 9
+   2433:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3054
+   2445:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2312
+   2474:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=5935
+   2505:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=4793
+   2513:INFO:app.voice.session_manager:voice_models_ready stt=base.en/cuda/float16 tts=kokoro-v1.0:af_heart
+   2525:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3061
+   2567:INFO:app.voice.stt:stt_transcribed stt_ms=964 audio_ms=2996
+   2589:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2516
+   2599:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=4319
+   2627:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2085
+   2641:INFO:app.voice.stt:stt_transcribed stt_ms=1091 audio_ms=7060
+   2663:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2355
+   2679:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=3386
+   2691:INFO:app.voice.tts_kokoro:tts_synthesized tts_ms=2037

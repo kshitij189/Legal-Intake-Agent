@@ -3,6 +3,8 @@
 import asyncio
 import contextlib
 import logging
+import uuid
+from collections.abc import Collection
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
@@ -67,12 +69,13 @@ def dispatch_pending(
     client: Client,
     loop: asyncio.AbstractEventLoop,
     task_queue: str,
+    firm_ids: Collection[uuid.UUID] | None = None,
 ) -> int:
     """Start REQUESTED workflows (runs in a thread). A start that was already done - e.g. the
     commit below was lost after a crash - is recognised by Temporal and simply marked STARTED."""
     started = 0
     with sessions() as session, session.begin():
-        for execution in workflow_service.claim_requested(session):
+        for execution in workflow_service.claim_requested(session, firm_ids=firm_ids):
             future = asyncio.run_coroutine_threadsafe(
                 start_requested(client, execution, task_queue), loop
             )

@@ -23,6 +23,8 @@ class ToolContext:
     offered_slot_ids: set[uuid.UUID] = field(default_factory=set)
     # Book through the durable Temporal workflow (set from settings by the conversation).
     durable_booking: bool = False
+    # Temporal task queue for durable booking; None = settings (evaluations use their own queue).
+    booking_task_queue: str | None = None
     clock: Callable[[], datetime] = _utc_now
 
 

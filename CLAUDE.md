@@ -294,6 +294,16 @@ copy .env.example .env   # then edit values
 .\.venv\Scripts\python scripts/temporal_worker.py              # workflows + activities + outbox dispatcher
 .\.venv\Scripts\python -u scripts/workflow_restart_test.py --report <f>   # kill/restart + outage test (~4 min)
 
+# evaluation harness (Phase 6) - needs postgres + temporal (system), + livekit (audio); stop
+# scripts/temporal_worker.py first (the harness runs its own worker on its own task queue)
+.\.venv\Scripts\python -u scripts/run_evaluations.py --track system   # scripted model + faults (~1 min, free)
+.\.venv\Scripts\python -u scripts/run_evaluations.py --track live     # real model chain; quota hit -> SKIPPED
+.\.venv\Scripts\python -u scripts/run_evaluations.py --track audio    # WebRTC speech (~12 min, GPU)
+.\.venv\Scripts\python -u scripts/run_evaluations.py --track all      # everything; reports -> reports/eval/
+#   --only ID[,ID] --category C --limit N --resume <progress.jsonl> --pause S -v
+#   audio: --audio-tts piper (TTS off the GPU: isolates STT; see Phase 6 GPU-memory finding)
+#          --audio-back-to-back (no readiness gate between calls)
+
 # checks (run pytest from backend/ so its pyproject settings apply)
 cd backend; ..\.venv\Scripts\python -m pytest; cd ..
 .\.venv\Scripts\ruff check backend scripts
@@ -408,8 +418,27 @@ Notes:
 - The blueprint's `agent/claude_client.py` is `agent/llm_client.py` (neutral types + fallback)
   with `agent/llm_gemini.py` and `agent/llm_groq.py` adapters.
 
-Commands for later phases (voice worker, Temporal worker, frontend, evaluations) are added here when
-those phases are implemented.
+### Evaluation harness (Phase 6)
+- `fixtures/scenarios/transcript_scenarios.json` (45 labelled scenarios, strict schema in
+  `app/evaluation/scenario.py`) and `audio_scenarios.json` (9). Each transcript scenario has caller
+  turns, expectations and the tracks it runs on. System-track scenarios also script the model:
+  `say` / `tools` / `outage` steps, with `{{today+N}}` and `{{offered_slot:N}}` placeholders.
+- Scripts must account for every model call the safety layer makes: an omission nudge or a guard
+  block each consume one more scripted step. Running out of steps is reported as `ERROR`, never
+  `PASS`.
+- **system** track: `ScenarioLLM` plus real tools, DB and Temporal (its own task queue, faults
+  injected per scenario, only the evaluation firm's outbox dispatched). It proves the system
+  guarantees. **live** track: the configured model chain; it measures model quality. A provider
+  outage there is `SKIPPED`. **audio** track: `scripts/voice_eval_worker.py` (fixed
+  acknowledgement model, or `VOICE_EVAL_LLM=live`), synthesized callers, WER and latency.
+- Every run uses a fresh firm `eval-<run_id>`, so the demo firm's data is untouched. Generated
+  reports go to `reports/` (git-ignored); curated evidence goes to `docs/evidence/phase6/`.
+- Invariants are checked on every scenario: no `VERIFIED_BY_SYSTEM` field, at most one booked
+  appointment, and no unsupported claim reaching the caller (re-checked against final DB state).
+- `tests/integration/test_evaluation_harness.py` runs every non-Temporal system scenario plus
+  negative controls (disabled guard, disabled rules, wrong expectations) that must FAIL.
+
+Commands for later phases (frontend) are added here when those phases are implemented.
 
 ## 13. Testing and evaluation requirements
 
