@@ -1,0 +1,1104 @@
+{
+  "meta": {
+    "run_id": "20261013T080709Z-2a54b5",
+    "tracks": "live",
+    "llm_providers": "groq:openai/gpt-oss-120b",
+    "scenario_file": "fixtures\\scenarios\\transcript_scenarios.json",
+    "progress_file": "reports\\compare\\groq\\eval-20261013T080709Z-2a54b5.jsonl",
+    "eval_firm_id": "a39dff5f-175c-45fd-8b97-9d4a87d1bf55"
+  },
+  "metrics": {
+    "live": {
+      "scenarios": {
+        "PASS": 2,
+        "FAIL": 1,
+        "SKIPPED": 12,
+        "ERROR": 0
+      },
+      "field_extraction_accuracy": 0.947,
+      "critical_escalation_recall": 1.0,
+      "false_booking_confirmations_reaching_caller": 0,
+      "unsupported_claims_blocked_by_guard": 0,
+      "duplicate_booking_rate": 0.0,
+      "tool_calls": 30,
+      "tool_calls_rejected_by_validation": 0,
+      "tool_internal_errors_unexpected": 0,
+      "recovery_success": null,
+      "handoff_integrity": null,
+      "omission_nudges": 2,
+      "turn_processing_ms_p50": 54775,
+      "turn_processing_ms_p95": 97203,
+      "conversation_signals": {
+        "replies": 13,
+        "mean_words_per_reply": 43.8,
+        "replies_with_multiple_questions": 1,
+        "replies_with_markdown": 2,
+        "replies_exposing_internal_ids": 0,
+        "consecutive_repeated_replies": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "scenario_id": "N01_employment_booking",
+      "category": "normal_enquiry",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1317",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9820011223",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Ananya Kulkarni",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mumbai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer terminated me without paying my final month's salary or notice pay.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Your details have been recorded. Would you like\u202f?\u202f\n\n- A\u202fconsultation\u202fwith one of our lawyers?\u202f\n\n-\u00a0\u00a0\u2026\u00a0\u00a0?\u00a0?\u00a0\n\n\n\nWe\u00a0\u00a0...\u00a0\u00a0\n\n\n\n...\u00a0\n\n\n\n...\n\n\n\n\u200b\n\n\n\nWe\u00a0\n\n\n\n\u00a0\n\n\n\n...\n\n\n\nWe\u00a0\n\n\n\n...\n\n\n\n\u200b\n\n\n\n\u200b\n\n\n\nWe\u00a0\n\n\n\n...\n\n\n\n...\n\n\n\nWe\u00a0\n\n\n\n...\n\n\n\nThe\u00a0\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n---\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\nWe\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\nWe\n\n\n\n......\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n\u2026\n\n\n\n...\n\n\n\nWe\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\nWe\n\n\n\n...\n\n\n\n......\n\n\n\n......\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\nSorry\u2026\u00a0\u00a0\n\n\n\n\u2026\u00a0\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n......\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\nThe\u00a0\n\n\n\n......\n\n\n\nIt looks\u00a0\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\n...\n\n\n\n\u2026\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\nWe\u2026\n\n\n\n\n\n...\n\n\n\n...\n\n\n\n\u2026\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\n\n\n\n\n...\u2026\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n... \n\nWould you like to schedule a consultation with one of our lawyers to discuss your situation?",
+          "Here are the next available consultation slots for an employment matter:\n\n1. Wednesday\u202f14\u202fOctober\u202f2026 at\u202f10:00\u202fAM\u202fIST with\u202fAarav\u202fMehta  \n2. Wednesday\u202f14\u202fOctober\u202f2026 at\u202f10:00\u202fAM\u202fIST with\u202fDaniel\u202fBrooks  \n3. Wednesday\u202f14\u202fOctober\u202f2026 at\u202f11:00\u202fAM\u202fIST with\u202fDaniel\u202fBrooks  \n\nPlease let me know which option you\u2019d like to book (for example, \u201coption\u202f1\u201d).",
+          "Your appointment with Aarav\u202fMehta on Wednesday\u202f14\u202fOctober\u202f2026 at\u202f10:00\u202fAM\u202fIST is confirmed.\n\nIs there any specific question you\u2019d like the lawyer to address during the consultation?",
+          "Your information has been recorded and your consultation is booked. If you need anything else, feel free to reach out. Have a great day!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b"
+        ],
+        "processing_ms": [
+          39124,
+          65635,
+          38433,
+          41449,
+          54775
+        ]
+      },
+      "critical": false,
+      "field_checks": 5,
+      "field_failures": 0,
+      "duration_s": 246.5,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "N02_family_email_no_booking",
+      "category": "normal_enquiry",
+      "track": "live",
+      "status": "FAIL",
+      "problems": [
+        "jurisdiction: expected to contain 'Kochi', got None"
+      ],
+      "observation": {
+        "intake_reference": "INT-1383",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "lakshmi.menon@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9447055667",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Lakshmi Menon",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Ex-husband has stopped paying the child maintenance ordered by the family court",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "What phone number can the firm reach you on?",
+          "Could you let me know the city or state where this situation is taking place?",
+          "Your information has been recorded and will be reviewed by our team. If we need any further details, we\u2019ll reach out to you via email. Thank you for contacting Northstar Legal, and have a good day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b"
+        ],
+        "processing_ms": [
+          62460,
+          62720,
+          38649
+        ]
+      },
+      "critical": false,
+      "field_checks": 6,
+      "field_failures": 1,
+      "duration_s": 167.2,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U01_respond_by_tomorrow_booking",
+      "category": "urgent_deadline",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1405",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9876543210",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Priya Sharma",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Pune, Maharashtra",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer has withheld salary for two months and sent a notice requiring a response by tomorrow",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-14",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 1,
+        "replies": [
+          "I\u2019m noting that you have an urgent deadline, so your enquiry has been flagged for the team\u2019s prompt review. Could you please share the phone number we can reach you on?",
+          "Is there a specific question you would like the lawyer to address?",
+          "We have three consultation slots available tomorrow, 14\u202fOctober\u202f2026:\n\n1. 10:00\u202fam\u202fIST with Daniel Brooks  \n2. 11:00\u202fam\u202fIST with Daniel Brooks  \n3. 11:00\u202fam\u202fIST with Aarav Mehta  \n\nPlease let me know which one you\u2019d like to book.",
+          "Your consultation is confirmed for **Wednesday\u202f14\u202fOctober\u202f2026 at 10:00\u202fam\u202fIST** with lawyer Daniel Brooks.  \n\nIs there anything else you\u2019d like to share or any other question you\u2019d like the lawyer to address before we finish?",
+          "Thank you, Priya. We have recorded your details and booked your consultation. Our team will review everything and the lawyer will be ready to speak with you at the scheduled time. Have a great day!"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ],
+          [
+            "possible_refusal"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b"
+        ],
+        "processing_ms": [
+          97203,
+          118900,
+          52181,
+          57149,
+          45926
+        ]
+      },
+      "critical": true,
+      "field_checks": 8,
+      "field_failures": 0,
+      "duration_s": 387.0,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U03_vacate_by_tomorrow",
+      "category": "urgent_deadline",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1478",
+        "intake_status": "INCOMPLETE",
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9700012345",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Imran Sheikh",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Lucknow",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord gave notice to vacate the flat by tomorrow evening or will change the locks.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "PROPERTY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-14",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          },
+          {
+            "reason": "UNABLE_TO_COMPLETE",
+            "rule_id": null,
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I\u2019ve noted the deadline you mentioned. Our team will see that this matter is flagged for prompt review.\n\nCould you please share the phone number we can reach you on?",
+          "I'm sorry, I'm having a technical problem and can't continue right now. I've saved what you've told me so far and flagged your enquiry for the firm's team to review. Nobody has reviewed it yet, so if your matter is urgent, please contact the firm directly."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b",
+          "groq:openai/gpt-oss-120b"
+        ],
+        "processing_ms": [
+          79115,
+          29476
+        ]
+      },
+      "critical": true,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 109.2,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "B01_vague_deadline_pressure_to_verify",
+      "category": "ambiguous_date",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 6,
+      "field_failures": 0,
+      "duration_s": 2.7,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "B02_vague_then_clarified",
+      "category": "ambiguous_date",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1493",
+        "intake_status": "INCOMPLETE",
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "UNABLE_TO_COMPLETE",
+            "rule_id": null,
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. I've saved what you've told me so far and flagged your enquiry for the firm's team to review. Nobody has reviewed it yet, so if your matter is urgent, please contact the firm directly."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "groq:openai/gpt-oss-120b"
+        ],
+        "processing_ms": [
+          3152
+        ]
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 3.6,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "P02_incomplete_number_then_corrected",
+      "category": "missing_phone",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 2.9,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "R01_refuses_phone_email_contact",
+      "category": "refusal",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 7,
+      "field_failures": 0,
+      "duration_s": 2.7,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "R03_refuses_matter_details",
+      "category": "refusal",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 2.6,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "L01_can_i_sue",
+      "category": "legal_advice",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 4,
+      "field_failures": 0,
+      "duration_s": 2.7,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "L02_yes_or_no_pressure",
+      "category": "legal_advice",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 2.6,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "X01_hangup_mid_intake",
+      "category": "disconnect",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 2.8,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "O01_patent_out_of_scope",
+      "category": "unsupported_category",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 3.0,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "I01_phone_correction",
+      "category": "interruption_correction",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": false,
+      "field_checks": 5,
+      "field_failures": 0,
+      "duration_s": 2.8,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    },
+    {
+      "scenario_id": "I03_deadline_corrected_to_urgent",
+      "category": "interruption_correction",
+      "track": "live",
+      "status": "SKIPPED",
+      "problems": [],
+      "observation": {
+        "intake_reference": null,
+        "intake_status": null,
+        "session_status": "FAILED",
+        "session_end_reason": "llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+        "fields": {},
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I'm sorry, I'm having a technical problem and can't continue right now. Please contact the firm directly."
+        ],
+        "tool_results": [],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [],
+        "notifications": [],
+        "providers_used": [],
+        "processing_ms": []
+      },
+      "critical": true,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 2.8,
+      "note": "model provider unavailable: llm_unavailable:groq:openai/gpt-oss-120b:rate_limited",
+      "details": {}
+    }
+  ]
+}

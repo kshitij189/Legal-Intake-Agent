@@ -97,5 +97,8 @@ remain before any real use are listed at the end.
    processing agreements, region choices, or a self-hosted model.
 6. **Right to erasure** for a whole intake (beyond transcript retention) is not implemented.
    Neither are backups/restore drills or dependency vulnerability scanning in CI.
-7. **Langfuse tracing** (optional in the blueprint) is not added. Structured logs and the audit
-   trail are the observability surface.
+7. **Langfuse tracing** (added after Phase 8) is self-hosted and off by default. With
+   `LANGFUSE_CAPTURE_CONTENT=true`, traces hold caller statements and model messages, so they need
+   the same protection and retention as transcripts; that is acceptable for fictional data only.
+   The stack runs with its own secrets (`infra/langfuse/.env`), publishes only to 127.0.0.1, and
+   has Langfuse's product telemetry turned off.

@@ -19,6 +19,7 @@ import json
 import logging
 import sys
 import time
+import uuid
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -106,7 +107,8 @@ def main() -> int:
 
     settings = get_settings()
     sessions = make_session_factory(make_engine(settings.database_url))
-    run_id = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    # Unique even for runs started in the same second: each run owns (and retires) its own firm.
+    run_id = f"{datetime.now(UTC):%Y%m%dT%H%M%SZ}-{uuid.uuid4().hex[:6]}"
     tracks = ["system", "live", "audio"] if args.track == "all" else [args.track]
     progress_path = args.resume or args.report_dir / f"eval-{run_id}.jsonl"
     progress_path.parent.mkdir(parents=True, exist_ok=True)

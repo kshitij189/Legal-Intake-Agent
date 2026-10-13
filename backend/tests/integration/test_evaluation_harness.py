@@ -91,3 +91,25 @@ def test_script_mismatch_is_an_error_not_a_pass(eval_ctx: EvalContext) -> None:
     result = run_scenario(short, "system", eval_ctx)
     assert result.status == ERROR
     assert "exhausted" in (result.note or "")
+
+
+def test_runs_started_together_get_separate_firms(engine: Engine) -> None:
+    """Regression: two runs in the same second shared one firm, and the first to finish
+    retired it under the other (NotFound mid-run)."""
+    import re
+
+    from app.evaluation.runner import retire_eval_firm
+
+    source = (Path(__file__).resolve().parents[3] / "scripts" / "run_evaluations.py").read_text(
+        encoding="utf-8"
+    )
+    assert re.search(r'run_id = f"\{datetime\.now\(UTC\).*uuid\.uuid4\(\)\.hex', source)
+    sessions = make_session_factory(engine)
+    first = create_eval_firm(sessions, "20261013T073652Z-aaaaaa")
+    second = create_eval_firm(sessions, "20261013T073652Z-bbbbbb")
+    assert first != second
+    retire_eval_firm(sessions, first)
+    from app.domain.firm_config_service import get_active_firm
+
+    with sessions() as s:
+        assert get_active_firm(s, second).id == second  # unaffected

@@ -57,7 +57,12 @@ class GroqLLMClient:
             ToolCall(id=tc.id, name=tc.function.name, arguments=tc.function.arguments or "{}")
             for tc in (message.tool_calls or [])
         )
-        return LLMResponse(content=message.content, tool_calls=calls, provider=self.name)
+        return LLMResponse(
+            content=message.content,
+            tool_calls=calls,
+            provider=self.name,
+            usage=groq_usage(response),
+        )
 
     def _create(self, messages: list[dict[str, Any]], tools: Sequence[Mapping[str, Any]]) -> Any:
         for attempt in range(1, self.TOOL_USE_FAILED_ATTEMPTS + 1):
@@ -96,3 +101,14 @@ def _error_code(exc: groq.APIStatusError) -> str:
     body = exc.body if isinstance(exc.body, dict) else {}
     error = body.get("error", body)
     return str(error.get("code") or exc.status_code) if isinstance(error, dict) else "unknown"
+
+
+def groq_usage(response: Any) -> dict[str, int] | None:
+    usage = getattr(response, "usage", None)
+    if usage is None:
+        return None
+    counts = {
+        "input": getattr(usage, "prompt_tokens", None),
+        "output": getattr(usage, "completion_tokens", None),
+    }
+    return {k: int(v) for k, v in counts.items() if isinstance(v, int)} or None

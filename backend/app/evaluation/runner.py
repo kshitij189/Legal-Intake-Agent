@@ -180,6 +180,7 @@ def run_scenario(scenario: Scenario, track: Track, ctx: EvalContext) -> Scenario
             registry=failing_registry(scenario.faults.db_outage_tool)
             if scenario.faults.db_outage_tool
             else None,
+            trace_tags=("eval", track, scenario.id),
         )
         convo.start()
         replies: list[str] = []

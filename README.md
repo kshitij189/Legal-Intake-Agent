@@ -44,6 +44,7 @@ flowchart LR
     TW --> PG
     DASH[Next.js review dashboard] --> API
     API -- status_changed signal --> TW
+    CONV -. traces .-> LF[(Langfuse<br/>self-hosted, optional)]
     MIC <-- WebRTC --> LK[LiveKit server] <--> Voice
 ```
 
@@ -95,6 +96,12 @@ cd frontend; npm run start                                     # dashboard on ht
 - Review at **http://127.0.0.1:3000**: firm `northstar-legal`, e.g.
   `sana.kapoor@northstar-legal.example` (intake coordinator), password = `DEMO_STAFF_PASSWORD`.
 - No microphone? `scripts/text_chat.py` runs the same agent in the terminal.
+- **Tracing (optional):** run
+  `docker compose -f infra/langfuse/docker-compose.yml --env-file infra/langfuse/.env up -d`
+  (copy `infra/langfuse/.env.example` first), set `LANGFUSE_ENABLED=true` and the project keys
+  in `.env`, then open http://localhost:3100. Every caller turn becomes a trace with model calls
+  (tokens, latency, failovers), tool calls and guardrail blocks
+  ([screenshot](docs/evidence/phase8/langfuse/langfuse_trace_detail.png)).
 
 All commands, including the checks, are in [`CLAUDE.md` §12](CLAUDE.md).
 

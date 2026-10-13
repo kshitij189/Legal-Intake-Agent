@@ -36,6 +36,7 @@ from app.models.enums import (
     SessionChannel,
     Speaker,
 )
+from app.observability.tracing import get_tracer
 from app.tools.context import ToolContext
 from app.tools.escalation_tools import unable_escalation_key
 from app.tools.executor import ToolExecutor, ToolSpec
@@ -92,6 +93,8 @@ class IntakeConversation:
     # Overrides for evaluations: the tool set (e.g. one tool made to fail) and the booking queue.
     registry: Mapping[str, ToolSpec] | None = None
     booking_task_queue: str | None = None
+    # Extra Langfuse tags for this conversation (e.g. ("eval", "system", scenario id)).
+    trace_tags: tuple[str, ...] = ()
 
     call_session_id: uuid.UUID | None = field(default=None, init=False)
     ended: bool = field(default=False, init=False)
@@ -153,9 +156,31 @@ class IntakeConversation:
         if self.ended or self._executor is None:
             raise ConversationEnded("the conversation is not active")
         self._record(Speaker.CALLER, caller_text)
-        started = time.perf_counter()
-        reply = self._respond(caller_text)
-        self.last_processing_ms = round((time.perf_counter() - started) * 1000)
+        tracer = get_tracer()
+        with (
+            tracer.session(
+                str(self.call_session_id),
+                trace_name="intake.turn",
+                tags=[str(self.channel).lower(), *self.trace_tags],
+                metadata={"firm_id": str(self.firm_id)},
+            ),
+            tracer.observe(
+                "intake.turn", as_type="agent", input=tracer.content(caller_text)
+            ) as turn,
+        ):
+            started = time.perf_counter()
+            calls_before, models_before = len(self.trace), len(self.providers_used)
+            reply = self._respond(caller_text)
+            self.last_processing_ms = round((time.perf_counter() - started) * 1000)
+            turn.update(
+                output=tracer.content(reply),
+                metadata={
+                    "processing_ms": self.last_processing_ms,
+                    "tools": [t.tool for t in self.trace[calls_before:]],
+                    "models": self.providers_used[models_before:],
+                    "session_ended": self.ended,
+                },
+            )
         self._record(Speaker.AGENT, reply, self.last_processing_ms)
         return reply
 
@@ -209,6 +234,13 @@ class IntakeConversation:
                     if omissions:
                         # The draft is discarded; the model gets one chance to save what it missed.
                         nudged = True
+                        with get_tracer().observe(
+                            "omission_check",
+                            as_type="guardrail",
+                            level="WARNING",
+                            output={"omissions": [o.code for o in omissions]},
+                        ):
+                            pass
                         self._audit(
                             "agent.omission_nudged",
                             AuditOutcome.SUCCESS,
@@ -276,6 +308,14 @@ class IntakeConversation:
         if not violations:
             return reply, response
         logger.warning("reply_blocked", extra={"violations": violations})
+        with get_tracer().observe(
+            "reply_guard",
+            as_type="guardrail",
+            level="WARNING",
+            input=get_tracer().content(reply),
+            output={"violations": violations},
+        ):
+            pass
         self._audit("agent.reply_blocked", AuditOutcome.REJECTED, {"violations": violations})
         correction = {"role": "user", "content": reply_guard.correction_instruction(violations)}
         try:

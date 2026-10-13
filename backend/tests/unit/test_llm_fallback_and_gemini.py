@@ -96,6 +96,23 @@ def test_default_chain_is_gemini_first_and_only_last_entry_waits(
     assert [c._rate_limit_budget for c in clients] == [0.0, 0.0, 0.0, 30.0]  # type: ignore[attr-defined]
 
 
+def test_only_the_last_entry_retries_server_errors(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Traced regression: retries on a failing primary stalled a turn for 63 s before failover."""
+    seen: list[tuple[str, int]] = []
+
+    class Recorder:
+        def __init__(self, *, model: str, max_retries: int, **_: object) -> None:
+            seen.append((model, max_retries))
+            self.name = model
+
+    monkeypatch.setattr("app.agent.llm_gemini.GeminiLLMClient", Recorder)
+    monkeypatch.setattr("app.agent.llm_groq.GroqLLMClient", Recorder)
+    build_llm_client(
+        settings(monkeypatch, GEMINI_API_KEY="g", GROQ_API_KEY="q", LLM_MAX_RETRIES="2")
+    )
+    assert [retries for _, retries in seen] == [0, 0, 0, 2]
+
+
 def test_bare_entries_use_the_provider_default_model(monkeypatch: pytest.MonkeyPatch) -> None:
     client = build_llm_client(
         settings(monkeypatch, LLM_PROVIDERS="gemini, groq", GEMINI_API_KEY="g", GROQ_API_KEY="q")

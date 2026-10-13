@@ -706,3 +706,68 @@ pagination or auto-refresh, actor ids in the timeline, eval outbox leftovers).
 
 **Next:** all eight phases are implemented. Pending with the user: the real-microphone test
 (DoD 2), a live-LLM voice call, and the limitations listed above.
+
+---
+
+## 2026-10-13 — Follow-up: Langfuse tracing; Groq vs Gemini as the primary model
+
+**Requested by the user:** add Langfuse tracing, and make Groq primary if it is better than Gemini.
+
+**Added**
+- `langfuse` 4.15.6 (new dependency; released 2026-09-24; brings OpenTelemetry, which is in
+  the approved stack).
+- `infra/langfuse/docker-compose.yml`: self-hosted Langfuse 4.45.0, adapted from the official
+  file.
+  - Its own project and env file, never the app's `.env`.
+  - Only the UI (127.0.0.1:3100) and MinIO (127.0.0.1:9190) are published; telemetry is off.
+  - Headless creation of the project and its keys.
+  - ClickHouse `start_period: 60s`: the first start exceeded upstream's 1 s, and the web
+    containers never started.
+- `app/observability/tracing.py` (adapter, no-op when off, content redaction). Instrumented:
+  - conversation turns, with reply-guard and omission-check guardrails;
+  - each model attempt in the fallback chain (tokens, failure reasons);
+  - each tool call.
+
+  Also new: `LLMResponse.usage` (filled from Gemini `usage_metadata` and Groq `usage`) and
+  `IntakeConversation.trace_tags`. Evaluation runs are tagged.
+- Tests: `test_tracing.py` (no-op, redaction, SDK failures swallowed, errors marked, chain
+  generations, new-messages input), `test_tracing_conversation.py` (full tree on a real DB, no
+  caller text when capture is off), a chain retry-policy test, and a test that same-second runs
+  get separate firms. `tests/conftest.py` forces tracing off for the suite.
+
+**Problems found and fixed** (measured or seen in traces)
+- `localhost` → IPv6 first on Windows: 2.1 s per export, now 0.08 s with `127.0.0.1`.
+- Export read timeouts (SDK default 5 s) while each generation carried the whole conversation:
+  input is now only the new messages, and the timeout is 20 s.
+- **A primary model's 503/504 stalled a turn for 63 s:** google-genai retried server errors (up
+  to 3 × 20 s) before failover. Now only the last chain entry retries; earlier entries fail over
+  at once.
+- Two evaluation runs started in the same second shared one firm, and the first to finish
+  retired it under the other (`NotFound`). Run ids now carry a random suffix.
+- First per-call `flush()` design: it blocked call end, and SDK atexit + batch export make it
+  unnecessary, so it was removed. The wall-time difference I first blamed on it was in fact
+  Temporal timing variance. Measured per scenario: about 0.1 s per conversation plus about 2 s
+  once per process.
+
+**Decision: model order unchanged (Gemini primary, Groq fallback)**
+- The same 15 live scenarios were run with each model as the only chain entry
+  (`docs/evidence/phase8/model_comparison/`):
+
+  | Model alone | Median turn | Turn p95 | Result |
+  |---|---|---|---|
+  | gemini-3.5-flash-lite | 3.6 s | 7.1 s | 6 PASS, 0 FAIL, 9 SKIPPED (per-minute rate limit) |
+  | groq openai/gpt-oss-120b | 54.8 s | 97.2 s | 2 PASS, 1 FAIL, 12 SKIPPED (limits exhausted) |
+
+- Langfuse shows about 3,500–4,200 input tokens per model call. Groq's free tier allows 8,000
+  tokens/minute, i.e. about 2 calls a minute, while a turn often needs 2–3 calls.
+- Quality could not be separated on this sample (Groq completed only 3 scenarios). Groq-first
+  would be worth re-measuring on a paid tier.
+- First attempt invalid: both runs shared one firm (bug above), so the Groq run was repeated.
+
+**Tests and validations executed (actual)**
+- Langfuse 4.45.0 healthy; SDK `auth_check()` true.
+- 2 system scenarios → 8 traces / 25 observations read back through `/api/public/v2/observations`
+  (matches the expected 8 turns + 16 tools + 1 guardrail).
+- A live scenario → 12 generations with token usage; UI screenshots in
+  `docs/evidence/phase8/langfuse/`.
+- System track traced: 45/45 PASS. Overhead: turn p95 214 vs 199 ms.

@@ -78,6 +78,17 @@ class Settings(BaseSettings):
     # Password given to the fictional staff by scripts/seed_demo_data.py (unset = no logins).
     demo_staff_password: SecretStr | None = None
 
+    # Langfuse tracing (optional; self-hosted stack in infra/langfuse). Off unless enabled and keys
+    # are set. Without content capture, traces hold structure, timings, tool names, statuses and
+    # token counts, but no caller text, model messages or tool arguments.
+    langfuse_enabled: bool = False
+    # 127.0.0.1, not localhost: on Windows localhost tries IPv6 first (~2 s per connection).
+    langfuse_base_url: str = "http://127.0.0.1:3100"
+    langfuse_public_key: str | None = None
+    langfuse_secret_key: SecretStr | None = None
+    langfuse_capture_content: bool = False
+    langfuse_environment: str = "local"
+
 
 @lru_cache
 def get_settings() -> Settings:

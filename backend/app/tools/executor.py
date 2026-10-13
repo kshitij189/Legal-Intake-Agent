@@ -21,6 +21,7 @@ from app.domain.audit import record_audit
 from app.domain.call_session_service import get_call_session
 from app.domain.errors import DomainError
 from app.models.enums import AuditOutcome
+from app.observability.tracing import get_tracer
 from app.tools.context import ToolContext
 from app.tools.schemas import ToolError, ToolInput, ToolResult
 
@@ -53,7 +54,20 @@ class ToolExecutor:
 
     def execute(self, name: str, raw_arguments: str | None) -> ToolResult:
         started = time.perf_counter()
-        result = self._execute(name, raw_arguments)
+        tracer = get_tracer()
+        with tracer.observe(
+            f"tool {name}", as_type="tool", input=tracer.content(raw_arguments)
+        ) as observation:
+            result = self._execute(name, raw_arguments)
+            observation.update(
+                output=tracer.content(result.to_json()),
+                metadata={
+                    "ok": result.ok,
+                    "error_code": result.error.code if result.error else None,
+                },
+                level="DEFAULT" if result.ok else "WARNING",
+                status_message=result.error.code if result.error else None,
+            )
         logger.info(
             "tool_call",
             extra={

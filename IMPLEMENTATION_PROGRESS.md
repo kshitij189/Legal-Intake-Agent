@@ -608,7 +608,8 @@ structured logging, failure recovery; repeatable demo.
 - [x] **Recorded demo:** `scripts/record_demo.py` → `docs/demo/DEMO.md` plus
   `dashboard_walkthrough.webm`. It covers a normal intake, an urgent escalation, a calendar
   failure with recovery, and the coordinator review.
-- [ ] Optional Langfuse tracing: not added (documented in `docs/SECURITY.md`).
+- [x] Optional Langfuse tracing: added 2026-10-13 as a follow-up (see "Follow-up: tracing and
+  model choice" below).
 
 **Acceptance criteria → evidence** (`docs/evidence/phase8/`, `docs/demo/`)
 - [x] *Happy path and predictable behaviour when a dependency fails.* `record_demo.py`:
@@ -663,6 +664,36 @@ Definition of done (blueprint §18):
 - No Langfuse tracing; English only.
 
 **Blockers:** DoD item 2 needs the user's microphone (deferred by the user).
+
+### Follow-up (2026-10-13): Langfuse tracing and model choice
+- **Tracing:**
+  - Self-hosted Langfuse 4.45.0 (`infra/langfuse/`, own secrets, localhost only, telemetry off)
+    with SDK 4.15.6.
+  - One trace per caller turn, grouped per call; model attempts appear as generations (tokens,
+    latency, failover reason), plus tool calls and guardrails.
+  - Off by default; content is captured only on request.
+  - Verified against the real server through `GET /api/public/v2/observations`: 2 system
+    scenarios produced 8 traces and 25 observations, exactly as expected; a live scenario
+    produced 12 generations with token usage.
+  - Screenshots: `docs/evidence/phase8/langfuse/`.
+- **Overhead** (system track, traced vs untraced): about 2 s once per process (client start),
+  then about 0.1 s per conversation; turn p95 214 ms vs 199 ms.
+- **Problems found by measuring or tracing, all fixed:**
+  - `localhost` resolved IPv6 first: 2.1 s per export, now 0.08 s with `127.0.0.1`.
+  - Exports timed out at the SDK's 5 s while every generation carried the whole history: input
+    is now only the new messages, and the export timeout is 20 s.
+  - Traced live turn: `gemini-3.8-flash` returned 503/504 after 32 s and 63 s, because the SDK
+    retried 5xx before failing over. Now only the last chain entry retries.
+  - Two evaluation runs started in the same second shared, and then retired, one firm. Run ids
+    now carry a random suffix.
+- **Model choice** (`docs/evidence/phase8/model_comparison/`): same 15 live scenarios, each
+  model alone.
+  - gemini-3.5-flash-lite: 6 PASS, 0 FAIL, 9 SKIPPED (per-minute limit); median turn 3.6 s.
+  - groq gpt-oss-120b: 2 PASS, 1 FAIL, 12 SKIPPED (limits exhausted); median turn 54.8 s.
+
+  Langfuse shows about 4,000 input tokens per call against Groq's free 8,000 tokens/minute.
+  **Decision: keep Gemini primary and Groq fallback.** Groq-first would need a paid tier.
+  Quality could not be separated on this sample.
 
 ---
 

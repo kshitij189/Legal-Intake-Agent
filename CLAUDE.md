@@ -316,6 +316,10 @@ cd frontend; npm install; npm run build; npm run start; cd ..  # http://127.0.0.
 .\.venv\Scripts\python scripts/purge_transcripts.py            # retention: delete expired transcript turns
 .\.venv\Scripts\python scripts/retire_eval_firms.py [--dry-run]  # deactivate old eval-*/dash-* firms
 
+# tracing (optional) - self-hosted Langfuse v4, UI http://localhost:3100 (login in infra/langfuse/.env)
+docker compose -f infra/langfuse/docker-compose.yml --env-file infra/langfuse/.env up -d
+#   then LANGFUSE_ENABLED=true + the project keys in .env; LANGFUSE_CAPTURE_CONTENT=true stores text
+
 # checks (run pytest from backend/ so its pyproject settings apply)
 cd backend; ..\.venv\Scripts\python -m pytest; cd ..
 cd backend; ..\.venv\Scripts\python -m pytest -m ui; cd ..   # Playwright UI tests (built frontend, ports 3000/8000 free)
@@ -503,6 +507,34 @@ Notes:
   outbox dispatcher only starts requests of active firms.
 - Security review and remaining gaps: `docs/SECURITY.md`. Demo: `docs/demo/DEMO.md`. Overview:
   `README.md`.
+
+### Tracing (Langfuse, Phase 8 follow-up)
+- `app/observability/tracing.py` is the only module that imports the Langfuse SDK
+  (`langfuse` 4.15.6, server `4.45.0` pinned in `infra/langfuse/docker-compose.yml`).
+- One trace per caller turn (`intake.turn`, type agent), grouped by Langfuse session = call
+  session id. Children:
+  - `llm <provider:model>` generations, one per chain attempt, with tokens, latency and the
+    failure reason;
+  - `tool <name>`, with ok / error code;
+  - `reply_guard` / `omission_check` guardrails.
+- Tags: channel, plus `eval`, track and scenario id for evaluation runs.
+- Off unless `LANGFUSE_ENABLED` and both keys are set; then every call is a no-op. SDK errors are
+  swallowed: tracing must never break a call. Export is asynchronous (batched, plus an atexit
+  flush); never flush on the call path.
+- Content (caller text, model messages, tool arguments, results) is sent only with
+  `LANGFUSE_CAPTURE_CONTENT=true`. Otherwise only sizes, names, statuses and token counts.
+  Generation input is the messages since the model last spoke, never the whole history.
+- Use `127.0.0.1`, not `localhost`, for `LANGFUSE_BASE_URL`: on Windows, localhost tried IPv6
+  first and cost ~2 s per export. The export timeout is 20 s.
+- The test suite forces tracing off (`tests/conftest.py`); tracing is tested with a fake client
+  (`tests/unit/test_tracing.py`, `tests/integration/test_tracing_conversation.py`).
+- Langfuse v4 self-hosted is "events only": read traces with `GET /api/public/v2/observations`
+  (`/api/public/traces` returns 404).
+- Model chain decision (2026-10-13, measured; `docs/evidence/phase8/model_comparison/`): keep
+  Gemini primary. On the free tier, Groq gpt-oss-120b alone ran at a median turn of 54.8 s
+  (8,000 tokens/minute versus about 4,000 input tokens per call), against 3.6 s for
+  gemini-3.5-flash-lite. Only the last chain entry retries 5xx or waits out rate limits; earlier
+  entries fail over immediately.
 
 ## 13. Testing and evaluation requirements
 

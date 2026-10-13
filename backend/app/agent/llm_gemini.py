@@ -190,7 +190,20 @@ def from_gemini_response(response: types.GenerateContentResponse, provider: str)
         tool_calls=calls,
         provider=provider,
         provider_state=candidate.content,
+        usage=gemini_usage(response),
     )
+
+
+def gemini_usage(response: types.GenerateContentResponse) -> dict[str, int] | None:
+    meta = getattr(response, "usage_metadata", None)
+    if meta is None:
+        return None
+    usage = {
+        "input": getattr(meta, "prompt_token_count", None),
+        "output": getattr(meta, "candidates_token_count", None),
+        "reasoning": getattr(meta, "thoughts_token_count", None),
+    }
+    return {k: int(v) for k, v in usage.items() if isinstance(v, int)} or None
 
 
 def _retry_delay(exc: errors.APIError) -> float | None:

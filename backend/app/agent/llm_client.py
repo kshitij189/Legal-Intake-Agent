@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import Any, Protocol
 
 from app.config import Settings
+from app.observability.tracing import get_tracer
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,8 @@ class LLMResponse:
     provider: str = ""  # chain name of the model that answered, e.g. "gemini:gemini-3.8-flash"
     # Opaque data the same model needs back on the next request (never sent to others).
     provider_state: Any = None
+    # Token counts reported by the provider ({"input": n, "output": n}); None if not reported.
+    usage: dict[str, int] | None = None
 
 
 class LLMUnavailable(Exception):
@@ -85,6 +88,14 @@ def strip_private_keys(message: Mapping[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in message.items() if not k.startswith("_")}
 
 
+def new_messages(messages: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Messages after the last assistant turn (caller text, tool results, automated checks)."""
+    last_assistant = max(
+        (i for i, m in enumerate(messages) if m.get("role") == "assistant"), default=-1
+    )
+    return [strip_private_keys(m) for m in messages[last_assistant + 1 :]]
+
+
 class FallbackLLMClient:
     """Tries models in order; the first successful response wins. A model whose quota is
     exhausted (429 with a long retry delay) is skipped until the provider says it resets."""
@@ -108,20 +119,52 @@ class FallbackLLMClient:
     def complete(
         self, messages: Sequence[Mapping[str, Any]], tools: Sequence[Mapping[str, Any]]
     ) -> LLMResponse:
+        tracer = get_tracer()
         failures = []
         for name, client in self._entries:
             now = self._clock()
             if self._cooldown_until.get(name, 0.0) > now:
                 failures.append(f"{name}:quota_cooldown")
+                with tracer.observe(
+                    f"llm {name}",
+                    as_type="generation",
+                    model=name,
+                    level="WARNING",
+                    status_message="skipped: quota_cooldown",
+                ):
+                    pass
                 continue
-            try:
-                response = client.complete(messages, tools)
-            except LLMUnavailable as exc:
-                logger.warning("llm_model_failed", extra={"model": name, "reason": exc.reason})
-                failures.append(f"{name}:{exc.reason}")
-                if exc.retry_after is not None and exc.retry_after > COOLDOWN_THRESHOLD_SECONDS:
-                    self._cooldown_until[name] = now + exc.retry_after
-                continue
+            with tracer.observe(
+                f"llm {name}",
+                as_type="generation",
+                model=name,
+                # Only what is new since the model last spoke: earlier generations already hold the
+                # rest, and full histories made every export grow with the call length.
+                input=tracer.content(new_messages(messages)),
+                metadata={"messages": len(messages), "tools_offered": len(tools)},
+            ) as generation:
+                try:
+                    response = client.complete(messages, tools)
+                except LLMUnavailable as exc:
+                    logger.warning("llm_model_failed", extra={"model": name, "reason": exc.reason})
+                    generation.update(level="WARNING", status_message=exc.reason)
+                    failures.append(f"{name}:{exc.reason}")
+                    if exc.retry_after is not None and exc.retry_after > COOLDOWN_THRESHOLD_SECONDS:
+                        self._cooldown_until[name] = now + exc.retry_after
+                    continue
+                generation.update(
+                    output=tracer.content(
+                        {
+                            "content": response.content,
+                            "tool_calls": [
+                                {"name": c.name, "arguments": c.arguments}
+                                for c in response.tool_calls
+                            ],
+                        }
+                    ),
+                    metadata={"tool_calls": [c.name for c in response.tool_calls]},
+                    usage_details=response.usage,
+                )
             self.last_provider = name
             return response
         raise LLMUnavailable("; ".join(failures))
@@ -151,7 +194,8 @@ def parse_chain(spec: str, settings: Settings) -> list[tuple[str, str]]:
 
 def build_llm_client(settings: Settings, sleep: Callable[[float], None] = time.sleep) -> LLMClient:
     """Model chain from LLM_PROVIDERS. Entries whose provider has no API key are skipped. Only the
-    last entry waits out short rate limits; earlier ones fail over at once."""
+    last entry waits out short rate limits or retries server errors; earlier ones fail over at
+    once, so one slow provider cannot stall a call."""
     from app.agent.llm_gemini import GeminiLLMClient  # adapters import provider SDKs
     from app.agent.llm_groq import GroqLLMClient
 
@@ -167,14 +211,15 @@ def build_llm_client(settings: Settings, sleep: Callable[[float], None] = time.s
     entries: list[tuple[str, LLMClient]] = []
     for i, (provider, model) in enumerate(usable):
         adapter = GeminiLLMClient if provider == "gemini" else GroqLLMClient
+        last = i == len(usable) - 1
         client = adapter(
             api_key=keys[provider] or "",
             model=model,
             timeout_seconds=settings.llm_timeout_seconds,
-            max_retries=settings.llm_max_retries,
-            rate_limit_max_wait_seconds=(
-                settings.llm_rate_limit_max_wait_seconds if i == len(usable) - 1 else 0.0
-            ),
+            # Only the last entry retries server errors. Earlier ones fail over at once: traced
+            # 2026-10-13, a primary returning 503/504 with retries stalled a turn for 63 s.
+            max_retries=settings.llm_max_retries if last else 0,
+            rate_limit_max_wait_seconds=settings.llm_rate_limit_max_wait_seconds if last else 0.0,
             sleep=sleep,
         )
         entries.append((client.name, client))
