@@ -10,6 +10,10 @@ calls need no translation. Failure mapping is what matters for the model chain:
 - 5xx / network / timeout         -> LLMUnavailable (retried only when this is the last entry)
 
 Credits are one-time, so exhaustion is an expected state, not an incident.
+
+Models (checked against the live API, 2026-10-17): `sarvam-30b` is deprecated (HTTP 400).
+`sarvam-105b-conversations` answers directly in ~0.5 s and is the default; `sarvam-105b` is a
+reasoning model (~3 s, 400-600 hidden reasoning tokens per reply), too slow for live voice.
 """
 
 import json
@@ -36,6 +40,7 @@ DEFAULT_BASE_URL = "https://api.sarvam.ai/v1"
 # How long the chain skips Sarvam after exhausted credits or a rejected key (> the chain's 60 s
 # cooldown threshold, so FallbackLLMClient stops calling it until then).
 SKIP_SECONDS = 3600.0
+MAX_TOKENS = 2048
 _EXHAUSTED = re.compile(r"credit|quota|insufficient|balance|payment|billing", re.I)
 _THINKING = re.compile(r"<think>.*?</think>", re.S)
 
@@ -76,6 +81,9 @@ class SarvamLLMClient:
             "model": self.model,
             "messages": [strip_private_keys(m) for m in messages],
             "temperature": self._temperature,
+            # Explicit: sarvam-105b is a reasoning model that spends hundreds of hidden tokens
+            # thinking, and with the server default limit it returned an empty reply (measured).
+            "max_tokens": MAX_TOKENS,
         }
         if tools:
             body["tools"] = list(tools)

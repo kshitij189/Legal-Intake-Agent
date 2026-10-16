@@ -14,7 +14,7 @@ from app.config import Settings
 def client_for(handler: Any, *, max_retries: int = 0, budget: float = 0.0) -> SarvamLLMClient:
     return SarvamLLMClient(
         api_key="test-key",
-        model="sarvam-30b",
+        model="sarvam-105b-conversations",
         timeout_seconds=5,
         max_retries=max_retries,
         rate_limit_max_wait_seconds=budget,
@@ -42,11 +42,12 @@ def test_request_is_openai_shaped_and_private_keys_are_stripped() -> None:
     reply = client_for(handler).complete(
         [{"role": "user", "content": "hi", "_provider_state": {"x": 1}}], TOOLS
     )
-    assert reply.content == "Hello" and reply.provider == "sarvam:sarvam-30b"
+    assert reply.content == "Hello" and reply.provider == "sarvam:sarvam-105b-conversations"
     assert seen["url"] == "https://api.sarvam.ai/v1/chat/completions"
     assert seen["headers"]["authorization"] == "Bearer test-key"
     assert seen["headers"]["api-subscription-key"] == "test-key"
     assert seen["body"]["messages"] == [{"role": "user", "content": "hi"}]
+    assert seen["body"]["max_tokens"] == 2048
     assert seen["body"]["tools"] == TOOLS and seen["body"]["tool_choice"] == "auto"
 
 
@@ -177,7 +178,10 @@ def test_sarvam_joins_the_chain_only_with_a_key(monkeypatch: pytest.MonkeyPatch)
         settings(monkeypatch, LLM_PROVIDERS=chain, SARVAM_API_KEY="k", GEMINI_API_KEY="g")
     )
     assert isinstance(with_key, FallbackLLMClient)
-    assert with_key.provider_names == ["sarvam:sarvam-30b", "gemini:gemini-3.5-flash-lite"]
+    assert with_key.provider_names == [
+        "sarvam:sarvam-105b-conversations",
+        "gemini:gemini-3.5-flash-lite",
+    ]
     without = build_llm_client(settings(monkeypatch, LLM_PROVIDERS=chain, GEMINI_API_KEY="g"))
     assert isinstance(without, FallbackLLMClient)
     assert without.provider_names == ["gemini:gemini-3.5-flash-lite"]
@@ -199,7 +203,7 @@ def test_explicit_model_and_only_the_last_entry_retries(monkeypatch: pytest.Monk
     )
     assert isinstance(client, FallbackLLMClient)
     first, last = (c for _, c in client._entries)
-    assert client.provider_names == ["sarvam:sarvam-105b", "sarvam:sarvam-30b"]
+    assert client.provider_names == ["sarvam:sarvam-105b", "sarvam:sarvam-105b-conversations"]
     assert (first._max_retries, last._max_retries) == (0, 2)  # type: ignore[attr-defined]
 
 
@@ -220,7 +224,8 @@ def test_chain_skips_a_sarvam_with_exhausted_credits_and_keeps_answering() -> No
 
     now = [1000.0]
     chain = FallbackLLMClient(
-        [("sarvam:sarvam-30b", client_for(exhausted)), ("gemini:x", Next())], clock=lambda: now[0]
+        [("sarvam:sarvam-105b-conversations", client_for(exhausted)), ("gemini:x", Next())],
+        clock=lambda: now[0],
     )
     for _ in range(3):
         assert (

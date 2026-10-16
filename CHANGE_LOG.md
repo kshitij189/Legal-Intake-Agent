@@ -797,7 +797,31 @@ Motivation: Groq's free 8,000 tokens/minute makes it too slow for live voice, an
   without a key, and the guarantee that a chain with exhausted credits keeps answering and
   re-checks Sarvam only after the skip window.
 
-**Not verified:** the request/response details were built from Sarvam's documented OpenAI-compatible
-shape (search results; the docs page fetch was declined), not from a live call. Sarvam's models'
-tool-calling quality on this agent is unknown. `check_sarvam.py` checks the first; the live
-evaluation (`LLM_PROVIDERS=sarvam ... --track live`) measures the second.
+**Not verified at the time of writing:** the request/response details came from Sarvam's documented
+OpenAI-compatible shape, not from a live call. They were verified the same day once the user added a
+key (next section).
+
+### Verified against the live API (2026-10-17, after the key was added)
+- First `check_sarvam.py` run: HTTP 400. The error body (read with a one-off probe, because the
+  adapter deliberately does not log bodies) said **`sarvam-30b` is deprecated**; available models:
+  `sarvam-105b`, `sarvam-105b-conversations`. Authentication worked with either header.
+- Model probe: `sarvam-105b` is a reasoning model (2.8 s for "say OK", 430-600 hidden reasoning
+  tokens) and returned an **empty reply** under the server's default token limit.
+  `sarvam-105b-conversations` answers directly in 0.5 s. **Default changed to
+  `sarvam-105b-conversations`**; the adapter now sends `max_tokens=2048`.
+- With no tools offered, a prompt telling the model to use a tool produced an empty reply (23
+  tokens, no content): a check-script artifact, fixed by using a plain prompt for that step. The
+  agent's reply-guard retry is already a plain-text request, and an empty reply there falls back
+  to the fixed safe reply.
+- `check_sarvam.py`: 3/3 PASS (plain reply; tool call with valid JSON arguments; continuation
+  after a tool result).
+- **Live evaluation, Sarvam alone, 8 scenarios** (N01, U01, I03, B01, R01, L02, X01, P02): **7 PASS,
+  1 FAIL**; field accuracy 0.971; critical escalation recall 1.0; false booking confirmations 0;
+  6 omission nudges; **turn p50 0.8 s, p95 2.3 s**; scenarios took 1.6-12.7 s.
+  - B01 FAIL, two causes: the checker matched the forbidden phrase "you should refuse" inside the
+    correct refusal "I can't advise whether you should refuse to leave" (a checker flaw: it ignores
+    negation, as with "you have a case" on 2026-10-13; not changed here), and the model asked the
+    caller to confirm `matter_category` instead of saving it as reported (a real miss; the intake
+    was still finalized safely).
+  - Only 8 of 15 planned scenarios were run, to spare the one-time credits; credit use was not
+    measured (check the Sarvam dashboard). Sample too small to rank quality against Gemini.

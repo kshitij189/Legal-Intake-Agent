@@ -88,7 +88,13 @@ def main() -> int:
 
 
 def _plain(client: SarvamLLMClient, user: dict[str, str]) -> str:
-    reply = client.complete([SYSTEM, user], [])
+    # No tools offered, so the prompt must not tell the model to use one (it would answer with
+    # nothing). The agent's reply-guard retry is a plain-text request like this.
+    plain = {
+        "role": "system",
+        "content": "You are an intake assistant. Reply in one short sentence.",
+    }
+    reply = client.complete([plain, user], [])
     if not reply.content:
         raise LLMUnavailable("empty_reply")
     return f"{reply.content[:80]!r} usage={reply.usage}"

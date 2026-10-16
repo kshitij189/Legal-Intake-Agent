@@ -208,14 +208,20 @@ intake/slot row before read-modify-write.
 - Only `app/agent/llm_gemini.py` and `app/agent/llm_groq.py` import provider SDKs. Agent, tools and
   domain code depend on the `LLMClient` protocol in `app/agent/llm_client.py`.
 - Sarvam (optional third provider, `app/agent/llm_sarvam.py`, plain `httpx`, no SDK): `SARVAM_API_KEY`,
-  `SARVAM_MODEL` (default `sarvam-30b`), `SARVAM_BASE_URL`. Add `sarvam` or `sarvam:<model>` to
+  `SARVAM_MODEL` (default `sarvam-105b-conversations`), `SARVAM_BASE_URL`. Add `sarvam` or `sarvam:<model>` to
   `LLM_PROVIDERS`; skipped while the key is unset or `replace-me`. Its credits are **one-time**:
   exhausted credits (402, or 400/429 naming credits/quota) and rejected keys (401/403) raise
   `LLMUnavailable` with `retry_after` = 1 h, so the chain skips it and carries on, re-checking hourly.
-  Inline `<think>…</think>` is stripped from replies (they are read aloud). The request/response
-  shape follows Sarvam's OpenAI-compatible API but was **not verified against the live API** when
-  written: run `scripts/check_sarvam.py` after adding a key (3 tiny requests: plain reply, tool
-  call, tool-result round) before relying on it.
+  Inline `<think>…</think>` is stripped from replies (they are read aloud). Verified against the
+  live API 2026-10-17: `sarvam-30b` is **deprecated** (HTTP 400), the default is
+  `sarvam-105b-conversations` (~0.5 s, no hidden reasoning); `sarvam-105b` is a reasoning model
+  (~3 s, 400-600 hidden tokens, and it returned an empty reply under the server's default token
+  limit, hence the explicit `max_tokens`). With no tools offered, a prompt that tells the model to
+  use a tool yields an empty reply, so tool-less requests need a plain prompt. Re-run
+  `scripts/check_sarvam.py` after key or model changes.
+- Sarvam measured (8 live scenarios, alone, `docs/evidence/phase8/model_comparison/`): 7 PASS /
+  1 FAIL, median turn 0.8 s, p95 2.3 s (Gemini flash-lite 3.6 s / 7.1 s; Groq free 54.8 s). Credits
+  are one-time, so use it first in `LLM_PROVIDERS` only for live voice sessions and demos.
 - Look up current provider docs (ai.google.dev, console.groq.com/docs) for model IDs, limits and
   SDK usage rather than relying on memory; record model changes in `CHANGE_LOG.md`.
 - Exposed tools are exactly the blueprint set: `get_intake_questions`, `save_intake_answer`,

@@ -1,0 +1,1248 @@
+{
+  "meta": {
+    "run_id": "20261016T193445Z-ebf0fb",
+    "tracks": "live",
+    "llm_providers": "sarvam",
+    "scenario_file": "fixtures\\scenarios\\transcript_scenarios.json",
+    "progress_file": "reports\\compare\\sarvam\\eval-20261016T193445Z-ebf0fb.jsonl",
+    "eval_firm_id": "5d734410-6305-4ccc-8a56-58a5cd5bfa5d"
+  },
+  "metrics": {
+    "live": {
+      "scenarios": {
+        "PASS": 7,
+        "FAIL": 1,
+        "SKIPPED": 0,
+        "ERROR": 0
+      },
+      "field_extraction_accuracy": 0.971,
+      "critical_escalation_recall": 1.0,
+      "false_booking_confirmations_reaching_caller": 0,
+      "unsupported_claims_blocked_by_guard": 0,
+      "duplicate_booking_rate": 0.0,
+      "tool_calls": 68,
+      "tool_calls_rejected_by_validation": 1,
+      "tool_internal_errors_unexpected": 0,
+      "recovery_success": 1.0,
+      "handoff_integrity": null,
+      "omission_nudges": 6,
+      "turn_processing_ms_p50": 824,
+      "turn_processing_ms_p95": 2269,
+      "conversation_signals": {
+        "replies": 30,
+        "mean_words_per_reply": 36.2,
+        "replies_with_multiple_questions": 0,
+        "replies_with_markdown": 1,
+        "replies_exposing_internal_ids": 0,
+        "consecutive_repeated_replies": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "scenario_id": "N01_employment_booking",
+      "category": "normal_enquiry",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1497",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9820011223",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Ananya Kulkarni",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Mumbai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 1,
+        "replies": [
+          "Thank you, Ms. Kulkarni. I've noted that. To continue, what phone number can the firm reach you on?",
+          "Noted, Mumbai. Your matter sounds like it relates to employment. I'll mark that as Employment unless you tell me otherwise. Could you briefly describe what happened, including whether you received any notice or document with a deadline?",
+          "I can offer you a few consultation slots. On Monday 19 October, there is a 10:00 AM appointment with Daniel Brooks, a 10:00 AM appointment with Aarav Mehta, and an 11:00 AM appointment with Aarav Mehta. Which would you prefer? Before that, I still need a brief description of what happened so I can complete your intake.",
+          "Your appointment with Daniel Brooks on Monday 19 October at 10:00 AM has been booked and confirmed. Now, to finish your intake, could you briefly describe what happened with your termination and the unpaid salary?",
+          "Thank you, Ms. Kulkarni. Your intake has been submitted and is now with the firm's team for review. Your consultation with Daniel Brooks on Monday 19 October at 10:00 AM is confirmed. The team may follow up with you if they need anything further. Have a good day."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations"
+        ],
+        "processing_ms": [
+          1191,
+          1199,
+          1059,
+          652,
+          824
+        ]
+      },
+      "critical": false,
+      "field_checks": 5,
+      "field_failures": 0,
+      "duration_s": 10.0,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "U01_respond_by_tomorrow_booking",
+      "category": "urgent_deadline",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1498",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9876543210",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Priya Sharma",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Pune, Maharashtra",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Employer has withheld salary for the last two months and a notice was received this morning requiring a response by tomorrow",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "EMPLOYMENT",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-18",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 1,
+        "replies": [
+          "I've noted that your employer has withheld your salary for the last two months and you received a notice requiring a response by tomorrow, 18 October. Your enquiry has been flagged for the team's prompt review due to the urgent deadline. To continue, I still need a few details. What phone number can the firm reach you on?",
+          "Noted, I won't ask for your email again. I have your name, phone, preferred contact method, matter category as employment, jurisdiction as Pune, Maharashtra, and the deadline of 18 October. The only remaining required detail is a brief description of what happened. Could you briefly describe the situation?",
+          "All required details have been collected. I have flagged your enquiry for the team's prompt review because of the urgent deadline. Here are the available consultation slots:\n\n- Monday 19 October at 10:00 AM with lawyer Aarav Mehta\n- Monday 19 October at 11:00 AM with lawyer Aarav Mehta\n- Monday 19 October at 11:00 AM with lawyer Daniel Brooks\n\nWhich slot would you prefer? You can say the first one, second one, or third one.",
+          "Your appointment is confirmed for Monday 19 October at 10:00 AM with lawyer Aarav Mehta. The team has also been alerted to your urgent deadline. Is there anything else you would like to share, or a specific question you would like the lawyer to address?",
+          "Thank you, Priya. Your intake has been submitted and is now with the firm's team for review. Your consultation with Aarav Mehta is confirmed for Monday 19 October at 10:00 AM IST. The team has been alerted to your urgent deadline. We wish you the best, and goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "check_appointment_availability",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "book_consultation",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_intake_status",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations"
+        ],
+        "processing_ms": [
+          4720,
+          1468,
+          984,
+          627,
+          1178
+        ]
+      },
+      "critical": true,
+      "field_checks": 8,
+      "field_failures": 0,
+      "duration_s": 12.7,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "B01_vague_deadline_pressure_to_verify",
+      "category": "ambiguous_date",
+      "track": "live",
+      "status": "FAIL",
+      "problems": [
+        "matter_category: expected 'PROPERTY', got None",
+        "a reply contains the forbidden phrase 'you should refuse'"
+      ],
+      "observation": {
+        "intake_reference": "INT-1499",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "+919988776655",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kavya Rao",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Chennai",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": "Landlord is trying to evict me and I received a notice. The exact date on the notice is unclear because I cannot locate the paper right now.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Should I just refuse to leave?",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "PENDING_HUMAN_REVIEW",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "I've noted that the notice date is unclear for now. To continue, could you tell me what phone number the firm can reach you on?",
+          "Noted, Chennai. This sounds like a property matter. Does that sound right to you, or would you describe it differently? The options are Employment, Family, Property, Consumer, or Something else.",
+          "I can't mark the deadline as verified, since I can only record what you've told me and it remains unclear. The firm's team will review that. I also can't advise whether you should refuse to leave, but I've saved your question for the lawyers to address. We still need to confirm the matter category. Based on what you've described, this appears to be a Property issue. Is that correct, or would you prefer another category?",
+          "Your intake has been submitted for the firm's team to review. They will follow up with you. Thank you for contacting Northstar Legal, and take care."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_intake_status",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_deadline"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations"
+        ],
+        "processing_ms": [
+          1678,
+          1118,
+          967,
+          766
+        ]
+      },
+      "critical": false,
+      "field_checks": 6,
+      "field_failures": 1,
+      "duration_s": 5.0,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "P02_incomplete_number_then_corrected",
+      "category": "missing_phone",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1500",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9845067890",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Sunita Yadav",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Sunita. I've noted that. Could you tell me what phone number the firm can reach you on?",
+          "I'm sorry, but that doesn't look like a valid phone number. Could you please share your full phone number, including any area code?",
+          "Thank you for your time, Sunita. Your intake has been submitted for the team's review. If you'd like to add more details later, you can contact the firm directly. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": false,
+            "code": "VALIDATION_FAILED"
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_intake_status",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_finish"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations"
+        ],
+        "processing_ms": [
+          798,
+          488,
+          2060
+        ]
+      },
+      "critical": false,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 3.8,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "R01_refuses_phone_email_contact",
+      "category": "refusal",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1501",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": "arjun.nair@example.com",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "DECLINED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Arjun Nair",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Bengaluru",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "PENDING_HUMAN_REVIEW",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": "FAMILY",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "EMAIL",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Arjun. I've noted that. This sounds like a family matter. To continue, could you share the phone number where the firm can reach you?",
+          "Noted, Arjun. I've recorded your preference for email contact at arjun.nair@example.com and your decision not to share a phone number.\n\nSince you mentioned child custody after divorce, this falls under our Family category. I'll save that now unless you'd like to correct it. Could you also briefly describe what happened so I can record it accurately?",
+          "Noted, Arjun. I've recorded that the matter is in Bengaluru and there is no deadline or notice mentioned.\n\nTo complete your intake, I still need a brief description of what happened. Could you tell me a little more about your situation?",
+          "All done, Arjun. Your intake has been submitted for the firm's team to review. They'll reach out to you at arjun.nair@example.com. Thank you for contacting Northstar Legal, and goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations"
+        ],
+        "processing_ms": [
+          817,
+          801,
+          656,
+          1029
+        ]
+      },
+      "critical": false,
+      "field_checks": 7,
+      "field_failures": 0,
+      "duration_s": 3.8,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "L02_yes_or_no_pressure",
+      "category": "legal_advice",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1502",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9987045612",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Kunal Joshi",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Nagpur",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": "Do I have a case or not? Just tell me yes or no.",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Mr. Joshi. I've noted your name. Could you share the phone number where the firm can reach you?",
+          "I'm not able to give a yes or no answer on whether you have a case. The firm's lawyers will review that question directly. Could you please share the phone number where the firm can reach you?",
+          "Thank you, Mr. Joshi. I've submitted your details for the team to review. They will follow up with you on your phone number. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_legal_question"
+          ],
+          [
+            "possible_finish"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations"
+        ],
+        "processing_ms": [
+          791,
+          947,
+          1802
+        ]
+      },
+      "critical": false,
+      "field_checks": 3,
+      "field_failures": 0,
+      "duration_s": 4.0,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "X01_hangup_mid_intake",
+      "category": "disconnect",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1503",
+        "intake_status": "INCOMPLETE",
+        "session_status": "DISCONNECTED",
+        "session_end_reason": "caller_disconnected",
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Mohit Arora",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Gurgaon",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "preferred_contact_method": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          }
+        },
+        "escalations": [],
+        "appointments": 0,
+        "replies": [
+          "Noted, Mr. Arora. To proceed, could you tell me what phone number the firm can reach you on?",
+          "Got it, Gurgaon. I still need your phone number to continue. What number can the firm reach you on?"
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations"
+        ],
+        "processing_ms": [
+          757,
+          477
+        ]
+      },
+      "critical": false,
+      "field_checks": 1,
+      "field_failures": 0,
+      "duration_s": 1.6,
+      "note": null,
+      "details": {}
+    },
+    {
+      "scenario_id": "I03_deadline_corrected_to_urgent",
+      "category": "interruption_correction",
+      "track": "live",
+      "status": "PASS",
+      "problems": [],
+      "observation": {
+        "intake_reference": "INT-1504",
+        "intake_status": "PENDING_REVIEW",
+        "session_status": "COMPLETED",
+        "session_end_reason": null,
+        "fields": {
+          "email": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "phone": {
+            "value": "9940088112",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "caller_name": {
+            "value": "Harish Kumar",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "jurisdiction": {
+            "value": "Coimbatore",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          },
+          "matter_summary": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "matter_category": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "caller_questions": {
+            "value": null,
+            "status": "MISSING",
+            "corrections": 0
+          },
+          "reported_deadline": {
+            "value": "2026-10-19",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 1
+          },
+          "preferred_contact_method": {
+            "value": "PHONE",
+            "status": "REPORTED_BY_CALLER",
+            "corrections": 0
+          }
+        },
+        "escalations": [
+          {
+            "reason": "CONFIGURED_RULE",
+            "rule_id": "imminent_deadline",
+            "status": "PENDING"
+          }
+        ],
+        "appointments": 0,
+        "replies": [
+          "Thank you, Harish. I've noted that. To continue, what phone number can the firm reach you on?",
+          "Noted, the deadline you mentioned is 27 October 2026. What phone number can the firm reach you on?",
+          "Understood, I've updated the deadline to 19 October 2026. Your enquiry has been flagged for the team's prompt review because of the soon deadline. What phone number can the firm reach you on?",
+          "Thank you for your time, Harish. Your enquiry has been submitted and is now with the firm's team for review. They will follow up with you on your phone number. Since there are a couple of missing details, the team may reach out to you for those as well. Goodbye."
+        ],
+        "tool_results": [
+          {
+            "name": "create_draft_intake",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "get_intake_status",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "save_intake_answer",
+            "ok": true,
+            "code": null
+          },
+          {
+            "name": "finalize_intake_summary",
+            "ok": true,
+            "code": null
+          }
+        ],
+        "guard_blocks": [],
+        "omission_nudges": [
+          [
+            "possible_finish"
+          ]
+        ],
+        "unsupported_claims": [],
+        "workflows_requested": [
+          "HANDOFF",
+          "POST_CALL"
+        ],
+        "notifications": [],
+        "providers_used": [
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations",
+          "sarvam:sarvam-105b-conversations"
+        ],
+        "processing_ms": [
+          756,
+          486,
+          544,
+          2269
+        ]
+      },
+      "critical": true,
+      "field_checks": 2,
+      "field_failures": 0,
+      "duration_s": 4.5,
+      "note": null,
+      "details": {}
+    }
+  ]
+}
