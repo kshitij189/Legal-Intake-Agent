@@ -207,6 +207,15 @@ intake/slot row before read-modify-write.
 - Tool calls are executed one at a time, in order (gpt-oss models do not support parallel calls).
 - Only `app/agent/llm_gemini.py` and `app/agent/llm_groq.py` import provider SDKs. Agent, tools and
   domain code depend on the `LLMClient` protocol in `app/agent/llm_client.py`.
+- Sarvam (optional third provider, `app/agent/llm_sarvam.py`, plain `httpx`, no SDK): `SARVAM_API_KEY`,
+  `SARVAM_MODEL` (default `sarvam-30b`), `SARVAM_BASE_URL`. Add `sarvam` or `sarvam:<model>` to
+  `LLM_PROVIDERS`; skipped while the key is unset or `replace-me`. Its credits are **one-time**:
+  exhausted credits (402, or 400/429 naming credits/quota) and rejected keys (401/403) raise
+  `LLMUnavailable` with `retry_after` = 1 h, so the chain skips it and carries on, re-checking hourly.
+  Inline `<think>…</think>` is stripped from replies (they are read aloud). The request/response
+  shape follows Sarvam's OpenAI-compatible API but was **not verified against the live API** when
+  written: run `scripts/check_sarvam.py` after adding a key (3 tiny requests: plain reply, tool
+  call, tool-result round) before relying on it.
 - Look up current provider docs (ai.google.dev, console.groq.com/docs) for model IDs, limits and
   SDK usage rather than relying on memory; record model changes in `CHANGE_LOG.md`.
 - Exposed tools are exactly the blueprint set: `get_intake_questions`, `save_intake_answer`,
@@ -315,6 +324,8 @@ cd frontend; npm install; npm run build; npm run start; cd ..  # http://127.0.0.
 .\.venv\Scripts\python -u scripts/record_demo.py               # repeatable demo -> docs/demo/ (DEMO.md + video)
 .\.venv\Scripts\python scripts/purge_transcripts.py            # retention: delete expired transcript turns
 .\.venv\Scripts\python scripts/retire_eval_firms.py [--dry-run]  # deactivate old eval-*/dash-* firms
+
+.\.venv\Scripts\python scripts/check_sarvam.py              # verify SARVAM_API_KEY + tool calling (3 tiny requests)
 
 # tracing (optional) - self-hosted Langfuse v4, UI http://localhost:3100 (login in infra/langfuse/.env)
 docker compose -f infra/langfuse/docker-compose.yml --env-file infra/langfuse/.env up -d

@@ -771,3 +771,33 @@ pagination or auto-refresh, actor ids in the timeline, eval outbox leftovers).
 - A live scenario → 12 generations with token usage; UI screenshots in
   `docs/evidence/phase8/langfuse/`.
 - System track traced: 45/45 PASS. Overhead: turn p95 214 vs 199 ms.
+
+---
+
+## 2026-10-17 — Sarvam provider configuration (no key yet)
+
+**Requested by the user:** configure everything so that adding a Sarvam API key is the only step left.
+Motivation: Groq's free 8,000 tokens/minute makes it too slow for live voice, and Sarvam's docs list
+60 requests/minute (40 for the 105B model) with no token-per-minute limit on the free plan.
+
+**Added**
+- `app/agent/llm_sarvam.py`: OpenAI-compatible chat adapter over `httpx` (no new dependency).
+  Failure mapping for a chain whose credits are one-time: exhausted credits and rejected keys make
+  the chain skip Sarvam for an hour; plain 429 follows the existing wait-or-fail-over rules; 5xx is
+  retried only when Sarvam is the last entry; usage tokens feed Langfuse.
+- Settings `SARVAM_API_KEY`, `SARVAM_MODEL` (`sarvam-30b`), `SARVAM_BASE_URL`; provider `sarvam`
+  in `LLM_PROVIDERS` parsing; adapters now chosen from a map instead of an if/else.
+- `.env.example` entries, a `SARVAM_API_KEY=replace-me` placeholder and `,sarvam` appended to
+  `LLM_PROVIDERS` in the local `.env` (skipped while the key is a placeholder, so behaviour is
+  unchanged today).
+- `scripts/check_sarvam.py`: three tiny requests (plain reply, tool call, tool-result round),
+  prints a PASS/FAIL per step with a hint, never prints the key.
+- `tests/unit/test_llm_sarvam.py` (15): request shape and private-key stripping, tool-call and
+  usage parsing, thinking stripped, each failure mapping, retry policy, chain membership with or
+  without a key, and the guarantee that a chain with exhausted credits keeps answering and
+  re-checks Sarvam only after the skip window.
+
+**Not verified:** the request/response details were built from Sarvam's documented OpenAI-compatible
+shape (search results; the docs page fetch was declined), not from a live call. Sarvam's models'
+tool-calling quality on this agent is unknown. `check_sarvam.py` checks the first; the live
+evaluation (`LLM_PROVIDERS=sarvam ... --track live`) measures the second.

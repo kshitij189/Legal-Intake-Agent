@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     groq_api_key: SecretStr | None = None
     # Production Groq model with tool calling (alternative available to this key: gpt-oss-20b).
     groq_model: str = "openai/gpt-oss-120b"
+    # Sarvam (optional; OpenAI-compatible chat API, one-time credits). Add "sarvam" or
+    # "sarvam:<model>" to LLM_PROVIDERS to use it; with no key the entry is skipped.
+    sarvam_api_key: SecretStr | None = None
+    sarvam_model: str = "sarvam-30b"
+    sarvam_base_url: str = "https://api.sarvam.ai/v1"
     llm_timeout_seconds: float = 20.0
     llm_max_retries: int = 2
     # Total time one model call may spend waiting out provider rate limits (429 + retry-after).

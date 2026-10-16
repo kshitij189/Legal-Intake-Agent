@@ -11,6 +11,7 @@ import logging
 import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from functools import partial
 from typing import Any, Protocol
 
 from app.config import Settings
@@ -23,7 +24,7 @@ DEFAULT_RATE_LIMIT_DELAY = 5.0
 # A 429 asking us to wait longer than this is a quota exhaustion (e.g. a daily limit): the model
 # is skipped until the quota resets instead of being retried on every call.
 COOLDOWN_THRESHOLD_SECONDS = 60.0
-PROVIDERS = ("gemini", "groq")
+PROVIDERS = ("gemini", "groq", "sarvam")
 
 
 @dataclass(frozen=True)
@@ -187,7 +188,11 @@ def parse_chain(spec: str, settings: Settings) -> list[tuple[str, str]]:
         provider = provider.strip().lower()
         if provider not in PROVIDERS:
             raise ValueError(f"unknown LLM provider {provider!r} in LLM_PROVIDERS")
-        default = settings.gemini_model if provider == "gemini" else settings.groq_model
+        default = {
+            "gemini": settings.gemini_model,
+            "groq": settings.groq_model,
+            "sarvam": settings.sarvam_model,
+        }[provider]
         chain.append((provider, model.strip() or default))
     return chain
 
@@ -198,8 +203,18 @@ def build_llm_client(settings: Settings, sleep: Callable[[float], None] = time.s
     once, so one slow provider cannot stall a call."""
     from app.agent.llm_gemini import GeminiLLMClient  # adapters import provider SDKs
     from app.agent.llm_groq import GroqLLMClient
+    from app.agent.llm_sarvam import SarvamLLMClient
 
-    keys = {"gemini": _key(settings.gemini_api_key), "groq": _key(settings.groq_api_key)}
+    keys = {
+        "gemini": _key(settings.gemini_api_key),
+        "groq": _key(settings.groq_api_key),
+        "sarvam": _key(settings.sarvam_api_key),
+    }
+    adapters: dict[str, Callable[..., Any]] = {
+        "gemini": GeminiLLMClient,
+        "groq": GroqLLMClient,
+        "sarvam": partial(SarvamLLMClient, base_url=settings.sarvam_base_url),
+    }
     requested = parse_chain(settings.llm_providers, settings)
     usable = [(p, m) for p, m in requested if keys[p]]
     for provider in {p for p, _ in requested} - {p for p, _ in usable}:
@@ -210,9 +225,8 @@ def build_llm_client(settings: Settings, sleep: Callable[[float], None] = time.s
 
     entries: list[tuple[str, LLMClient]] = []
     for i, (provider, model) in enumerate(usable):
-        adapter = GeminiLLMClient if provider == "gemini" else GroqLLMClient
         last = i == len(usable) - 1
-        client = adapter(
+        client = adapters[provider](
             api_key=keys[provider] or "",
             model=model,
             timeout_seconds=settings.llm_timeout_seconds,
